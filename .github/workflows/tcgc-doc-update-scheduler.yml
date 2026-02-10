@@ -42,11 +42,17 @@ jobs:
           echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
 
       - name: Trigger Copilot coding agent
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          echo "${{ secrets.GH_PAT }}" | gh auth login --with-token
-          gh agent-task create "${{ steps.build-prompt.outputs.prompt }}" \
-            --base main \
-            --custom-agent tcgc-doc-updater
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/copilot/agent-tasks \
+            -f prompt="${{ steps.build-prompt.outputs.prompt }}" \
+            -f base="main" \
+            -f custom_agent="tcgc-doc-updater"
 
       - name: Summary
         run: |
