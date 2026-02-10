@@ -45,9 +45,10 @@ jobs:
 
       - name: Trigger Copilot coding agent
         run: |
+          echo "${{ secrets.GH_PAT }}" | gh auth login --with-token
           gh agent-task create "${{ steps.build-prompt.outputs.prompt }}" \
             --base main \
-            --custom-agent tcgc-doc-updater \
+            --custom-agent tcgc-doc-updater
 
       - name: Summary
         run: |
