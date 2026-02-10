@@ -27,8 +27,6 @@ permissions:
 jobs:
   trigger-copilot-agent:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GH_PAT }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
