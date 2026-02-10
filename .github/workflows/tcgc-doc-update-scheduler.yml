@@ -1,6 +1,6 @@
 name: TCGC Documentation Update Scheduler
 
-# This workflow triggers GitHub Copilot coding agent via CLI to maintain TCGC documentation
+# This workflow triggers GitHub Copilot coding agent via `gh copilot` CLI to maintain TCGC documentation
 
 on:
   schedule:
@@ -27,6 +27,8 @@ permissions:
 jobs:
   trigger-copilot-agent:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,14 +43,15 @@ jobs:
 
           echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
 
-      - name: Login to GitHub CLI
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-        
+      - name: Install Copilot CLI extension
+        run: gh extension install github/gh-copilot --force
+
       - name: Trigger Copilot coding agent
         run: |
-          gh agent-task create "${{ steps.build-prompt.outputs.prompt }}" \
+          gh copilot task create \
+            "${{ steps.build-prompt.outputs.prompt }}" \
             --base main \
-            --custom-agent tcgc-doc-updater \
+            --custom-agent tcgc-doc-updater
 
       - name: Summary
         run: |
