@@ -43,6 +43,9 @@ jobs:
 
           echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
 
+      - name: Login to GitHub CLI
+        run: gh auth login
+        
       - name: Trigger Copilot coding agent
         run: |
           gh agent-task create "${{ steps.build-prompt.outputs.prompt }}" \
