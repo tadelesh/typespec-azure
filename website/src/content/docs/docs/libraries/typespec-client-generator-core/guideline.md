@@ -22,13 +22,13 @@ To use TCGC, add it to your `package.json`:
 }
 ```
 
-In your emitter's `$onEmit` function, use [`createSdkContext`](../reference/js-api/functions/createsdkcontext/) to convert [`EmitContext`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/emitcontext/) into [`SdkContext`](../reference/js-api/interfaces/sdkcontext/). The [`SdkContext.SdkPackage`](../reference/js-api/interfaces/sdkpackage/) contains the client type graph. See ["Client Type Graph"](#client-type-graph) for details.
+In your emitter's `$onEmit` function, use [`createSdkContext`](../reference/js-api/functions/createsdkcontext/) to convert [`EmitContext`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/emitcontext/) into [`SdkContext`](../reference/js-api/interfaces/sdkcontext/). The [`SdkContext.sdkPackage`](../reference/js-api/interfaces/sdkpackage/) contains the client type graph. See ["Client Type Graph"](#client-type-graph) for details.
 
 If your client emitter has options or global variables, extend [`SdkContext`](../reference/js-api/interfaces/sdkcontext/) with your custom emitter context. Example:
 
 ```ts
 import { EmitContext } from "@typespec/compiler";
-import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { createSdkContext, SdkContext } from "@azure-tools/typespec-client-generator-core";
 
 // Define your emitter-specific options
 interface PythonEmitterOptions {
@@ -44,7 +44,7 @@ interface PythonSdkContext extends SdkContext<PythonEmitterOptions> {
 
 export async function $onEmit(context: EmitContext<PythonEmitterOptions>) {
   const emitterContext: PythonSdkContext = {
-    ...createSdkContext(context),
+    ...(await createSdkContext(context)),
     // Initialize global variables
   };
 }
@@ -153,7 +153,7 @@ TCGC supports four kinds of methods: [`SdkBasicServiceMethod`](../reference/js-a
 
 `SdkBasicServiceMethod.parameters` is the method's input. Its type [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/) contains the type of the parameter along with some attributes of the parameter.
 
-`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exceptions` contains the method's error responses.
+`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exception` contains the method's error response.
 
 **SdkPagingServiceMethod** is a paging method that has pageable responses. It extends `SdkBasicServiceMethod` and contains extra paging information.
 
@@ -204,10 +204,6 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 - [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
 
-**Model Types:**
-
-- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
-
 **Model Property Types:**
 
 - [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
@@ -215,17 +211,19 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
   - `discriminator`: Indicates if the property is a discriminator property
   - `serializationOptions`: Contains serialization metadata (JSON, XML, multipart, etc.)
   - `encode`: Indicates the encoding style for properties (e.g., for arrays: "pipeDelimited", "commaDelimited", etc.)
-  
+
 **Model Types:**
 
-- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It has the following key properties related to inheritance and polymorphism:
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type and has the following key properties:
+  - `properties`: Array of model properties
   - `additionalProperties`: Indicates if the model can accept additional properties with a specific type (corresponds to TypeSpec `Record<>` types)
   - For discriminated models:
     - `discriminatorProperty`: The property used as a discriminator
-    - `discriminatedSubtypes`: List of all subtypes of this discriminated model
+    - `discriminatedSubtypes`: Record of all subtypes of this discriminated model keyed by discriminator value
   - For subtypes of discriminated models:
     - `discriminatorValue`: The instance value for the discriminator for this subtype
   - `baseModel`: The parent model if this model extends another model
+  - `serializationOptions`: Contains serialization metadata (JSON, XML, multipart, etc.)
 
 ### Example types
 

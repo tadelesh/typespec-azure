@@ -88,7 +88,7 @@ enum Azure.ClientGenerator.Core.InitializedBy
 
 | Name         | Value | Description                                                   |
 | ------------ | ----- | ------------------------------------------------------------- |
-| none         |       | The client initialization should be omitted and hand-written. |
+| none         | `0`   | The client initialization should be omitted and hand-written. |
 | individually | `1`   | The client could be initialized individually.                 |
 | parent       | `2`   | The client could be initialized by parent client.             |
 
