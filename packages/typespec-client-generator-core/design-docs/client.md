@@ -378,7 +378,7 @@ namespace MyCustomizations {
 ```
 
 The above tsp gets client `MyServiceClient` and sub client `InnerGroup`.
-The `InnerGroup`'s `clientInitialization` model's properties contains a property named `blobName`.
+The `InnerGroup`'s `clientInitialization` model's properties contain a property named `blobName`.
 The method `upload` no longer has `blobName` parameter, its corresponding operation's parameter `blobName` is mapped to the client `blobName` parameter.
 The `InnerGroup` client could be initialized both by parent or individually.
 
