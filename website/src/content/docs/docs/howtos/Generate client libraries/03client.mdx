@@ -707,8 +707,8 @@ client.pet();
 // generated petstore_client.go
 type PetStoreClient struct {}
 
-func NewPetStorePetsActionsClient() *PetStorePetsActionsClient{
-  return &PetStorePetsActionsClient{}
+func NewPetStoreClient() *PetStoreClient{
+  return &PetStoreClient{}
 }
 
 func (client *PetStoreClient) Feed(ctx context.Context, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
@@ -997,7 +997,7 @@ class _FoodClientOperationsMixin:
     @distributed_trace
     def feed(self, **kwargs: Any) -> None:
 
-class _PetActionClientOperationsMixin
+class _PetActionClientOperationsMixin:
 
     @distributed_trace
     def pet(self, **kwargs: Any) -> None:
@@ -1246,12 +1246,12 @@ func (client *PetStoreClient)NewOpGrp2Client() *OpGrp2Client{
 // generated petstoreopgrp1_client.go
 type OpGrp1Client struct {}
 
-func (client *PetStoreOpGrp1Client) Feed(ctx context.Context, options *PetStoreOpGrp1ClientFeedOptions) (PetStoreOpGrp1ClientFeedResponse, error) {}
+func (client *OpGrp1Client) Feed(ctx context.Context, options *PetStoreOpGrp1ClientFeedOptions) (PetStoreOpGrp1ClientFeedResponse, error) {}
 
 // generated petstoreopgrp2_client.go
 type OpGrp2Client struct {}
 
-func (client *PetStoreOpGrp2Client) Pet(ctx context.Context, options *PetStoreOpGrp2ClientPetOptions) (PetStoreOpGrp2ClientPetResponse, error) {}
+func (client *OpGrp2Client) Pet(ctx context.Context, options *PetStoreOpGrp2ClientPetOptions) (PetStoreOpGrp2ClientPetResponse, error) {}
 
 // generated options.go
 type PetStoreOpGrp1ClientFeedOptions struct {}
@@ -1766,8 +1766,8 @@ client.download()
 // generated storage_client.go
 type StorageClient struct {}
 
-func NewStorageClient() *NewStorageClient{
-  return &NewStorageClient{}
+func NewStorageClient() *StorageClient{
+  return &StorageClient{}
 }
 
 func (client *StorageClient) Download(ctx context.Context, options *StorageClientDownloadOptions) (StorageClientDownloadResponse, error) {}

@@ -171,8 +171,8 @@ TCGC always puts the following things in initialization parameters:
 4. Subscription ID parameter: if the service is an ARM service, then the subscription ID parameter on method will be elevated to client.
 
 The `SdkClientInitializationType` has `initializedBy` property.
-The value could be `InitializedBy.parent (1)` (the client could be initialized by parent client),
-`InitializedBy.individually (2)` (the client could be initialized individually) or `InitializedBy.parent | InitializedBy.individually (3)` (both).
+The value could be `InitializedBy.individually (1)` (the client could be initialized individually),
+`InitializedBy.parent (2)` (the client could be initialized by parent client) or `InitializedBy.parent | InitializedBy.individually (3)` (both).
 
 Default value of `initializedBy` for client is `InitializedBy.individually`, while `InitializedBy.parent` for sub client.
 
@@ -193,11 +193,11 @@ clients:
       name: PetStoreClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Cats
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -211,7 +211,7 @@ clients:
       - kind: client
         name: Dogs
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -235,12 +235,11 @@ clients:
       name: ToyStoreClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Cars
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -254,8 +253,7 @@ clients:
       - kind: client
         name: Dolls
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -285,11 +283,11 @@ clients:
       name: DogsClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Feed
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -303,7 +301,7 @@ clients:
       - kind: client
         name: Pet
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -327,12 +325,11 @@ clients:
       name: CatsClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Feed
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -346,8 +343,7 @@ clients:
       - kind: client
         name: Pet
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -401,7 +397,7 @@ clients:
   - &a3
     kind: client
     name: MyServiceClient
-    subClients:
+    children:
       - kind: client
         name: InnerGroup
         methods:
