@@ -786,6 +786,78 @@ type MyModel struct {
 </ClientTabItem>
 </ClientTabs>
 
+## Custom JSON Converter (C# Only)
+
+:::caution
+The `@useSystemTextJsonConverter` decorator is intended for C# backward compatibility only and should not be used for new services without guidance from SDK architects.
+:::
+
+The `@useSystemTextJsonConverter` decorator indicates that a model needs a custom `System.Text.Json` JSON converter in the C# SDK. This is used for backward compatibility scenarios where the default serialization behavior does not match the expected behavior of existing C# SDKs.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+@useSystemTextJsonConverter
+model MyModel {
+  prop: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# No effect in Python — the decorator is specific to C#
+class MyModel(_model_base.Model):
+    prop: str = rest_field()
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// A custom System.Text.Json converter will be generated for this model
+[JsonConverter(typeof(MyModelConverter))]
+public partial class MyModel
+{
+    public string Prop { get; set; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// No effect in TypeScript — the decorator is specific to C#
+export interface MyModel {
+  prop: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// No effect in Java — the decorator is specific to C#
+public final class MyModel {
+    public String getProp() { ... }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// No effect in Go — the decorator is specific to C#
+type MyModel struct {
+	Prop *string
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
 ## Models
 
 ### Models with additional properties of any type

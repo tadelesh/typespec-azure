@@ -193,11 +193,11 @@ clients:
       name: PetStoreClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Cats
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -211,7 +211,7 @@ clients:
       - kind: client
         name: Dogs
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -235,12 +235,11 @@ clients:
       name: ToyStoreClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Cars
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -254,8 +253,7 @@ clients:
       - kind: client
         name: Dolls
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -285,11 +283,11 @@ clients:
       name: DogsClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Feed
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -303,7 +301,7 @@ clients:
       - kind: client
         name: Pet
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -327,12 +325,11 @@ clients:
       name: CatsClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Feed
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -346,8 +343,7 @@ clients:
       - kind: client
         name: Pet
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -401,7 +397,7 @@ clients:
   - &a3
     kind: client
     name: MyServiceClient
-    subClients:
+    children:
       - kind: client
         name: InnerGroup
         methods:
@@ -530,13 +526,15 @@ model SubClientOptions {
 
 ## Changes needed with above design
 
-1. Change `@clientInitialization` decorator and add `initializedBy` property to `SdkClientInitializationType`
+> **Note:** Items 1 and 2 below have been implemented. The `children` property is now available on `SdkClientType`, and `@clientInitialization` accepts `ClientInitializationOptions` with `initializedBy`.
+
+1. ~~Change `@clientInitialization` decorator and add `initializedBy` property to `SdkClientInitializationType`~~ ✅ Done
 
 - Change `@clientInitialization` decorator's `options` parameter to `ClientInitializationOptions` type to accept `initializedBy` setting.
 - Add `clientInitialization` property to `SdkClientInitializationType`.
 - Add check for `initializedBy`, root clients could only have `individually` value.
 
-2. Deprecate client accessor method. Add `children` property to `SdkClientType` and put all sub clients in this list.
+2. ~~Deprecate client accessor method. Add `children` property to `SdkClientType` and put all sub clients in this list.~~ ✅ Done
 
 3. Consolidate `@client` and `@operationGroup`
 
