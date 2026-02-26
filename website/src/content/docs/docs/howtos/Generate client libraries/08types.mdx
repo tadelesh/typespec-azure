@@ -507,7 +507,7 @@ public partial class MyModel
 // In TypeScript SDK, MyModel would be generated normally
 // unless an external type is specified for TypeScript
 export interface MyModel {
-    prop: string;
+  prop: string;
 }
 ```
 
@@ -781,6 +781,67 @@ type MyModel struct {
 	DisplayName *string
 	Description *string
 }
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+## Custom JSON Converter (C# Only)
+
+The `@useSystemTextJsonConverter` decorator is a C#-specific decorator that indicates a model needs a custom `System.Text.Json` JSON converter. This is used only for backward compatibility in the C# emitter.
+
+:::caution
+This decorator is only relevant for C# code generation. Other language emitters will ignore it.
+:::
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+@useSystemTextJsonConverter
+model MyModel {
+  prop: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# No effect in Python
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// The C# emitter generates a custom System.Text.Json converter for MyModel
+[JsonConverter(typeof(MyModelConverter))]
+public partial class MyModel
+{
+    public string Prop { get; set; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabItem>

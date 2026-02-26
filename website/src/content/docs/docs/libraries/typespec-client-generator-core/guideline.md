@@ -139,9 +139,10 @@ The initialization parameter can be either [`SdkEndpointParameter`](../reference
 **SdkMethodParameter** is a normal client-level parameter that can be used in some of the methods belonging to the client. For type details, refer to the next section.
 
 :::caution[Deprecated Properties]
+
 - `SdkClient.service` and `SdkOperationGroup.service` are deprecated. Use `services` (plural) instead. These properties will be removed in a future release.
 - `SdkPackage.metadata.apiVersion` is deprecated. Use `apiVersions` instead.
-:::
+  :::
 
 ### Method
 
@@ -215,7 +216,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
   - `discriminator`: Indicates if the property is a discriminator property
   - `serializationOptions`: Contains serialization metadata (JSON, XML, multipart, etc.)
   - `encode`: Indicates the encoding style for properties (e.g., for arrays: "pipeDelimited", "commaDelimited", etc.)
-  
+
 **Model Types:**
 
 - [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It has the following key properties related to inheritance and polymorphism:
@@ -269,7 +270,7 @@ Normally, a client's initialization parameters include:
 
 4. **Subscription ID parameter**: If the service is an ARM service, then the subscription ID parameter on method is elevated to client.
 
-The client's initialization way is `undefined`. Emitters can choose how to initialize all the clients.
+By default, root clients have `initializedBy` set to `Individually`, while sub clients have `initializedBy` set to `Default` (0). When `initializedBy` is `Default`, emitters can choose how to initialize the sub clients.
 
 With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with initializing by parent client, initializing individually or both.
 

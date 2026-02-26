@@ -161,6 +161,17 @@ Example input:
 
 Output: None (204/empty response)
 
+### Azure_ClientGenerator_Core_ClientApiVersions_test
+
+- Endpoint: `get /azure/client-generator-core/client-api-versions/test`
+
+This scenario tests that @clientApiVersions adds additional API versions to the client.
+The service defines versions v2024-01-01 and v2024-06-01.
+The client extends the enum with additional versions v2023-01-01 and v2023-06-01.
+The generated client's API version enum should include all four versions.
+Expected query parameter: api-version="2024-06-01"
+Expected response status: 204
+
 ### Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter
 
 - Endpoint: `get /azure/client-generator-core/client-default-value/header-parameter`
@@ -871,6 +882,22 @@ Expected client structure:
 - Interface ResourceOperations should contain only operation `getResource`
 - Root client should contain operation `getHealthStatus` (moved from ResourceOperations)
 
+### Azure_ClientGenerator_Core_ClientOption_test
+
+- Endpoint: `get /azure/client-generator-core/client-option/test`
+
+This scenario tests that @clientOption passes options to emitters.
+The TestModel has a client option "enableExperimentalFeature" set to true for Python.
+Emitters should be able to read this option via getClientOptions().
+Expected query parameter: name="test"
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
 ### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
 
 - Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
@@ -1180,6 +1207,35 @@ A 2xx response should return true.
 Expected path parameter: id="existing"
 Expected response status: 200
 Expected return value: true
+
+### Azure_ClientGenerator_Core_Scope_allLanguages
+
+- Endpoint: `get /azure/client-generator-core/scope/allLanguages`
+
+This scenario tests that an operation without @scope is generated for all languages.
+Expected query parameter: name="all"
+Expected response body:
+
+```json
+{
+  "name": "all"
+}
+```
+
+### Azure_ClientGenerator_Core_Scope_excludeCsharp
+
+- Endpoint: `get /azure/client-generator-core/scope/excludeCsharp`
+
+This scenario tests that an operation decorated with @scope("!csharp") is excluded from C# generation
+but included in all other languages.
+Expected query parameter: name="excluded"
+Expected response body:
+
+```json
+{
+  "name": "excluded"
+}
+```
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
@@ -1712,6 +1768,50 @@ This scenario is to test two operations with two different page item types.
   ```
 
   Note that the nextLink preserves the original filter and select parameters.
+
+### Azure_Core_Page_withRelativeNextLink
+
+- Endpoint: `get /azure/core/page/with-relative-next-link`
+
+  This scenario tests pagination where the nextLink is a relative URL instead of an absolute URL.
+  When a relative URL is used, the client must resolve it against the endpoint base URL for subsequent requests.
+
+  Expected query parameter on initial request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (first page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 1,
+        "name": "User1",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ],
+    "nextLink": "/azure/core/page/with-relative-next-link/page/2"
+  }
+  ```
+
+  Expected query parameter on next link request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (second page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 2,
+        "name": "User2",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ]
+  }
+  ```
+
+  Note: The nextLink is a relative URL, not an absolute URL. The client must resolve it against the service endpoint.
 
 ### Azure_Core_Scalar_AzureLocationScalar_get
 
