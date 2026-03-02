@@ -1833,6 +1833,30 @@ type Dog struct {
 </ClientTabItem>
 </ClientTabs>
 
+### Custom JSON Converter (C# Only)
+
+:::caution
+`@useSystemTextJsonConverter` is only used for backward compatibility with the C# emitter. You should not use it unless directed by SDK architects.
+:::
+
+The `@useSystemTextJsonConverter` decorator marks a model as needing a custom `System.Text.Json` converter in the generated C# code. This is a C#-specific decorator and has no effect on other language emitters.
+
+```typespec
+@useSystemTextJsonConverter
+model MyModel {
+  prop: string;
+}
+```
+
+The decorator accepts an optional `scope` parameter to restrict it to specific emitters:
+
+```typespec
+@useSystemTextJsonConverter("csharp")
+model MyModel {
+  prop: string;
+}
+```
+
 ## Unions
 
 ### Union of literals with same type
