@@ -871,6 +871,47 @@ Expected client structure:
 - Interface ResourceOperations should contain only operation `getResource`
 - Root client should contain operation `getHealthStatus` (moved from ResourceOperations)
 
+### Azure_ClientGenerator_Core_ClientName_getModel
+
+- Endpoint: `get /azure/client-generator-core/client-name/model`
+
+This scenario tests that @clientName renames the model and its property in generated client code.
+The generated model should be named "RenamedModel" (not "OriginalModel").
+The property should be named "renamedProperty" (not "originalProperty").
+The serialized JSON key should still be "originalProperty".
+Expected query parameter: originalProperty="test"
+Expected response body:
+
+```json
+{
+  "originalProperty": "test"
+}
+```
+
+### Azure_ClientGenerator_Core_ClientName_originalOperation
+
+- Endpoint: `head /azure/client-generator-core/client-name/operation`
+
+This scenario tests that @clientName renames an operation in generated client code.
+The generated method should be named "renamedOperation" (not "originalOperation").
+Expected response status: 204
+
+### Azure_ClientGenerator_Core_ClientNamespace_getModel
+
+- Endpoint: `get /azure/client-generator-core/client-namespace/model`
+
+This scenario tests that @clientNamespace moves a model to a different namespace in generated client code.
+The generated model "RenamedNamespaceModel" should be in the "Azure.ClientGenerator.Core.ClientNamespace.Models" namespace
+instead of the default namespace.
+Expected query parameter: name="test"
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
 ### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
 
 - Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
@@ -1170,6 +1211,47 @@ param2: param2
 
 Expected response: 204 No Content
 
+### Azure_ClientGenerator_Core_ProtocolAndConvenient_bothMethods
+
+- Endpoint: `get /azure/client-generator-core/protocol-and-convenient/both`
+
+This scenario tests an operation with default behavior (both protocol and convenience methods generated).
+Expected response body:
+
+```json
+{
+  "name": "both"
+}
+```
+
+### Azure_ClientGenerator_Core_ProtocolAndConvenient_convenientOnly
+
+- Endpoint: `get /azure/client-generator-core/protocol-and-convenient/convenient-only`
+
+This scenario tests an operation where only the convenience method is generated.
+The @protocolAPI(false) decorator disables protocol method generation.
+Expected response body:
+
+```json
+{
+  "name": "convenient-only"
+}
+```
+
+### Azure_ClientGenerator_Core_ProtocolAndConvenient_protocolOnly
+
+- Endpoint: `get /azure/client-generator-core/protocol-and-convenient/protocol-only`
+
+This scenario tests an operation where only the protocol method is generated.
+The @convenientAPI(false) decorator disables convenience method generation.
+Expected response body:
+
+```json
+{
+  "name": "protocol-only"
+}
+```
+
 ### Azure_ClientGenerator_Core_ResponseAsBool_exists
 
 - Endpoint: `head /azure/client-generator-core/response-as-bool/exists/{id}`
@@ -1180,6 +1262,48 @@ A 2xx response should return true.
 Expected path parameter: id="existing"
 Expected response status: 200
 Expected return value: true
+
+### Azure_ClientGenerator_Core_Scope_excludeJava
+
+- Endpoint: `get /azure/client-generator-core/scope/not-java`
+
+This scenario tests an operation excluded from Java.
+All language emitters except Java should generate this operation.
+Expected response body:
+
+```json
+{
+  "name": "not-java"
+}
+```
+
+### Azure_ClientGenerator_Core_Scope_getAllLanguages
+
+- Endpoint: `get /azure/client-generator-core/scope/all`
+
+This scenario tests an operation that should be generated for all languages (no scope restriction).
+Expected response body:
+
+```json
+{
+  "name": "all"
+}
+```
+
+### Azure_ClientGenerator_Core_Scope_pythonOnly
+
+- Endpoint: `get /azure/client-generator-core/scope/python-only`
+
+This scenario tests an operation scoped to only Python.
+Only the Python emitter should generate this operation.
+Other language emitters should omit it.
+Expected response body:
+
+```json
+{
+  "name": "python-only"
+}
+```
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
@@ -1712,6 +1836,50 @@ This scenario is to test two operations with two different page item types.
   ```
 
   Note that the nextLink preserves the original filter and select parameters.
+
+### Azure_Core_Page_withRelativeNextLink
+
+- Endpoint: `get /azure/core/page/with-relative-next-link`
+
+  This scenario tests pagination where the nextLink is a relative URL instead of an absolute URL.
+  When a relative URL is used, the client must resolve it against the endpoint base URL for subsequent requests.
+
+  Expected query parameter on initial request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (first page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 1,
+        "name": "User1",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ],
+    "nextLink": "/azure/core/page/with-relative-next-link/page/2"
+  }
+  ```
+
+  Expected query parameter on next link request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (second page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 2,
+        "name": "User2",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ]
+  }
+  ```
+
+  Note: The nextLink is a relative URL, not an absolute URL. The client must resolve it against the service endpoint.
 
 ### Azure_Core_Scalar_AzureLocationScalar_get
 

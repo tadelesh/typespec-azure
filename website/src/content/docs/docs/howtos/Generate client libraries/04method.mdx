@@ -116,7 +116,9 @@ As emitters global parameters:
 
 To set global emitters parameters, read the documentation of [emitters configuration](https://microsoft.github.io/typespec/introduction/configuration#configuration-file).
 
-For fine tuning, the set of decorators `@protocolAPI` and `@convenientAPI` can be used. They take a required boolean as parameter.
+For fine tuning, the set of decorators `@protocolAPI` and `@convenientAPI` can be used. They take an optional boolean as parameter (defaults to `true`).
+
+These decorators can be applied to individual operations, or to a namespace or interface to affect all operations within that scope. Operation-level decorators override namespace/interface-level settings.
 
 #### Shifting the generation of protocol and convenience on and off
 
@@ -253,7 +255,10 @@ changes the way the API is exposed for those models.
 
 By default, the code generator will infer the usage based on the TypeSpec. If this inference doesn't
 correspond to expectation, this can be customized with the `usage` decorator. Possible values are
-`input` and `output`, and can be combined with `Usage.input | Usage.output`.
+`input`, `output`, `json`, and `xml`, and can be combined with bitwise OR (e.g., `Usage.input | Usage.output`).
+
+The `json` and `xml` flags indicate the serialization format the model is used with. These are useful when a model
+needs to be generated with serialization support for a specific format even if TCGC doesn't automatically detect it.
 
 > **NOTE:** If a model is never used, it will not be generated. Assigning a usage will force generation.
 
@@ -1816,6 +1821,93 @@ type MyServiceClientExistsResponse struct {
 ```
 
 </ClientTabs>
+
+## Using `@override` to customize method signatures
+
+The `@override` decorator lets you customize the method signature of an operation in the generated client SDK.
+This is useful for grouping spread parameters into a model, reordering parameters, or changing parameter optionality.
+
+To use `@override`, define a customization operation in a separate namespace (typically in `client.tsp`)
+with the desired method signature, then apply `@@override` to map the original operation to the customization.
+
+In the following example, the `createWidget` operation uses spread (`...Params`) which normally generates
+individual parameters `foo` and `bar`. The override groups them into a single `params` parameter of type `Params`.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using Http;
+
+@service(#{ title: "Widget Service" })
+namespace WidgetService;
+
+model Params {
+  foo: string;
+  bar: string;
+}
+
+@route("/widgets")
+@post
+op createWidget(...Params): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace Customizations;
+
+op createWidget(params: WidgetService.Params): void;
+
+@@override(WidgetService.createWidget, Customizations.createWidget);
+```
+
+```python
+class WidgetServiceClient:
+    def create_widget(self, body: Params, **kwargs: Any) -> None:
+        ...
+```
+
+```csharp
+public partial class WidgetServiceClient
+{
+    // protocol method
+    public virtual Response CreateWidget(RequestContent content, RequestContext context = null);
+    public virtual async Task<Response> CreateWidgetAsync(RequestContent content, RequestContext context = null);
+    // convenience method — takes the grouped Params model
+    public virtual Response CreateWidget(Params @params, CancellationToken cancellationToken = default);
+    public virtual async Task<Response> CreateWidgetAsync(Params @params, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class WidgetServiceClient {
+  createWidget(params: Params, options?: CreateWidgetOptionalParams): Promise<void>;
+}
+```
+
+```java
+public final class WidgetServiceClient {
+    public void createWidget(Params params);
+}
+```
+
+```go
+func (client *WidgetServiceClient) CreateWidget(ctx context.Context, params Params, options *WidgetServiceClientCreateWidgetOptions) (WidgetServiceClientCreateWidgetResponse, error)
+```
+
+</ClientTabs>
+
+You can also scope the override to specific languages:
+
+```typespec
+// Apply override only for C#
+@@override(WidgetService.createWidget, Customizations.createWidget, "csharp");
+```
 
 ## Using `@clientLocation` to control parameter placement
 

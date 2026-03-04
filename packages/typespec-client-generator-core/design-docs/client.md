@@ -171,8 +171,8 @@ TCGC always puts the following things in initialization parameters:
 4. Subscription ID parameter: if the service is an ARM service, then the subscription ID parameter on method will be elevated to client.
 
 The `SdkClientInitializationType` has `initializedBy` property.
-The value could be `InitializedBy.parent (1)` (the client could be initialized by parent client),
-`InitializedBy.individually (2)` (the client could be initialized individually) or `InitializedBy.parent | InitializedBy.individually (3)` (both).
+The value could be `InitializedBy.individually (1)` (the client could be initialized individually),
+`InitializedBy.parent (2)` (the client could be initialized by parent client) or `InitializedBy.individually | InitializedBy.parent (3)` (both).
 
 Default value of `initializedBy` for client is `InitializedBy.individually`, while `InitializedBy.parent` for sub client.
 
@@ -240,7 +240,6 @@ clients:
         name: Cars
         parent: *a2
         subClients: []
-        subClients: []
         initialization:
           kind: model
           properties:
@@ -254,7 +253,6 @@ clients:
       - kind: client
         name: Dolls
         parent: *a2
-        subClients: []
         subClients: []
         initialization:
           kind: model
@@ -332,7 +330,6 @@ clients:
         name: Feed
         parent: *a2
         subClients: []
-        subClients: []
         initialization:
           kind: model
           properties:
@@ -346,7 +343,6 @@ clients:
       - kind: client
         name: Pet
         parent: *a2
-        subClients: []
         subClients: []
         initialization:
           kind: model

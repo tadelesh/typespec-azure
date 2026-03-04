@@ -139,9 +139,10 @@ The initialization parameter can be either [`SdkEndpointParameter`](../reference
 **SdkMethodParameter** is a normal client-level parameter that can be used in some of the methods belonging to the client. For type details, refer to the next section.
 
 :::caution[Deprecated Properties]
+
 - `SdkClient.service` and `SdkOperationGroup.service` are deprecated. Use `services` (plural) instead. These properties will be removed in a future release.
 - `SdkPackage.metadata.apiVersion` is deprecated. Use `apiVersions` instead.
-:::
+  :::
 
 ### Method
 
@@ -215,10 +216,10 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
   - `discriminator`: Indicates if the property is a discriminator property
   - `serializationOptions`: Contains serialization metadata (JSON, XML, multipart, etc.)
   - `encode`: Indicates the encoding style for properties (e.g., for arrays: "pipeDelimited", "commaDelimited", etc.)
-  
-**Model Types:**
 
-- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It has the following key properties related to inheritance and polymorphism:
+**Model Inheritance and Polymorphism:**
+
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) also has the following key properties related to inheritance and polymorphism:
   - `additionalProperties`: Indicates if the model can accept additional properties with a specific type (corresponds to TypeSpec `Record<>` types)
   - For discriminated models:
     - `discriminatorProperty`: The property used as a discriminator
