@@ -871,6 +871,54 @@ Expected client structure:
 - Interface ResourceOperations should contain only operation `getResource`
 - Root client should contain operation `getHealthStatus` (moved from ResourceOperations)
 
+### Azure_ClientGenerator_Core_ConvenientApi_convenientOnly
+
+- Endpoint: `get /azure/client-generator-core/convenient-api/convenient-only`
+
+This scenario tests that an operation with @protocolAPI(false) generates only a convenience method.
+The client should be able to call the operation using the convenience method.
+Expected query parameter: name="test"
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+### Azure_ClientGenerator_Core_ConvenientApi_InterfaceLevel
+
+- Endpoints:
+  - `get /azure/client-generator-core/convenient-api/interface-level/convenient-only`
+  - `get /azure/client-generator-core/convenient-api/interface-level/both`
+
+This scenario tests that @convenientAPI and @protocolAPI can be applied at the interface level.
+All operations in the interface inherit @protocolAPI(false) from the interface,
+but the second operation overrides with @protocolAPI(true).
+Expected query parameter: name="test"
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+### Azure_ClientGenerator_Core_ConvenientApi_protocolOnly
+
+- Endpoint: `get /azure/client-generator-core/convenient-api/protocol-only`
+
+This scenario tests that an operation with @convenientAPI(false) generates only a protocol method.
+The client should be able to call the operation using the protocol method.
+Expected query parameter: name="test"
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
 ### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
 
 - Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
@@ -1180,6 +1228,51 @@ A 2xx response should return true.
 Expected path parameter: id="existing"
 Expected response status: 200
 Expected return value: true
+
+### Azure_ClientGenerator_Core_Scope_allLanguages
+
+- Endpoint: `get /azure/client-generator-core/scope/all-languages`
+
+This scenario tests that the 'allLanguages' operation is generated for all language emitters
+since it has no @scope restriction.
+Expected query parameter: name="test"
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+### Azure_ClientGenerator_Core_Scope_excludeCsharp
+
+- Endpoint: `get /azure/client-generator-core/scope/exclude-csharp`
+
+This scenario tests that the 'excludeCsharp' operation is generated for all languages
+except C#. The @scope decorator uses negation syntax to exclude a language.
+Expected query parameter: name="test"
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+### Azure_ClientGenerator_Core_Scope_pythonOnly
+
+- Endpoint: `get /azure/client-generator-core/scope/python-only`
+
+This scenario tests that the 'pythonOnly' operation is only generated for the Python emitter.
+Other language emitters should NOT generate this operation.
+Expected query parameter: name="test"
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
@@ -1712,6 +1805,50 @@ This scenario is to test two operations with two different page item types.
   ```
 
   Note that the nextLink preserves the original filter and select parameters.
+
+### Azure_Core_Page_withRelativeNextLink
+
+- Endpoint: `get /azure/core/page/with-relative-next-link`
+
+  This scenario tests pagination where the nextLink is a relative URL instead of an absolute URL.
+  When a relative URL is used, the client must resolve it against the endpoint base URL for subsequent requests.
+
+  Expected query parameter on initial request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (first page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 1,
+        "name": "User1",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ],
+    "nextLink": "/azure/core/page/with-relative-next-link/page/2"
+  }
+  ```
+
+  Expected query parameter on next link request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (second page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 2,
+        "name": "User2",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ]
+  }
+  ```
+
+  Note: The nextLink is a relative URL, not an absolute URL. The client must resolve it against the service endpoint.
 
 ### Azure_Core_Scalar_AzureLocationScalar_get
 

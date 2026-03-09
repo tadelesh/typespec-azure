@@ -464,6 +464,172 @@ The `@clientDoc` decorator can be used on everything that the `@doc` decorator c
 When both `@doc` and `@clientDoc` are present, the generated code outputs the final documentation depending on the mode that you called `@clientDoc` with.
 If called with `replace`, `@clientDoc` replaces `@doc` completely. If called with `append`, `@clientDoc` is appended onto `@doc`.
 
+### Append mode
+
+Use `DocumentationMode.append` to add SDK-specific notes to the existing service documentation instead of replacing it:
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+@doc("A widget resource")
+@clientDoc("\nNote: Widget IDs are globally unique and case-sensitive.", DocumentationMode.append)
+model Widget {
+  @doc("The unique identifier")
+  @clientDoc("\nMust be a valid UUID format.", DocumentationMode.append)
+  id: string;
+
+  @doc("The widget name")
+  name: string;
+
+  @doc("The widget color")
+  @clientDoc("\nSupported values: red, green, blue.", DocumentationMode.append)
+  color: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+class Widget(_Model):
+    """A widget resource
+
+    Note: Widget IDs are globally unique and case-sensitive.
+
+    :ivar id: The unique identifier
+
+     Must be a valid UUID format. Required.
+    :vartype id: str
+    :ivar name: The widget name. Required.
+    :vartype name: str
+    :ivar color: The widget color
+
+     Supported values: red, green, blue. Required.
+    :vartype color: str
+    """
+
+    id: str = rest_field()
+    """The unique identifier
+
+     Must be a valid UUID format. Required."""
+    name: str = rest_field()
+    """The widget name. Required."""
+    color: str = rest_field()
+    """The widget color
+
+     Supported values: red, green, blue. Required."""
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+/// <summary>
+/// A widget resource
+/// Note: Widget IDs are globally unique and case-sensitive.
+/// </summary>
+public partial class Widget
+{
+    /// <summary>
+    /// The unique identifier
+    /// Must be a valid UUID format.
+    /// </summary>
+    public string Id { get; }
+
+    /// <summary> The widget name. </summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// The widget color
+    /// Supported values: red, green, blue.
+    /// </summary>
+    public string Color { get; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+/**
+ * A widget resource
+ *
+ * Note: Widget IDs are globally unique and case-sensitive.
+ */
+export interface Widget {
+  /**
+   * The unique identifier
+   *
+   * Must be a valid UUID format.
+   */
+  id: string;
+  /** The widget name */
+  name: string;
+  /**
+   * The widget color
+   *
+   * Supported values: red, green, blue.
+   */
+  color: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+/**
+ * A widget resource
+ *
+ * Note: Widget IDs are globally unique and case-sensitive.
+ */
+@Immutable
+public final class Widget implements JsonSerializable<Widget> {
+    /*
+     * The unique identifier
+     *
+     * Must be a valid UUID format.
+     */
+    private final String id;
+
+    /*
+     * The widget name
+     */
+    private final String name;
+
+    /*
+     * The widget color
+     *
+     * Supported values: red, green, blue.
+     */
+    private final String color;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// Widget - A widget resource
+// Note: Widget IDs are globally unique and case-sensitive.
+type Widget struct {
+	// REQUIRED; The widget color
+	// Supported values: red, green, blue.
+	Color *string
+
+	// REQUIRED; The unique identifier
+	// Must be a valid UUID format.
+	ID *string
+
+	// REQUIRED; The widget name
+	Name *string
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
 ## Using `@alternateType` to Reference External Types
 
 The `@alternateType` decorator allows you to override the emitted type for a model, union, or enum in generated client libraries. With recent updates, you can now reference types defined in external namespaces or imported libraries.
@@ -507,7 +673,7 @@ public partial class MyModel
 // In TypeScript SDK, MyModel would be generated normally
 // unless an external type is specified for TypeScript
 export interface MyModel {
-    prop: string;
+  prop: string;
 }
 ```
 
