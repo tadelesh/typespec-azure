@@ -149,17 +149,19 @@ const DOC_UPDATER_GREP_PATTERN = "\\[Automated\\]";
  */
 export function listCommitsSince(sourcePaths: string[], lastCommit: string): string[] {
   const paths = sourcePaths.map((p) => `"${p}"`).join(" ");
+  const cmd = `git rev-list --invert-grep --grep=${DOC_UPDATER_GREP_PATTERN} ${lastCommit}..HEAD -- ${paths}`;
   try {
-    const result = execSync(
-      `git rev-list --invert-grep --grep=${DOC_UPDATER_GREP_PATTERN} ${lastCommit}..HEAD -- ${paths}`,
-      {
-        encoding: "utf-8",
-        cwd: REPO_ROOT,
-      },
-    ).trim();
+    const result = execSync(cmd, {
+      encoding: "utf-8",
+      cwd: REPO_ROOT,
+    }).trim();
     if (!result) return [];
     return result.split("\n").reverse(); // oldest first
-  } catch {
+  } catch (e) {
+    const stderr = (e as { stderr?: string }).stderr ?? String(e);
+    console.error(
+      `[knowledge] listCommitsSince failed:\n  cmd: ${cmd}\n  cwd: ${REPO_ROOT}\n  error: ${stderr}`,
+    );
     return [];
   }
 }
