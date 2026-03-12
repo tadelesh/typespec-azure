@@ -190,7 +190,7 @@ export function getHumanFeedback(prNumber: number): HumanFeedback | null {
   try {
     // Check if PR is merged
     const state = execSync(
-      `gh pr view ${prNumber} --repo Azure/typespec-azure --json state,mergedAt --jq ".state"`,
+      `gh pr view ${prNumber} --repo tadelesh/typespec-azure --json state,mergedAt --jq ".state"`,
       { encoding: "utf-8", cwd: REPO_ROOT },
     ).trim();
 
@@ -200,7 +200,7 @@ export function getHumanFeedback(prNumber: number): HumanFeedback | null {
 
     // Get all commits on the PR
     const commitsJson = execSync(
-      `gh pr view ${prNumber} --repo Azure/typespec-azure --json commits --jq ".commits"`,
+      `gh pr view ${prNumber} --repo tadelesh/typespec-azure --json commits --jq ".commits"`,
       { encoding: "utf-8", cwd: REPO_ROOT },
     ).trim();
 
@@ -215,7 +215,7 @@ export function getHumanFeedback(prNumber: number): HumanFeedback | null {
 
     // Get review comments
     const reviewsJson = execSync(
-      `gh pr view ${prNumber} --repo Azure/typespec-azure --json reviews --jq ".reviews"`,
+      `gh pr view ${prNumber} --repo tadelesh/typespec-azure --json reviews --jq ".reviews"`,
       { encoding: "utf-8", cwd: REPO_ROOT },
     ).trim();
 
