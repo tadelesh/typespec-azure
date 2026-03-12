@@ -427,3 +427,64 @@ model Page {
   ]>;
 }
 ```
+
+### Overriding the next link HTTP verb
+
+The `@nextLinkVerb` decorator (from `Azure.ClientGenerator.Core.Legacy`) overrides the HTTP verb used when following the next link in paging operations. By default, next link requests use GET, but some legacy services require POST.
+
+:::caution
+The `@nextLinkVerb` decorator is legacy functionality. New services should use standard GET-based next links.
+:::
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@nextLinkVerb("POST")
+op listItems(): {
+  @pageItems items: Item[];
+  @nextLink nextLink?: string;
+};
+```
+
+### Forcing an operation to be pageable (Legacy)
+
+:::caution
+The `@markAsPageable` decorator is legacy functionality from `Azure.ClientGenerator.Core.Legacy`. It should only be used when the service-side operation follows a paging pattern that is not automatically detected by TypeSpec. New services should use standard paging decorators like `@list` and `@pageItems`.
+:::
+
+The `@markAsPageable` decorator forces an operation to be treated as pageable, generating iterators/async iterators in the client SDK, even if the operation doesn't use standard paging patterns like `@list`.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@markAsPageable
+op listLegacyItems(): {
+  items: Item[];
+  nextLink?: string;
+};
+```
+
+### Preventing an operation from being pageable (Legacy)
+
+:::caution
+The `@disablePageable` decorator is legacy functionality from `Azure.ClientGenerator.Core.Legacy`. It should only be used to explicitly opt out of pagination for operations that are incorrectly auto-detected as pageable.
+:::
+
+The `@disablePageable` decorator prevents an operation from being treated as pageable, even if it follows paging patterns (e.g., uses `@list`). The response will be the paged model itself rather than an iterator.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@disablePageable
+@list
+op listItems(): {
+  @pageItems items: Item[];
+  @nextLink nextLink?: string;
+};
+```

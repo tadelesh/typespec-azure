@@ -1651,6 +1651,79 @@ func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (*Resp
 
 The `@clientLocation` decorator allows you to explicitly move parameters between client and operation levels.
 
+## Using `@scope` to control language-specific generation
+
+The `@scope` decorator controls which language emitters an operation or model property applies to. This is useful when certain operations or properties should only appear in specific language SDKs.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+// This operation will only be generated for Python and Java
+@scope("python, java")
+op pythonAndJavaOnly(): void;
+
+// This operation will be generated for all languages EXCEPT C#
+@scope("!csharp")
+op notForCSharp(): void;
+
+// This operation will be generated for all languages (default behavior)
+op forAllLanguages(): void;
+```
+
+The `@scope` decorator supports:
+
+- Single language: `"python"`
+- Multiple languages: `"python, java"`
+- Negation (exclude): `"!csharp"` or `"!(java, python)"`
+- Supported identifiers: `csharp`, `python`, `java`, `javascript`, `go`
+
+You can also apply `@scope` to model properties to include or exclude them from specific language SDKs:
+
+```typespec
+model MyModel {
+  commonProp: string;
+
+  // This property will only appear in Python SDKs
+  @scope("python")
+  pythonSpecificProp?: string;
+}
+```
+
+## Using `@responseAsBool` for HEAD operations
+
+The `@responseAsBool` decorator makes a HEAD operation return a `boolean` instead of `void`. When applied, a `404` response maps to `false`, a `2xx` response maps to `true`, and other error responses still throw exceptions.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+using Http;
+
+@service
+namespace MyService;
+
+@responseAsBool
+@head
+op exists(@path name: string): OkResponse;
+```
+
+In the generated SDK, the method will return `boolean` (or the language-specific equivalent), making it natural to check resource existence:
+
+```
+// Pseudocode for all languages:
+bool result = client.exists("my-resource");
+// result is true if 200 OK, false if 404 Not Found
+```
+
+:::note
+`@responseAsBool` can only be applied to HEAD operations. Applying it to other HTTP verbs will produce a diagnostic warning.
+:::
+
 ### Moving subscriptionId from client to operation level
 
 In ARM services, `subscriptionId` is automatically elevated to the client level. By applying `@clientLocation` to `subscriptionId` and explicitly moving it to an operation, you can move it back down to the method-level.

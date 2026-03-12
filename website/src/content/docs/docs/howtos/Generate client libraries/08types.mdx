@@ -497,6 +497,32 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 
 - The referenced type should be compatible with the intended usage in the generated client library.
 
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a string property should be deserialized as `null` when its value is an empty string (`""`). This is useful when working with services that return empty strings to represent absent values.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+model MyModel {
+  @deserializeEmptyStringAsNull
+  displayName?: string;
+
+  description?: string;
+}
+```
+
+In this example, when the service returns `{"displayName": "", "description": ""}`:
+
+- `displayName` will be deserialized as `null` (because of the decorator)
+- `description` will remain as `""` (default behavior)
+
+:::note
+This decorator can only be applied to properties of type `string`. Applying it to non-string properties will produce a diagnostic error.
+:::
+
 ## Client Default Values (Legacy)
 
 :::caution

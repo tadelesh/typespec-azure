@@ -944,3 +944,41 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Specifying Additional Client API Versions
+
+The `@clientApiVersions` decorator lets you specify additional API versions that the client supports, extending the versions defined by the service's `@versioned` decorator. This is useful when you want to expose older API versions in the client SDK without fully annotating the spec with `@added`/`@removed` decorators for every type.
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Versioning;
+using Http;
+using Azure.ClientGenerator.Core;
+
+@versioned(Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+  v2024_06_01: "2024-06-01",
+}
+
+// Expose an additional older version that isn't in the @versioned enum
+enum AdditionalVersions {
+  v2023_06_01: "2023-06-01",
+}
+
+@@clientApiVersions(My.Service, AdditionalVersions);
+
+op get(): void;
+```
+
+In this example, the generated client will support three API versions: `2023-06-01`, `2024-01-01`, and `2024-06-01`. The default version remains the latest one from `@versioned` (`2024-06-01`).
+
+:::note
+The service must be versioned (using `@versioned`) for `@clientApiVersions` to work. The additional versions enum must contain string values matching the API version format.
+:::

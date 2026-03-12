@@ -268,3 +268,35 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## Forcing an operation to be treated as LRO (Legacy)
+
+:::caution
+The `@markAsLro` decorator is legacy functionality from `Azure.ClientGenerator.Core.Legacy`. It should only be used when the service-side operation behaves as a long-running operation but doesn't use standard LRO patterns that TypeSpec can detect automatically. **New services should NOT use this decorator.**
+:::
+
+The `@markAsLro` decorator forces an operation to be treated as a Long Running Operation even when the TypeSpec definition doesn't include standard LRO metadata. This causes the generated SDK to include polling mechanisms and LRO return types.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+using Http;
+
+@service
+namespace MyService;
+
+model ExportResult {
+  uri: string;
+}
+
+// This operation is actually long-running on the server side,
+// but the spec doesn't capture LRO patterns
+@markAsLro
+@post
+op export(@body request: { format: string }): ExportResult;
+```
+
+:::note
+`@markAsLro` can only be applied to operations that return a model type. If the operation already has proper LRO metadata, a diagnostic warning will be emitted indicating that the decorator is redundant.
+:::
