@@ -646,7 +646,7 @@ model ClientInitializationOptions {
   parameters?: Model;
 
   /**
-   * Determines how the client can be initialized. Use `InitializedBy` enum to set the value. The value can be `InitializedBy.individually`, `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent`.
+   * Determines how the client can be initialized. Use `InitializedBy` enum to set the value. The value can be `InitializedBy.individually`, `InitializedBy.parent`, `InitializedBy.individually | InitializedBy.parent`, or `InitializedBy.customizeCode` (to omit generated initialization and handle it manually in custom code).
    */
   initializedBy?: EnumMember | Union;
 }

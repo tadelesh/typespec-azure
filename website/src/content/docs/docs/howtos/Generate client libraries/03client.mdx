@@ -1998,6 +1998,23 @@ client.download("blobName");
 
 </ClientTabs>
 
+### Omit Client Initialization from Generated Code
+
+There are cases where a client's initialization should be omitted from the generated code and handled manually in custom (hand-written) code. You can signal this by setting `initializedBy` to `InitializedBy.customizeCode`.
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace Customizations;
+
+@@clientInitialization(MySubClient, { initializedBy: InitializedBy.customizeCode });
+```
+
+When `InitializedBy.customizeCode` is set, TCGC emitters will omit the constructor or factory method for that client from generated code. The client's initialization must be provided by custom code in the SDK overlay.
+
 ### One Client from Multiple Services
 
 You could define a single client that combines operations from multiple services. This is useful when you want to provide a unified client experience for related services that share a common endpoint, but require different versioning.
