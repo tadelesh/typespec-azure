@@ -132,7 +132,7 @@ clients:
         apiVersions:
           - av1
           - av2
-        initialization:
+        clientInitialization:
           kind: clientinitialization
           parameters:
             - kind: endpoint
@@ -159,7 +159,7 @@ clients:
         apiVersions:
           - bv1
           - bv2
-        initialization:
+        clientInitialization:
           kind: clientinitialization
           parameters:
             - kind: endpoint

@@ -944,3 +944,75 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Adding Client API Versions with `@clientApiVersions`
+
+The `@clientApiVersions` decorator lets you add extra API versions to a client beyond those defined in `@versioned`. This is useful when a client should expose preview or additional versions that are not part of the main service versioning enum.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@typespec/versioning";
+import "@typespec/http";
+
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+
+@versioned(Versions)
+@service(#{ title: "Widget Service" })
+namespace WidgetService;
+
+enum Versions {
+  v2023_01_01: "2023-01-01",
+  v2024_01_01: "2024-01-01",
+}
+
+model Widget {
+  id: string;
+  name: string;
+}
+
+@route("/widgets")
+@get
+op getWidget(@path id: string): Widget;
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+enum ExtraVersions {
+  v2024_06_01_preview: "2024-06-01-preview",
+}
+
+@@clientApiVersions(WidgetService, ExtraVersions);
+```
+
+```python
+# The client now supports the extra version in addition to the @versioned ones
+# Available versions: 2023-01-01, 2024-01-01, 2024-06-01-preview
+```
+
+```csharp
+// The client now includes the additional version
+// Available versions: 2023-01-01, 2024-01-01, 2024-06-01-preview
+```
+
+```typescript
+// The client now includes the additional version
+// Available versions: 2023-01-01, 2024-01-01, 2024-06-01-preview
+```
+
+```java
+// The client service version enum includes the additional version
+// Available versions: V2023_01_01, V2024_01_01, V2024_06_01_PREVIEW
+```
+
+```go
+// The client now includes the additional version
+// Available versions: 2023-01-01, 2024-01-01, 2024-06-01-preview
+```
+
+</ClientTabs>

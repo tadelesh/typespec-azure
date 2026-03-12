@@ -160,8 +160,8 @@ The above tsp gets the two root clients: `DogsClient` and `CatsClient`. All of t
 
 ### TCGC client types and client initialization
 
-TCGC client type (`SdkClientType`) has `subClients` and `parent` property to indicate the client hierarchy.
-It also has `initialization` property of `SdkInitializationType` to indicate the initialization paramters and how to initialize the client.
+TCGC client type (`SdkClientType`) has `children` and `parent` property to indicate the client hierarchy.
+It also has `clientInitialization` property of `SdkClientInitializationType` to indicate the initialization paramters and how to initialize the client.
 
 TCGC always puts the following things in initialization parameters:
 
@@ -170,7 +170,7 @@ TCGC always puts the following things in initialization parameters:
 3. API version parameter: if the service is versioned, then the API version parameter on method will be elevated to client.
 4. Subscription ID parameter: if the service is an ARM service, then the subscription ID parameter on method will be elevated to client.
 
-The `SdkInitializationType` has `initializedBy` property.
+The `SdkClientInitializationType` has `initializedBy` property.
 The value could be `InitializedBy.parent (1)` (the client could be initialized by parent client),
 `InitializedBy.individually (2)` (the client could be initialized individually) or `InitializedBy.parent | InitializedBy.individually (3)` (both).
 
@@ -183,8 +183,8 @@ clients:
   - &a1
     kind: client
     name: PetStoreClient
-    initialization:
-      kind: model
+    clientInitialization:
+      kind: clientinitialization
       properties:
         - kind: endpoint
           name: endpoint
@@ -193,13 +193,13 @@ clients:
       name: PetStoreClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Cats
         parent: *a1
-        subClients: []
-        initialization:
-          kind: model
+        children: []
+        clientInitialization:
+          kind: clientinitialization
           properties:
             - kind: endpoint
               name: endpoint
@@ -211,9 +211,9 @@ clients:
       - kind: client
         name: Dogs
         parent: *a1
-        subClients: []
-        initialization:
-          kind: model
+        children: []
+        clientInitialization:
+          kind: clientinitialization
           properties:
             - kind: endpoint
               name: endpoint
@@ -225,8 +225,8 @@ clients:
   - &a2
     kind: client
     name: ToyStoreClient
-    initialization:
-      kind: model
+    clientInitialization:
+      kind: clientinitialization
       properties:
         - kind: endpoint
           name: endpoint
@@ -235,14 +235,14 @@ clients:
       name: ToyStoreClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Cars
         parent: *a2
-        subClients: []
-        subClients: []
-        initialization:
-          kind: model
+        children: []
+        children: []
+        clientInitialization:
+          kind: clientinitialization
           properties:
             - kind: endpoint
               name: endpoint
@@ -254,10 +254,10 @@ clients:
       - kind: client
         name: Dolls
         parent: *a2
-        subClients: []
-        subClients: []
-        initialization:
-          kind: model
+        children: []
+        children: []
+        clientInitialization:
+          kind: clientinitialization
           properties:
             - kind: endpoint
               name: endpoint
@@ -275,8 +275,8 @@ clients:
   - &a1
     kind: client
     name: DogsClient
-    initialization:
-      kind: model
+    clientInitialization:
+      kind: clientinitialization
       properties:
         - kind: endpoint
           name: endpoint
@@ -285,13 +285,13 @@ clients:
       name: DogsClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Feed
         parent: *a1
-        subClients: []
-        initialization:
-          kind: model
+        children: []
+        clientInitialization:
+          kind: clientinitialization
           properties:
             - kind: endpoint
               name: endpoint
@@ -303,9 +303,9 @@ clients:
       - kind: client
         name: Pet
         parent: *a1
-        subClients: []
-        initialization:
-          kind: model
+        children: []
+        clientInitialization:
+          kind: clientinitialization
           properties:
             - kind: endpoint
               name: endpoint
@@ -317,8 +317,8 @@ clients:
   - &a2
     kind: client
     name: CatsClient
-    initialization:
-      kind: model
+    clientInitialization:
+      kind: clientinitialization
       properties:
         - kind: endpoint
           name: endpoint
@@ -327,14 +327,14 @@ clients:
       name: CatsClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Feed
         parent: *a2
-        subClients: []
-        subClients: []
-        initialization:
-          kind: model
+        children: []
+        children: []
+        clientInitialization:
+          kind: clientinitialization
           properties:
             - kind: endpoint
               name: endpoint
@@ -346,10 +346,10 @@ clients:
       - kind: client
         name: Pet
         parent: *a2
-        subClients: []
-        subClients: []
-        initialization:
-          kind: model
+        children: []
+        children: []
+        clientInitialization:
+          kind: clientinitialization
           properties:
             - kind: endpoint
               name: endpoint
@@ -390,7 +390,7 @@ namespace MyCustomizations {
 ```
 
 The above tsp gets client `MyServiceClient` and sub client `InnerGroup`.
-The `InnerGroup`'s `initialization` model's properties contains a property named `blob`.
+The `InnerGroup`'s `clientInitialization` model's properties contains a property named `blob`.
 The method `upload` no longer has `blobName` parameter, its corresponding operation's parameter `blobName` is mapped to the client `blob` parameter.
 The `InnerGroup` client could be initialized both by parent or individually.
 
@@ -401,15 +401,15 @@ clients:
   - &a3
     kind: client
     name: MyServiceClient
-    subClients:
+    children:
       - kind: client
         name: InnerGroup
         methods:
           - kind: basic
             name: upload
             parameters: []
-        initialization:
-          kind: model
+        clientInitialization:
+          kind: clientinitialization
           name: InnerGroupClientOptions
           isGeneratedName: false
           properties:
@@ -423,8 +423,8 @@ clients:
               onClient: true
           initializedBy: parent | individually
         parent: *a3
-    initialization:
-      kind: model
+    clientInitialization:
+      kind: clientinitialization
       properties:
         - kind: endpoint
           name: endpoint
@@ -530,17 +530,17 @@ model SubClientOptions {
 
 ## Changes needed with above design
 
-1. Change `@clientInitialization` decorator and add `initializedBy` property to `SdkInitializationType`
+1. Change `@clientInitialization` decorator and add `initializedBy` property to `SdkClientInitializationType`
 
 - Change `@clientInitialization` decorator's `options` parameter to `ClientInitializationOptions` type to accept `initializedBy` setting.
-- Add `clientInitialization` property to `SdkInitializationType`.
+- Add `clientInitialization` property to `SdkClientInitializationType`.
 - Add check for `initializedBy`, root clients could only have `individually` value.
 
-2. Deprecate client accessor method. Add `subClients` property to `SdkClientType` and put all sub clients in this list.
+2. Deprecate client accessor method. Add `children` property to `SdkClientType` and put all sub clients in this list.
 
 3. Consolidate `@client` and `@operationGroup`
 
 - Deprecate decorator `@operationGroup` and `SdkOperationGroup` type.
 - Current explicitly `@operationGroup` could be migrated to `@client`. If `@client` is nested, then it is a sub client, will follow previous operation group default logic.
-- Add `subClients`, `clientPath` properties to the `SdkClient` type to keep backward compatible for metadata type.
+- Add `children`, `clientPath` properties to the `SdkClient` type to keep backward compatible for metadata type.
 - Add `getClientPath` helper to provide similar function for TCGC `SdkClientType` type.

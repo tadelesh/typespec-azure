@@ -464,6 +464,19 @@ The `@clientDoc` decorator can be used on everything that the `@doc` decorator c
 When both `@doc` and `@clientDoc` are present, the generated code outputs the final documentation depending on the mode that you called `@clientDoc` with.
 If called with `replace`, `@clientDoc` replaces `@doc` completely. If called with `append`, `@clientDoc` is appended onto `@doc`.
 
+### Append mode
+
+When using `DocumentationMode.append`, the client documentation is appended to the existing `@doc` text. This is useful for adding SDK-specific guidance without losing the original API documentation.
+
+```typespec
+@doc("Returns the list of active widgets.")
+@clientDoc(" Note: Results are cached for 5 minutes.", DocumentationMode.append)
+op listWidgets(): Widget[];
+```
+
+In the generated SDK, the method documentation will read:
+_"Returns the list of active widgets. Note: Results are cached for 5 minutes."_
+
 ## Using `@alternateType` to Reference External Types
 
 The `@alternateType` decorator allows you to override the emitted type for a model, union, or enum in generated client libraries. With recent updates, you can now reference types defined in external namespaces or imported libraries.
@@ -475,7 +488,7 @@ Suppose you want your generated client library to use a type from an external pa
 ```typespec
 @alternateType(
   {
-    fullyQualifiedName: "externallib.ExternalModel",
+    identity: "externallib.ExternalModel",
     package: "externallib",
   },
   "python"
@@ -496,6 +509,84 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 ### Notes
 
 - The referenced type should be compatible with the intended usage in the generated client library.
+
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator marks a string property so that empty strings (`""`) are deserialized as `null` in the generated SDK. This is useful when a service returns empty strings to represent absent values.
+
+This decorator can only be applied to properties of type `string` or scalar types derived from `string`.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@typespec/rest";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using Azure.ClientGenerator.Core;
+
+@service(#{ title: "Widget Service" })
+namespace WidgetService;
+
+model Widget {
+  id: string;
+  name: string;
+
+  @deserializeEmptyStringAsNull
+  description?: string;
+}
+
+@route("/widgets")
+@get
+op getWidget(@path id: string): Widget;
+```
+
+```python
+class Widget(Model):
+    id: str
+    name: str
+    # When the service returns description: "",
+    # the SDK deserializes it as None
+    description: Optional[str]
+```
+
+```csharp
+// TODO: fill in C# example manually — emitter generation failed (missing .NET SDK)
+```
+
+```typescript
+export interface Widget {
+  id: string;
+  name: string;
+  // When the service returns description: "",
+  // the SDK deserializes it as undefined
+  description?: string;
+}
+```
+
+```java
+public final class Widget {
+    // When the service returns description: "",
+    // the SDK deserializes it as null
+    private String id;
+    private String name;
+    private String description;
+}
+```
+
+```go
+type Widget struct {
+    ID          *string
+    Name        *string
+    // When the service returns description: "",
+    // the SDK deserializes it as nil
+    Description *string
+}
+```
+
+</ClientTabs>
 
 ## Client Default Values (Legacy)
 
