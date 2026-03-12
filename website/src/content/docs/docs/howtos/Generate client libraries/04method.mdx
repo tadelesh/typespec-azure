@@ -1751,3 +1751,156 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Using `@scope` to limit operations to specific languages
+
+The `@scope` decorator restricts an operation or model property so that it is only generated for the specified language emitters.
+This is useful when an operation should only be available in certain SDKs.
+
+In the following example, the `create` operation is scoped to Python and Java only.
+C#, TypeScript, and Go SDKs will not include the `create` method.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@typespec/http";
+import "@typespec/rest";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+
+@service(#{ title: "Widget Service" })
+namespace WidgetService;
+
+model Widget {
+  @visibility(Lifecycle.Read)
+  id: string;
+  name: string;
+  color: string;
+}
+
+@route("/widgets")
+interface Widgets {
+  @get list(): Widget[];
+  @get read(@path id: string): Widget;
+  @post create(@body widget: Widget): Widget;
+}
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@scope(WidgetService.Widgets.create, "python, java");
+```
+
+```python
+class WidgetsOperations:
+    # create is included because Python is in scope
+    def list(self, **kwargs: Any) -> List[Widget]: ...
+    def read(self, id: str, **kwargs: Any) -> Widget: ...
+    def create(self, widget: Union[Widget, JSON, IO[bytes]], **kwargs: Any) -> Widget: ...
+```
+
+```csharp
+// create is NOT included because C# is not in scope
+public class WidgetServiceClient {
+    public virtual Response<IReadOnlyList<Widget>> GetWidgets(CancellationToken cancellationToken = default);
+    public virtual Response<Widget> GetWidget(string id, CancellationToken cancellationToken = default);
+    // No Create method
+}
+```
+
+```typescript
+// TypeScript emitter may not filter by @scope — check emitter support
+```
+
+```java
+public final class WidgetServiceClient {
+    // create is included because Java is in scope
+    public List<Widget> list() { ... }
+    public Widget read(String id) { ... }
+    public Widget create(Widget widget) { ... }
+}
+```
+
+```go
+// create is NOT included because Go is not in scope
+type WidgetServiceWidgetsClient struct { }
+
+func (client *WidgetServiceWidgetsClient) List(ctx context.Context, options *ListOptions) (ListResponse, error)
+func (client *WidgetServiceWidgetsClient) Read(ctx context.Context, id string, options *ReadOptions) (ReadResponse, error)
+// No Create method
+```
+
+</ClientTabs>
+
+## Using `@responseAsBool` for HEAD operations
+
+The `@responseAsBool` decorator changes a HEAD operation's return type to `boolean`. When applied, a `2xx` response returns `true` and a `404` response returns `false`.
+
+This decorator can only be applied to HEAD operations.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@typespec/http";
+import "@typespec/rest";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+
+@service(#{ title: "Widget Service" })
+namespace WidgetService;
+
+model Widget {
+  @visibility(Lifecycle.Read)
+  id: string;
+  name: string;
+}
+
+@route("/widgets")
+interface Widgets {
+  @head exists(@path id: string): OkResponse | NotFoundResponse;
+  @get read(@path id: string): Widget;
+}
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(WidgetService.Widgets.exists);
+```
+
+```python
+class WidgetsOperations:
+    # exists returns bool: True for 2xx, False for 404
+    def exists(self, id: str, **kwargs: Any) -> bool: ...
+    def read(self, id: str, **kwargs: Any) -> Widget: ...
+```
+
+```csharp
+// TODO: fill in C# example manually — emitter generation failed (missing .NET SDK)
+```
+
+```typescript
+// TypeScript returns a response object; boolean conversion depends on emitter implementation
+```
+
+```java
+public final class WidgetServiceClient {
+    public boolean exists(String id) { ... }
+    public Widget read(String id) { ... }
+}
+```
+
+```go
+// TODO: fill in Go example manually — emitter generation failed (internal error)
+```
+
+</ClientTabs>
