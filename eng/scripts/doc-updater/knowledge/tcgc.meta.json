@@ -6,5 +6,6 @@
     "packages/typespec-client-generator-core/lib/**",
     "packages/typespec-client-generator-core/generated-defs/**",
     "packages/typespec-client-generator-core/test/**"
-  ]
+  ],
+  "lastPrNumber": 16
 }
