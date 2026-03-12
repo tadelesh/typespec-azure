@@ -973,7 +973,8 @@ model Widget {
 }
 
 @route("/widgets")
-@get op getWidget(@path id: string): Widget;
+@get
+op getWidget(@path id: string): Widget;
 ```
 
 ```typespec title=client.tsp

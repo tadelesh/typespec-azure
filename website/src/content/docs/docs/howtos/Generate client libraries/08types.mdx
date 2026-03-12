@@ -475,7 +475,7 @@ op listWidgets(): Widget[];
 ```
 
 In the generated SDK, the method documentation will read:
-*"Returns the list of active widgets. Note: Results are cached for 5 minutes."*
+_"Returns the list of active widgets. Note: Results are cached for 5 minutes."_
 
 ## Using `@alternateType` to Reference External Types
 
@@ -533,12 +533,14 @@ namespace WidgetService;
 model Widget {
   id: string;
   name: string;
+
   @deserializeEmptyStringAsNull
   description?: string;
 }
 
 @route("/widgets")
-@get op getWidget(@path id: string): Widget;
+@get
+op getWidget(@path id: string): Widget;
 ```
 
 ```python
