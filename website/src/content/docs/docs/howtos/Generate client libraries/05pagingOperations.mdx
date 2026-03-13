@@ -427,3 +427,186 @@ model Page {
   ]>;
 }
 ```
+
+### Force an operation to be treated as pageable (Legacy)
+
+:::caution
+The `@markAsPageable` decorator is legacy functionality that should **only** be used for brownfield services where an operation returns a list but was not originally annotated with paging decorators. **New services should use `@list` with `@pageItems` and `@nextLink` instead.**
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.markAsPageable` decorator forces an operation to be treated as a paging operation even if it does not use `@list`. The operation must return a model that contains a property decorated with `@pageItems` or a property named `value`.
+
+<ClientTabs>
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model Widget {
+  id: string;
+  name: string;
+}
+
+model WidgetList {
+  value: Widget[];
+  nextLink?: url;
+}
+
+@route("/widgets")
+@get
+@markAsPageable
+op listWidgets(): WidgetList;
+```
+
+```python
+# The operation is generated as a paging method:
+def list_widgets(self, **kwargs: Any) -> ItemPaged[Widget]:
+    ...
+```
+
+```csharp
+// @markAsPageable is primarily a Python/Java customization.
+// C# emitter may handle paging detection differently.
+```
+
+```typescript
+// @markAsPageable is primarily a Python/Java customization.
+// TypeScript emitter may handle paging detection differently.
+```
+
+```java
+// The operation is generated as a paging method:
+public PagedIterable<Widget> listWidgets() { ... }
+```
+
+```go
+// @markAsPageable is primarily a Python/Java customization.
+// Go emitter may handle paging detection differently.
+```
+
+</ClientTabs>
+
+### Prevent an operation from being treated as pageable (Legacy)
+
+:::caution
+The `@disablePageable` decorator is legacy functionality that should **only** be used for brownfield services where an operation follows paging patterns but should not be generated as a paging method. **New services should not need this decorator.**
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.disablePageable` decorator prevents an operation from being treated as pageable, even if it follows paging patterns (e.g., uses `@list` with `@pageItems`).
+
+<ClientTabs>
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model Widget {
+  id: string;
+  name: string;
+}
+
+model WidgetList {
+  @pageItems
+  value: Widget[];
+
+  @nextLink
+  nextLink?: url;
+}
+
+@route("/widgets")
+@list
+@disablePageable
+op listWidgets(): WidgetList;
+```
+
+```python
+# The operation returns the raw response model, not a paging iterator:
+def list_widgets(self, **kwargs: Any) -> WidgetList:
+    ...
+```
+
+```csharp
+// @disablePageable is primarily a Python/Java customization.
+// C# emitter may handle paging detection differently.
+```
+
+```typescript
+// @disablePageable is primarily a Python/Java customization.
+// TypeScript emitter may handle paging detection differently.
+```
+
+```java
+// The operation returns the raw response model, not a paging type:
+public WidgetList listWidgets() { ... }
+```
+
+```go
+// @disablePageable is primarily a Python/Java customization.
+// Go emitter may handle paging detection differently.
+```
+
+</ClientTabs>
+
+### Override next-link HTTP verb (Legacy)
+
+:::caution
+The `@nextLinkVerb` decorator is legacy functionality that should **only** be used for brownfield services where the next-page endpoint uses a different HTTP verb than the default. **New services should follow standard paging patterns.**
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.nextLinkVerb` decorator overrides the HTTP verb used for next-page requests in paging. Only `"POST"` and `"GET"` are supported values. By default, paging uses `GET` for the next link.
+
+<ClientTabs>
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model Widget {
+  id: string;
+  name: string;
+}
+
+model WidgetList {
+  @pageItems
+  value: Widget[];
+
+  @nextLink
+  nextLink?: url;
+}
+
+@route("/widgets")
+@list
+@nextLinkVerb("POST")
+op listWidgets(): WidgetList;
+```
+
+```python
+# The paging method uses POST for next-page requests internally:
+def list_widgets(self, **kwargs: Any) -> ItemPaged[Widget]:
+    ...
+```
+
+```csharp
+// @nextLinkVerb is primarily a Python/Java customization.
+// C# emitter may handle next-link verb differently.
+```
+
+```typescript
+// @nextLinkVerb is primarily a Python/Java customization.
+// TypeScript emitter may handle next-link verb differently.
+```
+
+```java
+// The paging method uses POST for next-page requests internally:
+public PagedIterable<Widget> listWidgets() { ... }
+```
+
+```go
+// @nextLinkVerb is primarily a Python/Java customization.
+// Go emitter may handle next-link verb differently.
+```
+
+</ClientTabs>

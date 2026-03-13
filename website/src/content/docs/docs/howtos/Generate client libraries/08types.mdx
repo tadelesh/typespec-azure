@@ -2718,4 +2718,76 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 ```
 </ClientTabItem>
 </ClientTabs>
+
+## Custom JSON Converter (C# Only)
+
+:::caution
+The `@useSystemTextJsonConverter` decorator is a C#-specific customization for backward compatibility. It is only relevant for the C# emitter and has no effect on other languages.
+:::
+
+The `@Azure.ClientGenerator.Core.useSystemTextJsonConverter` decorator marks a model to use a custom `System.Text.Json` converter in the generated C# SDK. This is used when a model requires specialized JSON serialization/deserialization logic that cannot be expressed through standard TypeSpec patterns.
+
+<ClientTabs>
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@useSystemTextJsonConverter
+model CustomWidget {
+  id: string;
+  data: string;
+}
+
+@route("/widgets")
+@get
+op getWidget(@path id: string): CustomWidget;
 ```
+
+```python
+# @useSystemTextJsonConverter has no effect on Python.
+# The model is generated normally:
+class CustomWidget:
+    id: str
+    data: str
+```
+
+```csharp
+// The model is annotated with a custom JsonConverter attribute:
+[JsonConverter(typeof(CustomWidgetConverter))]
+public partial class CustomWidget
+{
+    public string Id { get; set; }
+    public string Data { get; set; }
+}
+```
+
+```typescript
+// @useSystemTextJsonConverter has no effect on TypeScript.
+// The model is generated normally:
+export interface CustomWidget {
+  id: string;
+  data: string;
+}
+```
+
+```java
+// @useSystemTextJsonConverter has no effect on Java.
+// The model is generated normally:
+public final class CustomWidget {
+    public String getId() { ... }
+    public String getData() { ... }
+}
+```
+
+```go
+// @useSystemTextJsonConverter has no effect on Go.
+// The model is generated normally:
+type CustomWidget struct {
+    ID   *string
+    Data *string
+}
+```
+
+</ClientTabs>

@@ -268,3 +268,57 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## Force an operation to be treated as LRO (Legacy)
+
+:::caution
+The `@markAsLro` decorator is legacy functionality that should **only** be used for brownfield services where an operation needs to be treated as long-running on the client side even though it isn't long-running on the service side. **New services should use standard LRO patterns with `@pollingOperation` instead.**
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.markAsLro` decorator forces an operation to be treated as a long-running operation (LRO). This is only valid on operations that return a model. If the operation already has real LRO metadata, a warning is emitted.
+
+<ClientTabs>
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model ProcessResult {
+  status: string;
+  result?: string;
+}
+
+@route("/process")
+@post
+@markAsLro
+op startProcess(): ProcessResult;
+```
+
+```python
+# The operation is generated as an LRO method with polling:
+def begin_start_process(self, **kwargs: Any) -> LROPoller[ProcessResult]:
+    ...
+```
+
+```csharp
+// @markAsLro is primarily a Python/Java customization.
+// C# emitter may handle LRO detection differently.
+```
+
+```typescript
+// @markAsLro is primarily a Python/Java customization.
+// TypeScript emitter may handle LRO detection differently.
+```
+
+```java
+// The operation is generated as an LRO method with polling:
+public SyncPoller<ProcessResult, ProcessResult> beginStartProcess() { ... }
+```
+
+```go
+// @markAsLro is primarily a Python/Java customization.
+// Go emitter may handle LRO detection differently.
+```
+
+</ClientTabs>
