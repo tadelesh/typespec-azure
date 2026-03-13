@@ -99,6 +99,16 @@ Clients, models, enums, and unions include namespace information. Emitters can u
 - A flattened structure (`SdkPackage.clients`, `SdkPackage.enums`, `SdkPackage.models`, `SdkPackage.unions`)
 - A hierarchical structure (`SdkPackage.namespaces`) requiring iteration through nested namespaces.
 
+### Namespace
+
+[`SdkNamespace`](../reference/js-api/interfaces/sdknamespace/) represents a namespace within a package. It mirrors the hierarchical namespace structure of the TypeSpec source and contains:
+
+- `name` / `fullName`: The short and fully-qualified namespace names.
+- `clients`, `models`, `enums`, `unions`: The types declared directly in this namespace.
+- `namespaces`: Nested child namespaces, allowing recursive traversal of the full namespace tree.
+
+Emitters that use `SdkPackage.namespaces` should iterate through nested namespaces recursively to discover all types.
+
 ### License Information
 
 Emitters can get package license info from `SdkPackage.licenseInfo`. The [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) contains license details for client code comments or license file generation.
@@ -124,7 +134,11 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 
 Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
 
-`SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized: by parent client or by itself.
+`SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized: by parent client or by itself. The `initializedBy` property is a bitmask of [`InitializedByFlags`](../reference/js-api/enumerations/initializedbyflags/) values:
+
+- `individually` (1): The client can be initialized on its own (default for root clients).
+- `parent` (2): The client can be initialized through its parent client (default for sub-clients).
+- `customizeCode` (4): The client initialization should be omitted from generated code and handled manually in custom code.
 
 The initialization parameter can be either [`SdkEndpointParameter`](../reference/js-api/interfaces/sdkendpointparameter/), [`SdkCredentialParameter`](../reference/js-api/interfaces/sdkcredentialparameter/) or [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/).
 
@@ -197,18 +211,21 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Model Types:**
 
-- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type. It has the following key properties:
+  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
+  - `serializationOptions`: Contains serialization details for JSON, XML, multipart, and binary formats (see [`SerializationOptions`](../reference/js-api/interfaces/serializationoptions/))
+  - For discriminated models:
+    - `discriminatorProperty`: The property used as a discriminator
+    - `discriminatedSubtypes`: Record of all subtypes of this discriminated model, keyed by discriminator value
+  - For subtypes of discriminated models:
+    - `discriminatorValue`: The instance value for the discriminator for this subtype
 
 **Model Property Types:**
 
 - [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
   - `flatten`: Indicates if the property can be flattened
-  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
-  - For discriminated models:
-    - `discriminatorProperty`: The property used as a discriminator
-    - `discriminatedSubtypes`: List of all subtypes of this discriminated model
-  - For subtypes of discriminated models:
-    - `discriminatorValue`: The instance value for the discriminator for this subtype
+  - `discriminator`: Boolean indicating if this property is the discriminator property of its model
+  - `serializationOptions`: Contains the serialized name and format-specific serialization details
   - For array properties:
     - `encode`: Indicates the encoding style for array properties (e.g., `"pipeDelimited"`, `"spaceDelimited"`, `"commaDelimited"`, `"newlineDelimited"`).
 
