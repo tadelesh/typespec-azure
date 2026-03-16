@@ -8,17 +8,15 @@ flowchart LR
     end
 
     Config --> P0
+    Config --> P1
 
-    P0[Feedback
+    P0[Feedback Session
     Learn from human corrections]
-    P1[Knowledge Build
-    Full or incremental
-    based on changed commits]
-    P2[Doc Update
-    Full or incremental
-    based on changed commits]
+    P1[Doc Update Session
+    Update docs + build knowledge
+    Full or incremental]
 
-    P0 --> P1 --> P2
+    P0 --> P1
 
     KB[(knowledge/tcgc.md)]
     MCP[GitHub MCP]
@@ -26,10 +24,9 @@ flowchart LR
 
     MCP -.-> P0
     MCP -.-> P1
-    MCP -.-> P2
-    KB --> P2
     P0 --> KB
+    KB --> P1
     P1 --> KB
-    P2 --> PR
+    P1 --> PR
     PR -.->|human edits| P0
 ```

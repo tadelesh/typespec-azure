@@ -187,20 +187,22 @@ export function listCommitsSince(sourcePaths: string[], lastCommit: string): str
 export function getHumanFeedback(prNumber: number): HumanFeedback | null {
   try {
     // Check if PR is merged
-    const state = execSync(
-      `gh pr view ${prNumber} --repo Azure/typespec-azure --json state,mergedAt --jq ".state"`,
-      { encoding: "utf-8", cwd: REPO_ROOT },
-    ).trim();
+    const state = execSync(`gh pr view ${prNumber} --json state,mergedAt --jq ".state"`, {
+      encoding: "utf-8",
+      cwd: REPO_ROOT,
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
 
     if (state !== "MERGED") {
       return null;
     }
 
     // Get all commits on the PR
-    const commitsJson = execSync(
-      `gh pr view ${prNumber} --repo Azure/typespec-azure --json commits --jq ".commits"`,
-      { encoding: "utf-8", cwd: REPO_ROOT },
-    ).trim();
+    const commitsJson = execSync(`gh pr view ${prNumber} --json commits --jq ".commits"`, {
+      encoding: "utf-8",
+      cwd: REPO_ROOT,
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
 
     const commits = JSON.parse(commitsJson) as Array<{
       oid: string;
@@ -212,10 +214,11 @@ export function getHumanFeedback(prNumber: number): HumanFeedback | null {
     const humanCommits = commits.filter((c) => !c.messageHeadline.startsWith("docs: automated"));
 
     // Get review comments
-    const reviewsJson = execSync(
-      `gh pr view ${prNumber} --repo Azure/typespec-azure --json reviews --jq ".reviews"`,
-      { encoding: "utf-8", cwd: REPO_ROOT },
-    ).trim();
+    const reviewsJson = execSync(`gh pr view ${prNumber} --json reviews --jq ".reviews"`, {
+      encoding: "utf-8",
+      cwd: REPO_ROOT,
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
 
     const reviews = JSON.parse(reviewsJson) as Array<{
       body: string;
