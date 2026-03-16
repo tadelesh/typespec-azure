@@ -195,6 +195,11 @@ async function main(): Promise<void> {
       const meta = args.fullRebuild ? null : await readMeta(config.name);
       const needsFullBuild = !meta || args.fullRebuild;
 
+      log(
+        `Meta: ${meta ? `lastCommit=${meta.lastCommit}, lastUpdated=${meta.lastUpdated}` : "(none)"}. ` +
+          `needsFullBuild=${needsFullBuild}`,
+      );
+
       if (needsFullBuild) {
         const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
         const prompt = buildFullKnowledgePrompt(config, docUpdatePrompt);

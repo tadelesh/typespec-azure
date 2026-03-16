@@ -22,78 +22,28 @@ This skill operates in a **temporary working directory** to compile and generate
 ### Step 1: Set Up Temporary Project
 
 1. Create a temp directory (e.g., `/tmp/tsp-doc-example-<feature>/` or a workspace-relative `.tmp/` folder)
-2. Initialize a `package.json` with the required dependencies:
+2. Copy the `package.json` from this skill's directory (`package.json` next to this file) into the temp directory
 
-   ```json
-   {
-     "name": "doc-example",
-     "private": true,
-     "dependencies": {
-       "@typespec/compiler": "latest",
-       "@typespec/rest": "latest",
-       "@typespec/http": "latest",
-       "@typespec/versioning": "latest",
-       "@azure-tools/typespec-azure-core": "latest",
-       "@azure-tools/typespec-client-generator-core": "latest",
-       "@azure-tools/typespec-python": "latest",
-       "@azure-tools/typespec-java": "latest",
-       "@azure-typespec/http-client-csharp": "latest",
-       "@azure-tools/typespec-ts": "latest",
-       "@azure-tools/typespec-go": "latest"
-     }
-   }
-   ```
-
-   > Add additional TypeSpec library dependencies (e.g., `@azure-tools/typespec-azure-resource-manager`) as needed for the specific example.
-
-3. Run `npm install --ignore-scripts` to install all dependencies
-   > Some emitters have postinstall scripts that require language-specific runtimes (e.g., Python). Using `--ignore-scripts` avoids install failures. The emitters will still work at compile time.
+3. Run `npm install --legacy-peer-deps` to install all dependencies
 
 ### Step 2: Write and Validate TypeSpec Example
 
 1. Create a `main.tsp` file containing the example code. The example must:
-   - Use the `@service` namespace pattern (e.g., `@service(#{ title: "..." })`)
+   - Use the `@service` to decorate the main service namespace
    - Include `import` and `using` statements for all required libraries
    - Be self-contained — no external file dependencies beyond installed packages
    - Demonstrate the specific feature being documented
 
 2. If the example involves client customization decorators (e.g., `@clientName`, `@access`, `@usage` from `@azure-tools/typespec-client-generator-core`), create a separate `client.tsp` that imports `main.tsp` and applies the decorators using augment syntax (`@@decorator`). This mirrors the recommended user pattern.
 
-3. Create a `tspconfig.yaml` with all five language emitters and minimal options to produce clean API surface output:
-
-   ```yaml
-   emit:
-     - "@azure-tools/typespec-python"
-     - "@azure-tools/typespec-java"
-     - "@azure-typespec/http-client-csharp"
-     - "@azure-tools/typespec-ts"
-     - "@azure-tools/typespec-go"
-   options:
-     "@azure-tools/typespec-python":
-       flavor: azure
-       generate-test: false
-       generate-sample: false
-       use-pyodide: true # Use when Python is not installed locally
-     "@azure-tools/typespec-java":
-       flavor: azure
-       generate-tests: false
-       generate-samples: false
-     "@azure-tools/typespec-ts":
-       flavor: azure
-       azure-sdk-for-js: false # Required for standalone generation outside azure-sdk-for-js repo
-       generate-test: false
-       generate-sample: false
-     "@azure-tools/typespec-go":
-       module: "example" # Required: Go emitter needs a module name
-       generate-samples: false
-   ```
-
-   > **Note:** C# (`@azure-typespec/http-client-csharp`) requires no additional options for basic generation. Add extra emitter options only if the example specifically needs them.
+3. Copy the `tspconfig.yaml` from this skill's directory (`tspconfig.yaml` next to this file) into the temp directory. Add extra emitter options only if the example specifically needs them.
 
 4. Run `npx tsp compile .` and verify it succeeds with **zero errors**
    - **Critical:** If a `client.tsp` file exists, you MUST use it as the entry point: `npx tsp compile client.tsp`. Compiling with `.` only picks up `main.tsp` and will NOT apply augment decorators from `client.tsp`.
+   - For `@azure-typespec/http-client-csharp` emitter, you need to add an empty `metadata.json` file in the output directory to trigger code generation. Create an empty file at `tsp-output/@azure-typespec/http-client-csharp/metadata.json` before running compilation.
    - If compilation fails, fix the `.tsp` files and re-compile until it passes
    - Do NOT proceed to Step 3 until compilation is clean
+   
 
 ### Step 3: Generate Language Code
 

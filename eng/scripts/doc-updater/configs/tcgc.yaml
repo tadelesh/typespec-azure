@@ -6,10 +6,9 @@ description: >-
   interacting with the TypeSpec core API.
 
 sourceCodePaths:
-  - packages/typespec-client-generator-core/src/**
-  - packages/typespec-client-generator-core/lib/**
-  - packages/typespec-client-generator-core/generated-defs/**
-  - packages/typespec-client-generator-core/test/**
+  - packages/typespec-client-generator-core/src
+  - packages/typespec-client-generator-core/lib
+  - packages/typespec-client-generator-core/test
 
 focusAreas:
   all: >-

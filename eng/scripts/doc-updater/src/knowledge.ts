@@ -149,17 +149,25 @@ const DOC_UPDATER_GREP_PATTERN = "\\[Automated\\]";
  */
 export function listCommitsSince(sourcePaths: string[], lastCommit: string): string[] {
   const paths = sourcePaths.map((p) => `"${p}"`).join(" ");
+
+  // Debug: check total commits (without grep filter) to distinguish
+  // "no commits at all" from "all commits filtered by grep"
+  const countCmd = `git rev-list --count ${lastCommit}..HEAD -- ${paths}`;
+  const filteredCmd = `git rev-list --invert-grep --grep=${DOC_UPDATER_GREP_PATTERN} ${lastCommit}..HEAD -- ${paths}`;
   try {
-    const result = execSync(
-      `git rev-list --invert-grep --grep=${DOC_UPDATER_GREP_PATTERN} ${lastCommit}..HEAD -- ${paths}`,
-      {
-        encoding: "utf-8",
-        cwd: REPO_ROOT,
-      },
-    ).trim();
+    const totalCount = execSync(countCmd, { encoding: "utf-8", cwd: REPO_ROOT }).trim();
+    console.log(`[knowledge] Total commits since ${lastCommit.slice(0, 8)}: ${totalCount}`);
+
+    const result = execSync(filteredCmd, { encoding: "utf-8", cwd: REPO_ROOT }).trim();
+    const filtered = result ? result.split("\n") : [];
+    console.log(`[knowledge] After filtering [Automated]: ${filtered.length}`);
     if (!result) return [];
-    return result.split("\n").reverse(); // oldest first
-  } catch {
+    return filtered.reverse(); // oldest first
+  } catch (e) {
+    const stderr = (e as { stderr?: string }).stderr ?? String(e);
+    console.error(
+      `[knowledge] listCommitsSince failed:\n  countCmd: ${countCmd}\n  filteredCmd: ${filteredCmd}\n  cwd: ${REPO_ROOT}\n  error: ${stderr}`,
+    );
     return [];
   }
 }

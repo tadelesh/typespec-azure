@@ -98,6 +98,11 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -122,10 +127,17 @@ jobs:
           distribution: "adopt"
           java-version: "21"
 
+      - name: Setup Maven
+        run: |
+          MAVEN_VERSION="3.9.9"
+          wget -q "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
+          tar -xzf "apache-maven-${MAVEN_VERSION}-bin.tar.gz" -C "$HOME"
+          echo "$HOME/apache-maven-${MAVEN_VERSION}/bin" >> $GITHUB_PATH
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Install repo dependencies
         run: pnpm install
