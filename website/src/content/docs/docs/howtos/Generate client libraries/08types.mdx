@@ -475,7 +475,7 @@ Suppose you want your generated client library to use a type from an external pa
 ```typespec
 @alternateType(
   {
-    fullyQualifiedName: "externallib.ExternalModel",
+    identity: "externallib.ExternalModel",
     package: "externallib",
   },
   "python"
@@ -1383,7 +1383,7 @@ const (
 ### Flattening
 
 :::caution
-Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
+Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects. The `@flattenProperty` decorator is a legacy feature under the `Azure.ClientGenerator.Core.Legacy` namespace.
 :::
 
 <ClientTabs>
@@ -2628,3 +2628,72 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 </ClientTabItem>
 </ClientTabs>
 ```
+
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that empty string values (`""`) should be deserialized as `null` in the generated client. This is useful when a service returns empty strings to represent absent values.
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+model ServiceConfig {
+  @deserializeEmptyStringAsNull
+  callbackUrl?: url;
+
+  @deserializeEmptyStringAsNull
+  description?: string;
+}
+
+@get
+op getConfig(): ServiceConfig;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# When the service returns {"callbackUrl": "", "description": ""},
+# the deserialized values will be None instead of empty strings
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// When the service returns {"callbackUrl": "", "description": ""},
+// the deserialized values will be null instead of empty strings
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+// When the service returns {"callbackUrl": "", "description": ""},
+// the deserialized values will be null instead of empty strings
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// When the service returns {"callbackUrl": "", "description": ""},
+// the deserialized values will be null instead of empty strings
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Notes
+
+- Can only be applied to model properties, not to models or other targets.
+- Only valid on `string` or `string`-derived scalar properties (e.g., `url`, custom scalars extending `string`).
+- Applying it to non-string types (e.g., `int32`, `string[]`) will emit a diagnostic error.
+- Supports language scoping: `@deserializeEmptyStringAsNull("csharp")` to apply only for C#.

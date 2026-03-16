@@ -86,7 +86,7 @@ Most TCGC types share the following common properties:
 - **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters.
 - **`name`** and **`isGeneratedName`**: The type's name and whether the name was created by TCGC.
 - **`access`**: Indicates whether the type has public or private accessibility.
-- **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration.
+- **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration. Key flags include `Input`, `Output`, `Json`, `Xml`, `ApiVersionEnum`, `JsonMergePatch`, `MultipartFormData`, `Spread`, `Exception`, `LroInitial`, `LroPolling`, `LroFinalEnvelope`, and `External`.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
 - **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
 
@@ -98,6 +98,8 @@ Clients, models, enums, and unions include namespace information. Emitters can u
 
 - A flattened structure (`SdkPackage.clients`, `SdkPackage.enums`, `SdkPackage.models`, `SdkPackage.unions`)
 - A hierarchical structure (`SdkPackage.namespaces`) requiring iteration through nested namespaces.
+
+`SdkPackage.metadata` contains package-level metadata such as `apiVersions`, a map from service namespace to the target API version string.
 
 ### License Information
 
@@ -144,7 +146,12 @@ TCGC supports four kinds of methods: [`SdkBasicServiceMethod`](../reference/js-a
 
 `SdkBasicServiceMethod.parameters` is the method's input. Its type [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/) contains the type of the parameter along with some attributes of the parameter.
 
-`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exceptions` contains the method's error responses.
+`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exceptions` contains the method's error responses. The response type [`SdkMethodResponse`](../reference/js-api/interfaces/sdkmethodresponse/) includes:
+
+- `type`: The response body type (if any)
+- `resultSegments`: For LRO/paging methods, the path of model properties from the response body to the logical result
+- `optional`: `true` when at least one HTTP response has no body
+- `streamMetadata`: Streaming metadata when the response is a stream
 
 **SdkPagingServiceMethod** is a paging method that has pageable responses. It extends `SdkBasicServiceMethod` and contains extra paging information.
 
@@ -159,7 +166,7 @@ Emitters can get the protocol-level operation from `SdkServiceMethod.operation`.
 
 TCGC currently supports one kind of operation: [`SdkHttpOperation`](../reference/js-api/interfaces/sdkhttpoperation/).
 
-`SdkHttpOperation` contains verb, path, URI template, query/header/path/cookie/body parameters, responses, and exceptions of an HTTP operation.
+`SdkHttpOperation` contains verb, path, `uriTemplate`, query/header/path/cookie/body parameters, responses, and exceptions of an HTTP operation. The `uriTemplate` property provides the full URI template including path and query parameters.
 
 Each parameter for an HTTP operation has a `methodParameterSegments` property to indicate the mapping of one payload parameter with the path of one or more method-level parameters or model properties. This helps emitters determine how to compose the underlying payload with the method's parameters. One body parameter can have several method-level parameter or model property mapping paths because of the implicit body parameter resolving from the TypeSpec HTTP library.
 
@@ -193,7 +200,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Union Types:**
 
-- [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+- [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type. For discriminated unions, the `discriminatedOptions` property contains the discriminator details including the envelope style and discriminator property name.
 
 **Model Types:**
 
@@ -203,14 +210,17 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 - [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
   - `flatten`: Indicates if the property can be flattened
-  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
-  - For discriminated models:
+  - `access`: Indicates the property's accessibility (`"public"` or `"internal"`)
+  - `encode`: Indicates the encoding style for array properties (e.g., `"pipeDelimited"`, `"commaDelimited"`)
+  - For array properties:
+    - `arrayEncode` (deprecated): Same as `encode`, use `encode` instead
+  - For discriminated models (on `SdkModelType`):
     - `discriminatorProperty`: The property used as a discriminator
     - `discriminatedSubtypes`: List of all subtypes of this discriminated model
-  - For subtypes of discriminated models:
+  - For subtypes of discriminated models (on `SdkModelType`):
     - `discriminatorValue`: The instance value for the discriminator for this subtype
-  - For array properties:
-    - `arrayEncode`: Indicates the encoding style for array properties (if specified).
+  - For additional properties (on `SdkModelType`):
+    - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
 
 ### Example types
 
@@ -228,9 +238,9 @@ For [`SdkModelExampleValue`](../reference/js-api/interfaces/sdkmodelexamplevalue
 
 ### Client Detection
 
-The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, `@operationGroup` and `@moveTo`.
+The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, `@operationGroup` and `@clientLocation`.
 
-If there is no explicitly defined `@client` or `@operationGroup`, then the first namespace with `@service` is a root client. The nested namespaces and interfaces under that namespace are sub clients with hierarchy. Meanwhile, any operations with `@moveTo` a `string` type target, is a sub client under the root client.
+If there is no explicitly defined `@client` or `@operationGroup`, then the first namespace with `@service` is a root client. The nested namespaces and interfaces under that namespace are sub clients with hierarchy. Meanwhile, any operations with `@clientLocation` targeting a `string` type, create a sub client under the root client.
 
 If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
 
@@ -254,13 +264,13 @@ Normally, a client's initialization parameters include:
 
 The client's initialization way is `undefined`. Emitters can choose how to initialize all the clients.
 
-With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with initializing by parent client, initializing individually or both.
+With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with initializing by parent client, initializing individually, both, or `customizeCode` (initialization omitted from generated code, intended for hand-written initialization).
 
 ### Method Detection
 
-The methods depend on the combination usage of `Operation`, `@scope`, and `@moveTo`.
+The methods depend on the combination usage of `Operation`, `@scope`, and `@clientLocation`.
 
-A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@moveTo` current client, deducting any operations with `@scope` out of current emitter or `@moveTo` another client.
+A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@clientLocation` targeting the current client, deducting any operations with `@scope` out of current emitter or `@clientLocation` targeting another client.
 
 ### Method Parameters Handling
 
