@@ -1751,3 +1751,150 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Scoping operations to specific languages
+
+The `@scope` decorator allows you to include or exclude operations and model properties for specific language emitters. This is useful when certain operations should only be generated for specific target languages.
+
+### Including an operation for specific languages
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace MyService;
+
+model Resource {
+  name: string;
+}
+
+op getResource(@path name: string): Resource;
+
+// This operation only appears in the Python SDK
+@scope("python")
+op debugResource(@path name: string): Resource;
+```
+
+```python
+# getResource and debugResource are both generated
+```
+
+```csharp
+// Only getResource is generated; debugResource is excluded
+```
+
+```typescript
+// Only getResource is generated; debugResource is excluded
+```
+
+```java
+// Only getResource is generated; debugResource is excluded
+```
+
+```go
+// Only getResource is generated; debugResource is excluded
+```
+
+</ClientTabs>
+
+### Excluding an operation from specific languages
+
+Use the negation syntax `!` to exclude an operation from specific languages while including it for all others.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace MyService;
+
+model Resource {
+  name: string;
+}
+
+// This operation is generated for all languages except C#
+@scope("!csharp")
+op legacyGet(@path name: string): Resource;
+```
+
+```python
+# legacyGet is generated
+```
+
+```csharp
+// legacyGet is excluded
+```
+
+```typescript
+// legacyGet is generated
+```
+
+```java
+// legacyGet is generated
+```
+
+```go
+// legacyGet is generated
+```
+
+</ClientTabs>
+
+### Notes
+
+- Multiple languages can be specified as a comma-separated list: `@scope("python, csharp")`
+- Multiple languages can be excluded: `@scope("!(csharp, java)")`
+- `@scope` should be used alongside other scoped decorators when applicable — using `@scope` alone without any other scoped decorator will emit a warning
+
+## HEAD operations with boolean response
+
+The `@responseAsBool` decorator models HEAD operation responses as a boolean value. A `2xx` response returns `true`, a `404` response returns `false`, and other error status codes raise exceptions.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace MyService;
+
+@error
+model Error {
+  code: int32;
+  message: string;
+}
+
+@responseAsBool
+@head
+op exists(@path name: string): void | Error;
+```
+
+```python
+# def exists(self, name: str) -> bool:
+#     ...
+# Returns True on 2xx, False on 404, raises on other errors
+```
+
+```csharp
+// public bool Exists(string name);
+// Returns true on 2xx, false on 404, throws on other errors
+```
+
+```typescript
+// exists(name: string): Promise<boolean>
+// Returns true on 2xx, false on 404, throws on other errors
+```
+
+```java
+// public boolean exists(String name)
+// Returns true on 2xx, false on 404, throws on other errors
+```
+
+```go
+// func (client *Client) Exists(ctx context.Context, name string) (bool, error)
+// Returns true on 2xx, false on 404, returns error on other errors
+```
+
+</ClientTabs>
+
+### Notes
+
+- `@responseAsBool` can **only** be applied to HEAD operations. Applying it to GET, POST, or other HTTP methods will emit a diagnostic error.
+- `404` is always treated as a normal (non-error) response returning `false`.
+- Other error status codes (e.g., `500`) still raise exceptions.
