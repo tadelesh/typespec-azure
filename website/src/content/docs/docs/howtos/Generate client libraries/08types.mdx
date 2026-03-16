@@ -744,12 +744,7 @@ public final class Widget implements JsonSerializable<Widget> {
 <ClientTabItem lang="go" >
 
 ```go
-type Widget struct {
-	// REQUIRED
-	Name        *string
-	// During deserialization, empty string "" will be converted to nil
-	Description *string
-}
+// Go does not support @deserializeEmptyStringAsNull
 ```
 
 </ClientTabItem>
