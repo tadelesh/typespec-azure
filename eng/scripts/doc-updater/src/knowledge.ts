@@ -158,6 +158,13 @@ export function listCommitsSince(sourcePaths: string[], lastCommit: string): str
     const totalCount = execSync(countCmd, { encoding: "utf-8", cwd: REPO_ROOT }).trim();
     console.log(`[knowledge] Total commits since ${lastCommit.slice(0, 8)}: ${totalCount}`);
 
+    // Log the actual commits so we can see what's being filtered
+    if (parseInt(totalCount, 10) > 0) {
+      const logCmd = `git log --oneline ${lastCommit}..HEAD -- ${paths}`;
+      const allCommits = execSync(logCmd, { encoding: "utf-8", cwd: REPO_ROOT }).trim();
+      console.log(`[knowledge] All commits:\n${allCommits}`);
+    }
+
     const result = execSync(filteredCmd, { encoding: "utf-8", cwd: REPO_ROOT }).trim();
     const filtered = result ? result.split("\n") : [];
     console.log(`[knowledge] After filtering [Automated]: ${filtered.length}`);
