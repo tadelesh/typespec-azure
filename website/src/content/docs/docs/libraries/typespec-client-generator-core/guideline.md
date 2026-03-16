@@ -319,7 +319,7 @@ TCGC uses the following steps to detect all the types in one spec:
 9. If type is an `EnumMember`, finds types for the enum the member belongs to.
 10. If type is a `UnionVariant`, finds types for the union the variant belongs to.
 11. Iterates parameters defined in `@server` and finds types.
-12. Iterates user-defined namespace for `Model`, `Enum` and `Union` to find orphan types (not referred by `Operation`).
+12. Discovers orphan types (not referenced by any `Operation`). Only types with an explicit `@usage` decorator or `@hierarchyBuilding` decorator are discovered as orphans. Unreferenced types without one of these decorators are excluded from SDK output entirely.
 13. Handles API version `Enum` used in `@versioned`.
 
 ### Access Calculation
@@ -330,6 +330,8 @@ If `@access` is decorated on either `Namespace`, `Operation`, types, or model pr
 ### Usage Calculation
 
 If there is no `@usage` used in the spec, all types' usage in TCGC is calculated by the place where the type is used. The `@usage` decorator can extend the usage for one type or all types under one namespace. The calculation logic is [here](../reference/decorators/#@Azure.ClientGenerator.Core.usage).
+
+> **Note:** Types not referenced by any operation (orphan types) are only included in the SDK output if they have `@usage` applied (directly or on their containing namespace) or `@hierarchyBuilding` applied. Without one of these decorators, unreferenced types are excluded entirely and will not appear in `SdkPackage`.
 
 ### Naming Logic for Anonymous Types
 

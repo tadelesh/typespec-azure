@@ -96,6 +96,11 @@ extern dec usage(
 Adds additional usage info to models/enums. Usage propagates to properties, parent models,
 and discriminated sub-models.
 
+**Orphan type inclusion**: Types not referenced by any operation (orphan types) are only
+included in the SDK output if they have `@usage` applied (directly or on their containing
+namespace). Without `@usage`, unreferenced types are excluded entirely. Similarly, types
+with `@hierarchyBuilding` (legacy) are also discovered as orphan types.
+
 TypeSpec-side enum values:
 
 ```typespec
@@ -1357,6 +1362,10 @@ Defined in `src/rules/`.
 
 - `@access(Access.public | Access.internal)` — access propagation
 - `@usage(Usage.input | Usage.output | Usage.json | Usage.xml)` — usage propagation
+- Orphan type discovery (types not referenced by operations) now requires explicit `@usage`
+  or `@hierarchyBuilding` decorator. Without these, unreferenced types are excluded from
+  SDK output entirely. Previously all types in service namespaces were automatically
+  discovered as orphans with `UsageFlags.None`.
 - Tests: `test/decorators/@access.test.ts`, `test/decorators/@usage.test.ts`,
   `test/decorators/@usage-extended.test.ts`
 - Docs: No dedicated page (mentioned across multiple pages)
@@ -1368,20 +1377,22 @@ Defined in `src/rules/`.
 - `@apiVersion` to mark/unmark API version parameters
 - API version as config option
 - Tests: `test/decorators/@client-api-versions.test.ts`, `test/decorators/@apiVersion.test.ts`
-- Docs: `10versioning.mdx`
+- Docs: `10versioning.mdx` (includes `@clientApiVersions` section)
 
 ### 7.11 Alternate Types
 
 - `@alternateType` for type replacement (TypeSpec or external types)
 - External type identity, package, minVersion
+- When `@alternateType` replaces a type, the original type is excluded from the referenced
+  type cache entirely (it does not appear with `UsageFlags.None`).
 - Tests: `test/decorators/@alternate-type.test.ts`
-- Docs: No dedicated page
+- Docs: `08types.mdx` (includes external type examples)
 
 ### 7.12 Scoping
 
 - `@scope` to limit operations/properties to specific languages
 - Tests: `test/decorators/@scope.test.ts`
-- Docs: No dedicated page
+- Docs: `04method.mdx`
 
 ### 7.13 Legacy Hierarchy Building
 
@@ -1393,7 +1404,7 @@ Defined in `src/rules/`.
 
 - `@clientDoc` with append/replace modes
 - Tests: `test/decorators/@client-doc.test.ts`
-- Docs: No dedicated page
+- Docs: `08types.mdx`
 
 ### 7.15 Client Options
 
@@ -1406,13 +1417,13 @@ Defined in `src/rules/`.
 
 - `@responseAsBool` for HEAD operations
 - Tests: `test/decorators/@response-as-bool.test.ts`
-- Docs: No dedicated page
+- Docs: `04method.mdx`
 
 ### 7.17 Deserialize Empty String As Null
 
 - `@deserializeEmptyStringAsNull`
 - Tests: `test/decorators/@deserialize-empty-string-as-null.test.ts`
-- Docs: No dedicated page
+- Docs: `08types.mdx`
 
 ### 7.18 Flatten Property
 
@@ -1572,21 +1583,21 @@ All under `packages/typespec-client-generator-core/test/`.
 
 ### 9.1 User Documentation (`website/src/content/docs/docs/howtos/Generate client libraries/`)
 
-| File                          | Title                               | Features Covered                                                                               |
-| ----------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `00howtogen.mdx`              | How to generate client libraries    | Overview, emitter setup                                                                        |
-| `01setup.mdx`                 | Setup for SDK Customization         | `client.tsp` setup, dependency config                                                          |
-| `02package.mdx`               | Common Behavior for Client Packages | `@service`, namespaces, license config, `@clientNamespace`                                     |
-| `03client.mdx`                | Clients                             | `@client`, `@operationGroup`, `@clientInitialization`, `@clientLocation`, sub-client hierarchy |
-| `04method.mdx`                | Basic methods                       | Protocol/convenience methods, `@protocolAPI`, `@convenientAPI`, visibility                     |
-| `05pagingOperations.mdx`      | Paging Operations                   | `@list`, `@pageItems`, `@nextLink`, `@continuationToken`, parameterized next links             |
-| `06longRunningOperations.mdx` | Long-Running Operations             | LRO templates, `@pollingOperation`, resource operations                                        |
-| `07multipart.mdx`             | Multipart Operations                | `@multipartBody`, `HttpPart`, file handling                                                    |
-| `08types.mdx`                 | Generated Types                     | Models, enums, unions, discriminators, `@clientNamespace`                                      |
-| `09renaming.mdx`              | Renaming Types                      | `@clientName`, `@encodedName`, language-specific renaming                                      |
-| `10versioning.mdx`            | Versioning                          | `@versioned`, `@added`, `@removed`, version selection                                          |
-| `11hierarchyBuilding.mdx`     | Multi-Layer Discriminator Hierarchy | `@hierarchyBuilding` (Legacy)                                                                  |
-| `12clientOptions.mdx`         | Client Options                      | `@clientOption`, `getClientOptions`                                                            |
+| File                          | Title                               | Features Covered                                                                                                                            |
+| ----------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `00howtogen.mdx`              | How to generate client libraries    | Overview, emitter setup                                                                                                                     |
+| `01setup.mdx`                 | Setup for SDK Customization         | `client.tsp` setup, dependency config                                                                                                       |
+| `02package.mdx`               | Common Behavior for Client Packages | `@service`, namespaces, license config, `@clientNamespace`                                                                                  |
+| `03client.mdx`                | Clients                             | `@client`, `@operationGroup`, `@clientInitialization`, `@clientLocation`, sub-client hierarchy                                              |
+| `04method.mdx`                | Basic methods                       | Protocol/convenience methods, `@protocolAPI`, `@convenientAPI`, visibility, `@scope`, `@responseAsBool`                                     |
+| `05pagingOperations.mdx`      | Paging Operations                   | `@list`, `@pageItems`, `@nextLink`, `@continuationToken`, parameterized next links                                                          |
+| `06longRunningOperations.mdx` | Long-Running Operations             | LRO templates, `@pollingOperation`, resource operations                                                                                     |
+| `07multipart.mdx`             | Multipart Operations                | `@multipartBody`, `HttpPart`, file handling                                                                                                 |
+| `08types.mdx`                 | Generated Types                     | Models, enums, unions, discriminators, `@clientNamespace`, `@clientDoc`, `@alternateType` (external types), `@deserializeEmptyStringAsNull` |
+| `09renaming.mdx`              | Renaming Types                      | `@clientName`, `@encodedName`, language-specific renaming                                                                                   |
+| `10versioning.mdx`            | Versioning                          | `@versioned`, `@added`, `@removed`, version selection, `@clientApiVersions`                                                                 |
+| `11hierarchyBuilding.mdx`     | Multi-Layer Discriminator Hierarchy | `@hierarchyBuilding` (Legacy)                                                                                                               |
+| `12clientOptions.mdx`         | Client Options                      | `@clientOption`, `getClientOptions`                                                                                                         |
 
 All user docs use `<ClientTabs>` with language blocks.
 
@@ -1596,7 +1607,7 @@ All user docs use `<ClientTabs>` with language blocks.
 
 ### 9.3 Design Documents (`packages/typespec-client-generator-core/design-docs/`)
 
-- `client.md` — Client type design, `SdkClientType`, `SdkInitializationType`, `InitializedBy`
+- `client.md` — Client type design, `SdkClientType`, `SdkClientInitializationType`, `InitializedBy`
 - `multiple-services.md` — Multi-service support, service arrays
 
 ---
@@ -1686,3 +1697,76 @@ The `decoratorsAllowList` controls which decorators are passed through to the `D
 ```
 
 Emitters can extend this via `additionalDecorators` in `CreateSdkContextOptions`.
+
+---
+
+## 13. Documentation Conventions
+
+Formatting rules learned from reviewer feedback. The doc-update agent must follow these when
+writing or editing documentation.
+
+### 13.1 TypeSpec Code Style in Examples
+
+- **Decorators on their own line.** Place decorators like `@get`, `@post`, `@route(...)` on a
+  separate line before the element they decorate. Do NOT put them on the same line as `op`,
+  `model`, etc.
+
+  ```typespec
+  // ✅ Correct
+  @get
+  op getWidget(@path id: string): Widget;
+
+  // ❌ Wrong — reviewer corrected this
+  @get op getWidget(@path id: string): Widget;
+  ```
+
+- **Blank lines between property groups.** When a model has properties with decorators
+  (e.g., `@visibility`, `@deserializeEmptyStringAsNull`), add a blank line between decorated
+  properties and non-decorated properties for readability.
+
+  ```typespec
+  // ✅ Correct
+  model Widget {
+    @visibility(Lifecycle.Read)
+    id: string;
+
+    name: string;
+    color: string;
+  }
+
+  // ❌ Wrong — reviewer added the blank line
+  model Widget {
+    @visibility(Lifecycle.Read)
+    id: string;
+    name: string;
+    color: string;
+  }
+  ```
+
+### 13.2 Markdown Formatting
+
+- **Italic text.** Use `_text_` (underscores) for italic emphasis, not `*text*` (asterisks).
+  Reviewer corrected `*"quoted text"*` → `_"quoted text"_`.
+
+### 13.3 Design Document Property Names
+
+When referencing `SdkClientType` properties in design documents and YAML examples, use the
+current property names:
+
+- `children` (not `subClients`)
+- `clientInitialization` (not `initialization`)
+- `SdkClientInitializationType` (not `SdkInitializationType`)
+- `kind: clientinitialization` (not `kind: model`)
+
+### 13.4 Guideline.md Terminology
+
+When referencing decorators in the emitter developer guideline:
+
+- Use `@clientLocation` (not the old name `@moveTo`)
+- Use `encode` for array encoding property (not `arrayEncode`), with valid values:
+  `"pipeDelimited"`, `"spaceDelimited"`, `"commaDelimited"`, `"newlineDelimited"`
+
+### 13.5 ExternalType Property Names
+
+When documenting `@alternateType` with `ExternalType`, use the correct property name
+`identity` (not `fullyQualifiedName`).

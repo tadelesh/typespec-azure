@@ -1,11 +1,9 @@
 {
-  "lastCommit": "f53de6d7e17fc395b621fabef39005066b7c64ce",
-  "lastUpdated": "2026-03-12T10:15:57.465Z",
+  "lastCommit": "d4ef3f8d8b8a1cec8627324d7a7960169823455f",
+  "lastUpdated": "2026-03-16T09:23:55.946Z",
   "analyzedPaths": [
-    "packages/typespec-client-generator-core/src/**",
-    "packages/typespec-client-generator-core/lib/**",
-    "packages/typespec-client-generator-core/generated-defs/**",
-    "packages/typespec-client-generator-core/test/**"
-  ],
-  "lastPrNumber": 16
+    "packages/typespec-client-generator-core/src",
+    "packages/typespec-client-generator-core/lib",
+    "packages/typespec-client-generator-core/test"
+  ]
 }
