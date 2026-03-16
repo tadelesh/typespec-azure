@@ -9,9 +9,13 @@ flowchart LR
 
     Config --> P0
 
-    P0[Feedback\nLearn from human corrections]
-    P1[Knowledge Build\nAnalyze source → knowledge base]
-    P2[Doc Update\nUpdate docs using knowledge]
+    P0[Feedback
+    Learn from human corrections]
+    P1[Knowledge Build
+    Analyze source →
+    knowledge base]
+    P2[Doc Update
+    Update docs using knowledge]
 
     P0 --> P1 --> P2
 
