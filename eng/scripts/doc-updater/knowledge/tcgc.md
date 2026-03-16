@@ -3,7 +3,7 @@
 ## Package Info
 
 - **Package**: `@azure-tools/typespec-client-generator-core`
-- **Version**: 0.66.0
+- **Version**: 0.66.2
 - **Decorator definitions**: `lib/decorators.tsp` (main), `lib/legacy.tsp` (legacy)
 - **Public types**: `src/interfaces.ts`
 
@@ -62,15 +62,22 @@
 | `@scope`                        | `azure/client-generator-core/scope/`                            |
 | `@clientApiVersions`            | `azure/client-generator-core/client-api-versions/`              |
 
-## Key Type Names (current as of v0.66.0)
+## Key Type Names (current as of v0.66.2)
 
-| Type Name                     | Location        | Notes                                  |
-| ----------------------------- | --------------- | -------------------------------------- |
-| `SdkClientType`               | `interfaces.ts` | Has `children` (not `subClients`)      |
-| `SdkClientInitializationType` | `interfaces.ts` | Was previously `SdkInitializationType` |
-| `SdkPackage`                  | `interfaces.ts` | Root package structure                 |
-| `SdkServiceMethod`            | `interfaces.ts` | Method on a client                     |
-| `SdkHttpOperation`            | `interfaces.ts` | HTTP operation details                 |
+| Type Name                     | Location        | Notes                                             |
+| ----------------------------- | --------------- | ------------------------------------------------- |
+| `SdkClientType`               | `interfaces.ts` | Has `children` (not `subClients`)                 |
+| `SdkClientInitializationType` | `interfaces.ts` | Was previously `SdkInitializationType`            |
+| `SdkPackage`                  | `interfaces.ts` | Root package structure                            |
+| `SdkServiceMethod`            | `interfaces.ts` | Method on a client                                |
+| `SdkHttpOperation`            | `interfaces.ts` | HTTP operation details                            |
+| `TCGCContext`                 | `interfaces.ts` | Has internal `__orphanTypesCache` (added v0.66.2) |
+
+## Internal Implementation Notes
+
+- `compareModelProperties` (internal-utils.ts): Signature changed from `(context: TCGCContext \| undefined, ...)` to `(program: Program, ...)` in v0.66.1. Not referenced in any docs.
+- `listOrphanTypes` (internal-utils.ts): New cached function in v0.66.2 consolidating orphan type discovery. Used by both `handleServiceOrphanTypes` and `getGeneratedName`. Not referenced in docs.
+- `getContextPath` (public-utils.ts): Root parameter expanded from `Operation | Model` to `Operation | Model | Union` in v0.66.2. Internal function, not in docs.
 
 ## Doc Conventions
 
