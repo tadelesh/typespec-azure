@@ -12,10 +12,11 @@ flowchart LR
     P0[Feedback
     Learn from human corrections]
     P1[Knowledge Build
-    Analyze source →
-    knowledge base]
+    Full or incremental
+    based on changed commits]
     P2[Doc Update
-    Update docs using knowledge]
+    Full or incremental
+    based on changed commits]
 
     P0 --> P1 --> P2
 
@@ -25,6 +26,7 @@ flowchart LR
 
     MCP -.-> P0
     MCP -.-> P1
+    MCP -.-> P2
     KB --> P2
     P0 --> KB
     P1 --> KB
