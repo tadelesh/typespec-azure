@@ -944,3 +944,88 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Extending Client API Versions
+
+The `@clientApiVersions` decorator allows you to extend the set of API versions exposed by the client beyond what the service's `@versioned` decorator defines. This is useful when you want to generate a complete API version enum without annotating the entire specification with versioning decorators.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/versioning";
+
+using Http;
+using Versioning;
+
+@versioned(Versions)
+@service
+namespace Demo;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+  v2024_06_01: "2024-06-01",
+}
+
+@route("/widgets")
+op list(): string[];
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Define additional API versions that the client should support
+enum ClientVersions {
+  v2023_01_01: "2023-01-01",
+  v2023_06_01: "2023-06-01",
+  ...Demo.Versions,
+}
+
+@@clientApiVersions(Demo, ClientVersions);
+```
+
+```python
+# The client exposes all 4 API versions (2 additional + 2 from service)
+from demo import DemoClient
+
+client = DemoClient(endpoint=..., credential=...)
+# Default version is the latest: "2024-06-01"
+```
+
+```csharp
+// The ServiceVersion enum includes all 4 versions
+public enum ServiceVersion
+{
+    V2023_01_01 = 1,
+    V2023_06_01 = 2,
+    V2024_01_01 = 3,
+    V2024_06_01 = 4,
+}
+
+public partial class DemoClientOptions : ClientOptions
+{
+    public DemoClientOptions(ServiceVersion version = ServiceVersion.V2024_06_01);
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+public enum DemoServiceVersion implements ServiceVersion {
+    V2024_01_01("2024-01-01"),
+    V2024_06_01("2024-06-01");
+
+    public static DemoServiceVersion getLatest() { ... } // V2024_06_01
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

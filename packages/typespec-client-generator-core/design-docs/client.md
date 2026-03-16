@@ -160,8 +160,8 @@ The above tsp gets the two root clients: `DogsClient` and `CatsClient`. All of t
 
 ### TCGC client types and client initialization
 
-TCGC client type (`SdkClientType`) has `subClients` and `parent` property to indicate the client hierarchy.
-It also has `initialization` property of `SdkInitializationType` to indicate the initialization paramters and how to initialize the client.
+TCGC client type (`SdkClientType`) has `children` and `parent` property to indicate the client hierarchy.
+It also has `clientInitialization` property of `SdkClientInitializationType` to indicate the initialization parameters and how to initialize the client.
 
 TCGC always puts the following things in initialization parameters:
 
@@ -170,7 +170,7 @@ TCGC always puts the following things in initialization parameters:
 3. API version parameter: if the service is versioned, then the API version parameter on method will be elevated to client.
 4. Subscription ID parameter: if the service is an ARM service, then the subscription ID parameter on method will be elevated to client.
 
-The `SdkInitializationType` has `initializedBy` property.
+The `SdkClientInitializationType` has `initializedBy` property.
 The value could be `InitializedBy.parent (1)` (the client could be initialized by parent client),
 `InitializedBy.individually (2)` (the client could be initialized individually) or `InitializedBy.parent | InitializedBy.individually (3)` (both).
 
@@ -193,11 +193,11 @@ clients:
       name: PetStoreClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Cats
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -211,7 +211,7 @@ clients:
       - kind: client
         name: Dogs
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -235,12 +235,12 @@ clients:
       name: ToyStoreClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Cars
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -254,8 +254,8 @@ clients:
       - kind: client
         name: Dolls
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -285,11 +285,11 @@ clients:
       name: DogsClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Feed
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -303,7 +303,7 @@ clients:
       - kind: client
         name: Pet
         parent: *a1
-        subClients: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -327,12 +327,12 @@ clients:
       name: CatsClientOptions
       isGeneratedName: true
       initializedBy: individually
-    subClients:
+    children:
       - kind: client
         name: Feed
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -346,8 +346,8 @@ clients:
       - kind: client
         name: Pet
         parent: *a2
-        subClients: []
-        subClients: []
+        children: []
+        children: []
         initialization:
           kind: model
           properties:
@@ -401,7 +401,7 @@ clients:
   - &a3
     kind: client
     name: MyServiceClient
-    subClients:
+    children:
       - kind: client
         name: InnerGroup
         methods:
@@ -530,10 +530,10 @@ model SubClientOptions {
 
 ## Changes needed with above design
 
-1. Change `@clientInitialization` decorator and add `initializedBy` property to `SdkInitializationType`
+1. Change `@clientInitialization` decorator and add `initializedBy` property to `SdkClientInitializationType`
 
 - Change `@clientInitialization` decorator's `options` parameter to `ClientInitializationOptions` type to accept `initializedBy` setting.
-- Add `clientInitialization` property to `SdkInitializationType`.
+- Add `clientInitialization` property to `SdkClientInitializationType`.
 - Add check for `initializedBy`, root clients could only have `individually` value.
 
 2. Deprecate client accessor method. Add `subClients` property to `SdkClientType` and put all sub clients in this list.
