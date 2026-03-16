@@ -1751,3 +1751,159 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Using `@responseAsBool` for HEAD operations
+
+The `@responseAsBool` decorator indicates that a HEAD operation should return a `boolean` instead of `void`. When applied, 2xx responses return `true`, 404 returns `false`, and any other status code still raises an error.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using Http;
+
+@service
+namespace Demo;
+
+@head
+op checkExists(@path id: string): {
+  @statusCode code: 200 | 404;
+};
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(Demo.checkExists);
+```
+
+```python
+class DemoClient:
+    def check_exists(self, id: str, **kwargs: Any) -> bool:
+        # Returns True for 2xx, False for 404
+        ...
+```
+
+```csharp
+public partial class DemoClient
+{
+    // Returns Response<bool>: true for 2xx, false for 404
+    public virtual Response<bool> CheckExists(string id, CancellationToken cancellationToken = default);
+    public virtual async Task<Response<bool>> CheckExistsAsync(string id, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+// NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+## Using `@scope` to control language applicability
+
+The `@scope` decorator controls which language emitters an operation or model property applies to. By default, all elements are available to all language emitters. Use `@scope` to include an element only for specific languages or exclude it from specific languages.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace Demo;
+
+model Widget {
+  name: string;
+
+  // This property will only be generated for Python
+  @scope("python")
+  pythonOnlyProp: string;
+}
+
+@route("/widgets/{id}")
+op get(@path id: string): Widget;
+
+// This operation will be generated for all languages except C#
+@scope("!csharp")
+@route("/widgets")
+op listWidgets(): Widget[];
+```
+
+```python
+# Python sees pythonOnlyProp and listWidgets
+class Widget(_Model):
+    name: str = rest_field(...)
+    python_only_prop: str = rest_field(name="pythonOnlyProp", ...)
+
+class DemoClientOperationsMixin:
+    def get(self, id: str, **kwargs: Any) -> Widget: ...
+    def list_widgets(self, **kwargs: Any) -> list[Widget]: ...
+```
+
+```csharp
+// C# does NOT see pythonOnlyProp or listWidgets
+public partial class Widget
+{
+    public string Name { get; }
+    // pythonOnlyProp is excluded by @scope("python")
+}
+
+public partial class DemoClient
+{
+    public virtual Response Get(string id, ...);
+    // listWidgets is excluded by @scope("!csharp")
+}
+```
+
+```typescript
+export interface Widget {
+  name: string;
+  pythonOnlyProp: string;
+}
+
+// listWidgets is available (not excluded for TypeScript)
+export async function get(context: Client, id: string, ...): Promise<Widget>;
+export async function listWidgets(context: Client, ...): Promise<Widget[]>;
+```
+
+```java
+public final class Widget {
+    public String getName() { ... }
+    public String getPythonOnlyProp() { ... }
+}
+
+public final class DemoClient {
+    public Widget get(String id) { ... }
+    // listWidgets is available (not excluded for Java)
+    public List<Widget> listWidgets() { ... }
+}
+```
+
+```go
+type Widget struct {
+	// REQUIRED
+	Name *string
+	// pythonOnlyProp is excluded by @scope("python")
+}
+
+func (client *DemoClient) Get(ctx context.Context, id string, options *DemoClientGetOptions) (DemoClientGetResponse, error)
+// listWidgets is available (not excluded for Go)
+func (client *DemoClient) ListWidgets(ctx context.Context, options *DemoClientListWidgetsOptions) (DemoClientListWidgetsResponse, error)
+```
+
+</ClientTabs>

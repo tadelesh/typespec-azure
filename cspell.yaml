@@ -95,3 +95,5 @@ words:
   - azsecrets
   - byval
   - petstoreopgrp
+  - responseasbool
+  - clientapiversions

@@ -427,3 +427,53 @@ model Page {
   ]>;
 }
 ```
+
+## Legacy Paging Decorators
+
+### Forcing an Operation to Be Pageable (Legacy)
+
+:::caution
+The `@markAsPageable` decorator is legacy functionality and should only be used when standard TypeSpec paging patterns are not feasible. Verify the generated code works end-to-end when using this decorator.
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.markAsPageable` decorator forces an operation to be treated as pageable even when it does not follow standard paging patterns. When applied, SDK generators will generate paging mechanisms (iterators/async iterators) and return pageable-specific return types.
+
+```typespec
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Needed for backward compatibility"
+@Azure.ClientGenerator.Core.Legacy.markAsPageable
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+### Disabling Paging for an Operation (Legacy)
+
+:::caution
+The `@disablePageable` decorator is legacy functionality and should only be used when you need to override the default paging behavior for specific operations.
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.disablePageable` decorator prevents an operation from being treated as pageable even when it follows standard paging patterns (e.g., decorated with `@list`). The response will be the paged model itself rather than the list of items, and no paging mechanisms will be generated.
+
+```typespec
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Override paging behavior"
+@Azure.ClientGenerator.Core.Legacy.disablePageable
+@list
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+### Specifying Next Link HTTP Verb (Legacy)
+
+:::caution
+The `@nextLinkVerb` decorator is legacy functionality and should only be used when standard TypeSpec paging patterns are not sufficient.
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.nextLinkVerb` decorator overrides the HTTP method used for fetching the next page. Only `"POST"` and `"GET"` are supported.
+
+```typespec
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Service uses POST for next links"
+@Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
+@post
+op listItems(): PageResult;
+```

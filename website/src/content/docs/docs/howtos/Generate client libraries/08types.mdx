@@ -654,6 +654,102 @@ model Config {
 </ClientTabItem>
 </ClientTabs>
 
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a model property of type `string` (or a scalar derived from `string`) should be deserialized as `null` when its value is an empty string (`""`). This is useful when services return empty strings to represent absent values rather than `null`.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using Http;
+
+@service
+namespace Demo;
+
+model Widget {
+  name: string;
+  description?: string;
+}
+
+op get(): Widget;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@deserializeEmptyStringAsNull(Demo.Widget.description);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+class Widget(_Model):
+    """Widget.
+
+    :ivar name: Required.
+    :vartype name: str
+    :ivar description:
+    :vartype description: str
+    """
+
+    name: str = rest_field(visibility=["read", "create", "update", "delete", "query"])
+    description: Optional[str] = rest_field(visibility=["read", "create", "update", "delete", "query"])
+    # During deserialization, empty string "" will be converted to None
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+public partial class Widget
+{
+    public string Name { get; }
+
+    // During deserialization, empty string "" will be converted to null
+    public string Description { get; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+export interface Widget {
+  name: string;
+  // During deserialization, empty string "" will be converted to undefined
+  description?: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+public final class Widget implements JsonSerializable<Widget> {
+    public String getName() { ... }
+
+    // During deserialization, empty string "" will be converted to null
+    public String getDescription() { ... }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// Go does not support @deserializeEmptyStringAsNull
+```
+
+</ClientTabItem>
+</ClientTabs>
+
 ## Models
 
 ### Models with additional properties of any type
