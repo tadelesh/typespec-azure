@@ -25,9 +25,6 @@ export interface DocUpdateConfig {
 
   /** Source code paths to analyze for cross-referencing */
   sourceCodePaths: string[];
-
-  /** Named focus areas that can be selected at dispatch time */
-  focusAreas: Record<string, string>;
 }
 
 /** Directory containing YAML config files, relative to this source file. */

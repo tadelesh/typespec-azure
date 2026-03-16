@@ -27,67 +27,25 @@ export async function loadPromptFile(configName: string, promptName: string): Pr
 }
 
 // ---------------------------------------------------------------------------
-// Knowledge build prompts (system-driven)
+// Knowledge build prompt (system-driven)
 // ---------------------------------------------------------------------------
 
 /**
- * Build the system prompt for a full knowledge build.
+ * Build the system prompt for a knowledge build.
  *
- * This is system-driven — the user only maintains the doc-update prompt.
- * The prompt is intentionally open-ended: it gives the LLM the doc-update
- * instructions and lets it decide what information is worth caching.
+ * When changedCommits are provided (incremental mode), the agent only
+ * updates knowledge sections affected by those commits.
+ * Otherwise it performs a full analysis from scratch.
  */
-export function buildFullKnowledgePrompt(config: DocUpdateConfig, docUpdatePrompt: string): string {
-  const paths = config.sourceCodePaths.map((p) => `- \`${p}\``).join("\n");
-  const knowledgePath = getKnowledgeRelativePath(config.name);
-
-  return `You are building a **knowledge base** for **${config.displayName}**.
-
-${config.description}
-
-## Source Code Locations
-
-${paths}
-
-## Output
-
-Write the knowledge base to: \`${knowledgePath}\`
-
-After writing, run \`pnpm format:dir ${knowledgePath}\` to format the file.
-
-## Context
-
-A separate documentation update agent will use this knowledge base as its reference when updating documentation. That agent will read what you write here first to reduce the efforts of reading all source code.
-
-Below are the instructions the doc-update agent will follow. Read them carefully to understand what information it will need:
-
-<doc-update-instructions>
-${docUpdatePrompt}
-</doc-update-instructions>
-
-## Instructions
-
-Analyze the source code and existing documentation. Then write a knowledge base that contains everything the doc-update agent would need to carry out those instructions effectively.
-
-You decide the structure and what to include. Think about what the doc-update agent will need to look up, cross-reference, or verify — and make sure that information is in the knowledge base.`;
-}
-
-/**
- * Build the system prompt for an incremental knowledge update session.
- *
- * Each session processes a batch of commits to keep context manageable.
- */
-export function buildIncrementalKnowledgePrompt(
+export function buildKnowledgePrompt(
   config: DocUpdateConfig,
-  commitHashes: string[],
-  existingKnowledge: string,
   docUpdatePrompt: string,
+  changedCommits?: string[],
 ): string {
   const paths = config.sourceCodePaths.map((p) => `- \`${p}\``).join("\n");
   const knowledgePath = getKnowledgeRelativePath(config.name);
-  const commits = commitHashes.map((h) => `- \`${h}\``).join("\n");
 
-  return `You are performing an incremental update to the knowledge base for **${config.displayName}**.
+  let prompt = `You are building a **knowledge base** for **${config.displayName}**.
 
 ${config.description}
 
@@ -106,25 +64,24 @@ ${docUpdatePrompt}
 </doc-update-instructions>
 
 ## Instructions
-
-The following commits (oldest first) need to be reviewed:
-
-${commits}
-
-**Repository:** \`Azure/typespec-azure\`
-
-Use GitHub MCP tools to inspect each commit. Analyze the changes and update the knowledge base accordingly to make sure the knowledge base contains everything the doc-update agent would need to carry out those instructions effectively.
-
-Skip commits that are irrelevant (pure refactors, CI, formatting, dependency bumps).
-
-## Output
-
-Write the updated knowledge base to: \`${knowledgePath}\`
-
-After writing, run \`pnpm format:dir ${knowledgePath}\` to format the file.
-
-**Important:** Preserve sections not affected by these commits. Only update what the commits actually change.
 `;
+
+  if (changedCommits && changedCommits.length > 0) {
+    const commits = changedCommits.map((h) => `- \`${h}\``).join("\n");
+    prompt += `\nThis is an incremental update. The following commits (oldest first) need to be reviewed:\n\n${commits}\n\n`;
+    prompt += `**Repository:** \`Azure/typespec-azure\`\n\n`;
+    prompt += `Use GitHub MCP tools to inspect each commit. Update the knowledge base to reflect any changes that affect what the doc-update agent needs to know.\n\n`;
+    prompt += `Skip commits that are irrelevant (pure refactors, CI, formatting, dependency bumps).\n\n`;
+    prompt += `**Important:** Preserve sections not affected by these commits. Only update what the commits actually change.\n`;
+  } else {
+    prompt += `\nAnalyze the source code and existing documentation. Then write a knowledge base that contains everything the doc-update agent would need to carry out those instructions effectively.\n\n`;
+    prompt += `You decide the structure and what to include. Think about what the doc-update agent will need to look up, cross-reference, or verify — and make sure that information is in the knowledge base.\n`;
+  }
+
+  prompt += `\n## Output\n\nWrite the knowledge base to: \`${knowledgePath}\`\n\n`;
+  prompt += `After writing, run \`pnpm format:dir ${knowledgePath}\` to format the file.\n`;
+
+  return prompt;
 }
 
 // ---------------------------------------------------------------------------
@@ -204,27 +161,19 @@ ${existingKnowledge}`;
 /**
  * Build the prompt for the doc-update phase.
  *
- * Injects the knowledge base content and runtime context (focus area, date)
- * directly into the prompt so the agent has everything it needs without
- * additional tool calls.
+ * Injects the knowledge base content and runtime context.
+ * When changedCommits are provided (incremental mode), the agent focuses
+ * only on documentation affected by those changes.
  */
 export async function buildDocUpdatePrompt(
   config: DocUpdateConfig,
-  focus: string,
+  changedCommits?: string[],
 ): Promise<string> {
-  const focusDescription = config.focusAreas[focus];
-  if (!focusDescription) {
-    const available = Object.keys(config.focusAreas).join(", ");
-    throw new Error(
-      `Unknown focus area "${focus}" for config "${config.name}". Available: ${available}`,
-    );
-  }
-
   const knowledge = await readKnowledge(config.name);
   if (!knowledge) {
     throw new Error(
       `No knowledge base found for "${config.name}". ` +
-        `Run with --phase knowledge first to build it.`,
+        `Run with --full-rebuild first to build it.`,
     );
   }
 
@@ -233,7 +182,16 @@ export async function buildDocUpdatePrompt(
 
   prompt += `\n\n## Runtime Context\n\n`;
   prompt += `**Date:** ${date}\n`;
-  prompt += `**Focus Area:** ${focus} — ${focusDescription}\n`;
+
+  if (changedCommits && changedCommits.length > 0) {
+    const commits = changedCommits.map((h) => `- \`${h}\``).join("\n");
+    prompt += `\n## Incremental Update Mode\n\n`;
+    prompt += `This is an incremental run. Only the following commits have changed the source code since the last update:\n\n`;
+    prompt += `${commits}\n\n`;
+    prompt += `**Repository:** \`Azure/typespec-azure\`\n\n`;
+    prompt += `Use GitHub MCP tools to inspect these commits and determine which documentation areas are affected. `;
+    prompt += `Only update documentation that is impacted by these changes — do not re-review unaffected areas.\n`;
+  }
 
   prompt += `\n## Package Knowledge Base\n\n`;
   prompt += knowledge;

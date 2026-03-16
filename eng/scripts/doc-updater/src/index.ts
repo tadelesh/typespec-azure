@@ -1,13 +1,13 @@
 /**
  * Doc-updater orchestrator using GitHub Copilot SDK.
  *
- * Pipeline:
- *   Phase 0 — Feedback: Learn from human corrections on the last PR
- *   Phase 1 — Knowledge Build: Analyze source code → build/update knowledge base (system-driven)
- *   Phase 2 — Doc Update: Use knowledge base → update documentation (per-package prompt)
+ * Pipeline (always runs all steps in order):
+ *   1. Feedback: Learn from human corrections on the last PR
+ *   2. Knowledge Build: Analyze source code → build/update knowledge base
+ *   3. Doc Update: Use knowledge base → update documentation
  *
  * Usage:
- *   tsx src/index.ts --config <name> [--focus <area>] [--phase <phase>] [--full-rebuild] [--dry-run] [--model <model>]
+ *   tsx src/index.ts --config <name> [--full-rebuild] [--dry-run] [--model <model>]
  */
 
 import { CopilotClient } from "@github/copilot-sdk";
@@ -26,8 +26,7 @@ import {
 import {
   buildDocUpdatePrompt,
   buildFeedbackPrompt,
-  buildFullKnowledgePrompt,
-  buildIncrementalKnowledgePrompt,
+  buildKnowledgePrompt,
   COMMITS_PER_BATCH,
   loadPromptFile,
 } from "./prompts.js";
@@ -49,88 +48,76 @@ async function main(): Promise<void> {
     console.log("=== DRY RUN ===\n");
     console.log(`Config:        ${config.name} (${config.displayName})`);
     console.log(`Model:         ${args.model}`);
-    console.log(`Phase:         ${args.phase}`);
-    console.log(`Focus:         ${args.focus}`);
     console.log(`Full Rebuild:  ${args.fullRebuild}`);
     console.log();
 
-    if (args.phase === "all" || args.phase === "knowledge") {
-      // Check for human feedback on last doc-update PR
-      try {
-        const meta = args.fullRebuild ? null : await readMeta(config.name);
-        if (meta?.lastPrNumber) {
-          const feedback = getHumanFeedback(meta.lastPrNumber);
-          if (feedback) {
-            const existingKnowledge = (await readKnowledge(config.name)) ?? "(none)";
-            const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
-            const prompt = buildFeedbackPrompt(
-              config,
-              feedback,
-              existingKnowledge,
-              docUpdatePrompt,
-            );
-            console.log("--- Feedback Prompt ---");
-            console.log(prompt);
-            console.log();
-          } else {
-            console.log("--- Feedback ---");
-            console.log(`(no human feedback detected on PR #${meta.lastPrNumber})`);
-            console.log();
-          }
-        }
-      } catch (e) {
-        console.log(`Feedback check error: ${e}`);
-        console.log();
-      }
+    let dryRunCommits: string[] | undefined;
 
-      try {
-        const meta = args.fullRebuild ? null : await readMeta(config.name);
-        if (!meta || args.fullRebuild) {
+    // Feedback
+    try {
+      const meta = args.fullRebuild ? null : await readMeta(config.name);
+      if (meta?.lastPrNumber) {
+        const feedback = getHumanFeedback(meta.lastPrNumber);
+        if (feedback) {
+          const existingKnowledge = (await readKnowledge(config.name)) ?? "(none)";
           const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
-          const prompt = buildFullKnowledgePrompt(config, docUpdatePrompt);
-          console.log("--- Knowledge Build Prompt (Full) ---");
+          const prompt = buildFeedbackPrompt(config, feedback, existingKnowledge, docUpdatePrompt);
+          console.log("--- Feedback Prompt ---");
           console.log(prompt);
           console.log();
         } else {
-          const commits = listCommitsSince(config.sourceCodePaths, meta.lastCommit);
-          if (commits.length === 0) {
-            console.log("--- Knowledge Build ---");
-            console.log("(skipped — no source changes detected)");
-            console.log();
-          } else {
-            const batches = chunkArray(commits, COMMITS_PER_BATCH);
-            console.log(
-              `--- Knowledge Build (Incremental: ${commits.length} commits in ${batches.length} batch(es)) ---`,
-            );
-            const existingKnowledge = (await readKnowledge(config.name)) ?? "(none)";
-            const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
-            const prompt = buildIncrementalKnowledgePrompt(
-              config,
-              batches[0],
-              existingKnowledge,
-              docUpdatePrompt,
-            );
-            console.log(prompt);
-            if (batches.length > 1) {
-              console.log(`\n... (${batches.length - 1} more batch(es) would follow)`);
-            }
-            console.log();
-          }
+          console.log("--- Feedback ---");
+          console.log(`(no human feedback detected on PR #${meta.lastPrNumber})`);
+          console.log();
         }
-      } catch (e) {
-        console.log(`Knowledge prompt error: ${e}`);
-        console.log();
       }
+    } catch (e) {
+      console.log(`Feedback check error: ${e}`);
+      console.log();
     }
 
-    if (args.phase === "all" || args.phase === "doc-update") {
-      try {
-        const prompt = await buildDocUpdatePrompt(config, args.focus);
-        console.log("--- Doc Update Prompt ---");
+    // Knowledge Build
+    try {
+      const meta = args.fullRebuild ? null : await readMeta(config.name);
+      if (!meta || args.fullRebuild) {
+        const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+        const prompt = buildKnowledgePrompt(config, docUpdatePrompt);
+        console.log("--- Knowledge Build Prompt (Full) ---");
         console.log(prompt);
-      } catch (e) {
-        console.log(`Doc update prompt error: ${e}`);
+        console.log();
+      } else {
+        const commits = listCommitsSince(config.sourceCodePaths, meta.lastCommit);
+        dryRunCommits = commits;
+        if (commits.length === 0) {
+          console.log("--- Knowledge Build ---");
+          console.log("(skipped — no source changes detected)");
+          console.log();
+        } else {
+          const batches = chunkArray(commits, COMMITS_PER_BATCH);
+          console.log(
+            `--- Knowledge Build (Incremental: ${commits.length} commits in ${batches.length} batch(es)) ---`,
+          );
+          const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+          const prompt = buildKnowledgePrompt(config, docUpdatePrompt, batches[0]);
+          console.log(prompt);
+          if (batches.length > 1) {
+            console.log(`\n... (${batches.length - 1} more batch(es) would follow)`);
+          }
+          console.log();
+        }
       }
+    } catch (e) {
+      console.log(`Knowledge prompt error: ${e}`);
+      console.log();
+    }
+
+    // Doc Update
+    try {
+      const prompt = await buildDocUpdatePrompt(config, dryRunCommits);
+      console.log("--- Doc Update Prompt ---");
+      console.log(prompt);
+    } catch (e) {
+      console.log(`Doc update prompt error: ${e}`);
     }
     return;
   }
@@ -144,151 +131,144 @@ async function main(): Promise<void> {
   const client = new CopilotClient();
 
   try {
-    // Phase 0: Feedback Loop — learn from human corrections on the last PR
-    if (args.phase === "all" || args.phase === "knowledge") {
+    // Early exit: if incremental mode and no source changes, skip everything
+    if (!args.fullRebuild) {
       const meta = await readMeta(config.name);
-      if (meta?.lastPrNumber && !args.fullRebuild) {
-        log(`Checking for human feedback on PR #${meta.lastPrNumber}...`);
-        const feedback = getHumanFeedback(meta.lastPrNumber);
-
-        if (feedback) {
-          const feedbackSummary = [
-            feedback.commits.length > 0 ? `${feedback.commits.length} human commit(s)` : "",
-            feedback.reviewComments.length > 0
-              ? `${feedback.reviewComments.length} review comment(s)`
-              : "",
-          ]
-            .filter(Boolean)
-            .join(", ");
-          log(`Human feedback detected: ${feedbackSummary}. Running feedback session...`);
-
-          const existingKnowledge = await readKnowledge(config.name);
-          if (existingKnowledge) {
-            const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
-            const prompt = buildFeedbackPrompt(
-              config,
-              feedback,
-              existingKnowledge,
-              docUpdatePrompt,
-            );
-            await runAgentSession(client, prompt, {
-              model: args.model,
-              repoRoot,
-              phaseName: "Feedback",
-              mcpServers: buildGitHubMcpConfig(),
-            });
-            log("Feedback session complete.");
-          }
-        } else {
-          log(`No human feedback detected on PR #${meta.lastPrNumber}.`);
+      if (meta) {
+        const commits = listCommitsSince(config.sourceCodePaths, meta.lastCommit);
+        if (commits.length === 0) {
+          await writeMeta(config.name, {
+            ...meta,
+            lastCommit: getCurrentCommit(),
+            lastUpdated: new Date().toISOString(),
+          });
+          log("No source changes detected — nothing to do.");
+          await client.stop();
+          return;
         }
       }
     }
 
-    // Phase 1: Knowledge Build (system-driven pre-step)
-    if (args.phase === "all" || args.phase === "knowledge") {
+    // Step 1: Feedback Loop — learn from human corrections on the last PR
+    const meta = await readMeta(config.name);
+    if (meta?.lastPrNumber && !args.fullRebuild) {
+      log(`Checking for human feedback on PR #${meta.lastPrNumber}...`);
+      const feedback = getHumanFeedback(meta.lastPrNumber);
+
+      if (feedback) {
+        const feedbackSummary = [
+          feedback.commits.length > 0 ? `${feedback.commits.length} human commit(s)` : "",
+          feedback.reviewComments.length > 0
+            ? `${feedback.reviewComments.length} review comment(s)`
+            : "",
+        ]
+          .filter(Boolean)
+          .join(", ");
+        log(`Human feedback detected: ${feedbackSummary}. Running feedback session...`);
+
+        const existingKnowledge = await readKnowledge(config.name);
+        if (existingKnowledge) {
+          const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+          const prompt = buildFeedbackPrompt(config, feedback, existingKnowledge, docUpdatePrompt);
+          await runAgentSession(client, prompt, {
+            model: args.model,
+            repoRoot,
+            phaseName: "Feedback",
+            mcpServers: buildGitHubMcpConfig(),
+          });
+          log("Feedback session complete.");
+        }
+      } else {
+        log(`No human feedback detected on PR #${meta.lastPrNumber}.`);
+      }
+
+      // Clear lastPrNumber so we don't re-check this PR on the next run
+      await writeMeta(config.name, { ...meta, lastPrNumber: undefined });
+    }
+
+    // Step 2: Knowledge Build
+    log(
+      `Starting knowledge build for ${config.displayName} ` + `(full-rebuild: ${args.fullRebuild})`,
+    );
+
+    const knowledgeMeta = args.fullRebuild ? null : await readMeta(config.name);
+    const needsFullBuild = !knowledgeMeta || args.fullRebuild;
+    let changedCommits: string[] | undefined;
+
+    log(
+      `Meta: ${knowledgeMeta ? `lastCommit=${knowledgeMeta.lastCommit}, lastUpdated=${knowledgeMeta.lastUpdated}` : "(none)"}. ` +
+        `needsFullBuild=${needsFullBuild}`,
+    );
+
+    if (needsFullBuild) {
+      const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+      const prompt = buildKnowledgePrompt(config, docUpdatePrompt);
+
+      await runAgentSession(client, prompt, {
+        model: args.model,
+        repoRoot,
+        phaseName: "Knowledge Build",
+        mcpServers: buildGitHubMcpConfig(),
+      });
+
+      await writeMeta(config.name, {
+        lastCommit: getCurrentCommit(),
+        lastUpdated: new Date().toISOString(),
+        analyzedPaths: config.sourceCodePaths,
+      });
+
+      log("Knowledge build (full) complete.");
+    } else {
+      const commits = listCommitsSince(config.sourceCodePaths, knowledgeMeta.lastCommit);
+      changedCommits = commits;
+
+      const batches = chunkArray(commits, COMMITS_PER_BATCH);
       log(
-        `Starting knowledge build for ${config.displayName} ` +
-          `(full-rebuild: ${args.fullRebuild})`,
+        `Found ${commits.length} commit(s) since last build. ` +
+          `Processing in ${batches.length} batch(es).`,
       );
 
-      const meta = args.fullRebuild ? null : await readMeta(config.name);
-      const needsFullBuild = !meta || args.fullRebuild;
+      const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
 
-      log(
-        `Meta: ${meta ? `lastCommit=${meta.lastCommit}, lastUpdated=${meta.lastUpdated}` : "(none)"}. ` +
-          `needsFullBuild=${needsFullBuild}`,
-      );
+      for (let i = 0; i < batches.length; i++) {
+        const batch = batches[i];
+        log(`Processing batch ${i + 1}/${batches.length} (${batch.length} commits)...`);
 
-      if (needsFullBuild) {
-        const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
-        const prompt = buildFullKnowledgePrompt(config, docUpdatePrompt);
-
+        const prompt = buildKnowledgePrompt(config, docUpdatePrompt, batch);
         await runAgentSession(client, prompt, {
           model: args.model,
           repoRoot,
-          phaseName: "Knowledge Build",
+          phaseName: `Knowledge Update [${i + 1}/${batches.length}]`,
           mcpServers: buildGitHubMcpConfig(),
         });
 
+        const lastCommitInBatch = batch[batch.length - 1];
         await writeMeta(config.name, {
-          lastCommit: getCurrentCommit(),
+          lastCommit: lastCommitInBatch,
           lastUpdated: new Date().toISOString(),
           analyzedPaths: config.sourceCodePaths,
         });
 
-        log("Knowledge build (full) complete.");
-      } else {
-        const commits = listCommitsSince(config.sourceCodePaths, meta.lastCommit);
-
-        if (commits.length === 0) {
-          log("No source changes detected — skipping knowledge build.");
-        } else {
-          const batches = chunkArray(commits, COMMITS_PER_BATCH);
-          log(
-            `Found ${commits.length} commit(s) since last build. ` +
-              `Processing in ${batches.length} batch(es).`,
-          );
-
-          const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
-
-          for (let i = 0; i < batches.length; i++) {
-            const batch = batches[i];
-            log(`Processing batch ${i + 1}/${batches.length} (${batch.length} commits)...`);
-
-            const existingKnowledge = await readKnowledge(config.name);
-            if (!existingKnowledge) {
-              throw new Error(
-                `Knowledge base not found for incremental update of "${config.name}". ` +
-                  `Run with --full-rebuild first.`,
-              );
-            }
-
-            const prompt = buildIncrementalKnowledgePrompt(
-              config,
-              batch,
-              existingKnowledge,
-              docUpdatePrompt,
-            );
-            await runAgentSession(client, prompt, {
-              model: args.model,
-              repoRoot,
-              phaseName: `Knowledge Update [${i + 1}/${batches.length}]`,
-              mcpServers: buildGitHubMcpConfig(),
-            });
-
-            const lastCommitInBatch = batch[batch.length - 1];
-            await writeMeta(config.name, {
-              lastCommit: lastCommitInBatch,
-              lastUpdated: new Date().toISOString(),
-              analyzedPaths: config.sourceCodePaths,
-            });
-
-            log(`Batch ${i + 1}/${batches.length} complete.`);
-          }
-
-          log("Knowledge build (incremental) complete.");
-        }
+        log(`Batch ${i + 1}/${batches.length} complete.`);
       }
+
+      log("Knowledge build (incremental) complete.");
     }
 
-    // Phase 2: Doc Update
-    if (args.phase === "all" || args.phase === "doc-update") {
-      log(
-        `Starting doc update for ${config.displayName} ` +
-          `(focus: ${args.focus}, model: ${args.model})`,
-      );
+    // Step 3: Doc Update
+    log(`Starting doc update for ${config.displayName} (model: ${args.model})`);
 
-      const docPrompt = await buildDocUpdatePrompt(config, args.focus);
+    const docPrompt = await buildDocUpdatePrompt(config, changedCommits);
 
-      await runAgentSession(client, docPrompt, {
-        model: args.model,
-        repoRoot,
-        phaseName: "Doc Update",
-      });
+    await runAgentSession(client, docPrompt, {
+      model: args.model,
+      repoRoot,
+      phaseName: "Doc Update",
+      // Incremental mode needs MCP to inspect commits
+      ...(changedCommits ? { mcpServers: buildGitHubMcpConfig() } : {}),
+    });
 
-      log("Doc update phase complete.");
-    }
+    log("Doc update phase complete.");
   } finally {
     await client.stop();
   }
