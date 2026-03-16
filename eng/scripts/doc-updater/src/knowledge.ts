@@ -44,8 +44,8 @@ export interface HumanFeedback {
 /** Directory containing generated knowledge files, relative to this source file. */
 const KNOWLEDGE_DIR = resolve(import.meta.dirname ?? ".", "../knowledge");
 
-/** Repository root, resolved from this source file's location. */
-const REPO_ROOT = resolve(import.meta.dirname ?? ".", "../../../..");
+/** Repository root, found via git. */
+const REPO_ROOT = execSync("git rev-parse --show-toplevel", { encoding: "utf-8" }).trim();
 
 /** Get the absolute path to a package's knowledge base file. */
 export function getKnowledgePath(configName: string): string {

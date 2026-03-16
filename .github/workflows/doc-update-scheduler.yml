@@ -177,7 +177,7 @@ jobs:
         id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+          token: ${{ github.token }}
           branch: automated/doc-update-${{ matrix.config }}-${{ steps.date.outputs.value }}-${{ github.run_number }}
           title: "[Automated] Update ${{ matrix.config }} documentation (${{ steps.date.outputs.value }})"
           body: |
