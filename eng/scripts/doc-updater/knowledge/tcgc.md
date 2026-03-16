@@ -123,7 +123,7 @@ extern dec usage(
 );
 ```
 
-Adds additional usage info. Usage propagates to properties, parent models, discriminated sub-models.
+Adds additional usage info. Usage propagates to properties, parent models, discriminated sub-models. Applying `@usage` to a model, enum, or union that is not referenced by any operation marks it as an **orphan type** — it will still be included in the SDK type graph and receive proper generated names for any anonymous sub-types.
 
 ```typespec
 enum Usage {
@@ -432,7 +432,9 @@ interface TCGCContext {
   getPackageVersions(): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
-  getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
+  getClientOrOperationGroup(
+    type: Namespace | Interface,
+  ): SdkClient | SdkOperationGroup | undefined;
   getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
   getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
 }
@@ -510,7 +512,11 @@ interface SdkClientInitializationType extends SdkTypeBase {
   kind: "clientinitialization";
   name: string;
   isGeneratedName: boolean;
-  parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
+  parameters: (
+    | SdkEndpointParameter
+    | SdkCredentialParameter
+    | SdkMethodParameter
+  )[];
   initializedBy: InitializedByFlags;
 }
 ```
@@ -924,7 +930,14 @@ interface SdkBodyParameter extends SdkModelPropertyTypeBase {
 #### `CollectionFormat`
 
 ```typescript
-type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
+type CollectionFormat =
+  | "multi"
+  | "csv"
+  | "ssv"
+  | "tsv"
+  | "pipes"
+  | "simple"
+  | "form";
 ```
 
 #### `SdkHttpParameter` (union)
@@ -1027,9 +1040,18 @@ interface SdkPagingServiceMetadata<TServiceOperation> {
   nextLinkSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
   nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
   nextLinkVerb?: "GET" | "POST";
-  nextLinkReInjectedParametersSegments?: (SdkMethodParameter | SdkModelPropertyType)[][];
-  continuationTokenParameterSegments?: (SdkMethodParameter | SdkModelPropertyType)[];
-  continuationTokenResponseSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
+  nextLinkReInjectedParametersSegments?: (
+    | SdkMethodParameter
+    | SdkModelPropertyType
+  )[][];
+  continuationTokenParameterSegments?: (
+    | SdkMethodParameter
+    | SdkModelPropertyType
+  )[];
+  continuationTokenResponseSegments?: (
+    | SdkServiceResponseHeader
+    | SdkModelPropertyType
+  )[];
   pageItemsSegments?: SdkModelPropertyType[];
   pageSizeParameterSegments?: (SdkMethodParameter | SdkModelPropertyType)[];
 }
@@ -1052,8 +1074,16 @@ interface SdkLroServiceMetadata {
   pollingInfo: SdkPollingOperationStep;
   envelopeResult: SdkModelType;
   logicalPath?: string;
-  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
-  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
+  finalResult?:
+    | SdkModelType
+    | SdkArrayType
+    | SdkBuiltInType<"unknown">
+    | "void";
+  finalEnvelopeResult?:
+    | SdkModelType
+    | SdkArrayType
+    | SdkBuiltInType<"unknown">
+    | "void";
   finalResultPath?: string;
 }
 ```
@@ -1085,7 +1115,12 @@ interface SdkHttpOperation {
   path: string;
   uriTemplate: string;
   verb: HttpVerb;
-  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
+  parameters: (
+    | SdkPathParameter
+    | SdkQueryParameter
+    | SdkHeaderParameter
+    | SdkCookieParameter
+  )[];
   bodyParam?: SdkBodyParameter;
   responses: SdkHttpResponse[];
   exceptions: SdkHttpErrorResponse[];
@@ -1205,28 +1240,28 @@ type SdkExampleValue =
 
 Exported from `public-utils.ts`:
 
-| Function                                       | Signature                                                                            | Description                                                                     |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| `getDefaultApiVersion`                         | `(context: TCGCContext, serviceNamespace: Namespace) => Version \| undefined`        | Returns the default (latest) API version for a versioned service                |
-| `isApiVersion`                                 | `(context: TCGCContext, type: ModelProperty) => boolean`                             | Checks if a parameter is an API version parameter                               |
-| `getEffectivePayloadType`                      | `(context: TCGCContext, type: Model, visibility?: Visibility) => Model`              | Returns named model equivalent of anonymous models, ignoring metadata           |
-| `getPropertyNames`                             | `(context: TCGCContext, property: ModelProperty) => [string, string]`                | Returns `[libraryName, wireName]` tuple                                         |
-| `getLibraryName`                               | `(context: TCGCContext, type: Type & { name?: string \| symbol }, scope?) => string` | Gets the client name. Priority: `@clientName` > `@friendlyName` > TypeSpec name |
-| `getWireName`                                  | `(context: TCGCContext, type: Type & { name: string }) => string`                    | Gets serialized name (respects `@encodedName`)                                  |
-| `getCrossLanguageDefinitionId`                 | `(context, type, operation?, appendNamespace?) => string`                            | Generates unique cross-language ID for a type                                   |
-| `getCrossLanguagePackageId`                    | `(context: TCGCContext) => [string, readonly Diagnostic[]]`                          | Gets the cross-language package ID                                              |
-| `getGeneratedName`                             | `(context, type: Model \| Union \| TspLiteralType, operation?) => string`            | Creates a name for anonymous models/unions                                      |
-| `getHttpOperationWithCache`                    | `(context: TCGCContext, operation: Operation) => HttpOperation`                      | Cached HTTP operation lookup                                                    |
-| `getHttpOperationExamples`                     | `(context: TCGCContext, operation: HttpOperation) => SdkHttpOperationExample[]`      | Gets examples for an HTTP operation                                             |
-| `isAzureCoreModel`                             | `(t: SdkType) => boolean`                                                            | Checks if a type is an Azure Core model                                         |
-| `isPagedResultModel`                           | `(context: TCGCContext, t: SdkType) => boolean`                                      | Checks if a type is used as a paged result                                      |
-| `getHttpOperationParameter`                    | `(method, param) => SdkHttpParameter \| SdkModelPropertyType \| undefined`           | Finds the HTTP parameter corresponding to a method parameter                    |
-| `getHttpOperationParametersForClientParameter` | `(client, param) => SdkHttpParameter[]`                                              | Finds HTTP parameters for a client initialization parameter                     |
-| `listAllServiceNamespaces`                     | `(context: TCGCContext) => Namespace[]`                                              | Lists all service namespaces in the program                                     |
-| `resolveOperationId`                           | `(context, operation, honorRenaming?) => string`                                     | Calculates operation ID                                                         |
-| `isHttpMetadata`                               | `(context, property: SdkModelPropertyType) => boolean`                               | Checks if a property is HTTP metadata                                           |
-| `getNamespaceFromType`                         | `(type) => Namespace \| undefined`                                                   | Extracts namespace from a type                                                  |
-| `getClientOptions`                             | `<T extends DecoratedType>(type: T, key: string) => unknown`                         | Gets a `@clientOption` value by key from a decorated type                       |
+| Function                                       | Signature                                                                            | Description                                                                                                                                                    |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `getDefaultApiVersion`                         | `(context: TCGCContext, serviceNamespace: Namespace) => Version \| undefined`        | Returns the default (latest) API version for a versioned service                                                                                               |
+| `isApiVersion`                                 | `(context: TCGCContext, type: ModelProperty) => boolean`                             | Checks if a parameter is an API version parameter                                                                                                              |
+| `getEffectivePayloadType`                      | `(context: TCGCContext, type: Model, visibility?: Visibility) => Model`              | Returns named model equivalent of anonymous models, ignoring metadata                                                                                          |
+| `getPropertyNames`                             | `(context: TCGCContext, property: ModelProperty) => [string, string]`                | Returns `[libraryName, wireName]` tuple                                                                                                                        |
+| `getLibraryName`                               | `(context: TCGCContext, type: Type & { name?: string \| symbol }, scope?) => string` | Gets the client name. Priority: `@clientName` > `@friendlyName` > TypeSpec name                                                                                |
+| `getWireName`                                  | `(context: TCGCContext, type: Type & { name: string }) => string`                    | Gets serialized name (respects `@encodedName`)                                                                                                                 |
+| `getCrossLanguageDefinitionId`                 | `(context, type, operation?, appendNamespace?) => string`                            | Generates unique cross-language ID for a type                                                                                                                  |
+| `getCrossLanguagePackageId`                    | `(context: TCGCContext) => [string, readonly Diagnostic[]]`                          | Gets the cross-language package ID                                                                                                                             |
+| `getGeneratedName`                             | `(context, type: Model \| Union \| TspLiteralType, operation?) => string`            | Creates a name for anonymous models/unions. Traverses orphan models and unions (types with `@usage` not referenced by operations) for context path resolution. |
+| `getHttpOperationWithCache`                    | `(context: TCGCContext, operation: Operation) => HttpOperation`                      | Cached HTTP operation lookup                                                                                                                                   |
+| `getHttpOperationExamples`                     | `(context: TCGCContext, operation: HttpOperation) => SdkHttpOperationExample[]`      | Gets examples for an HTTP operation                                                                                                                            |
+| `isAzureCoreModel`                             | `(t: SdkType) => boolean`                                                            | Checks if a type is an Azure Core model                                                                                                                        |
+| `isPagedResultModel`                           | `(context: TCGCContext, t: SdkType) => boolean`                                      | Checks if a type is used as a paged result                                                                                                                     |
+| `getHttpOperationParameter`                    | `(method, param) => SdkHttpParameter \| SdkModelPropertyType \| undefined`           | Finds the HTTP parameter corresponding to a method parameter                                                                                                   |
+| `getHttpOperationParametersForClientParameter` | `(client, param) => SdkHttpParameter[]`                                              | Finds HTTP parameters for a client initialization parameter                                                                                                    |
+| `listAllServiceNamespaces`                     | `(context: TCGCContext) => Namespace[]`                                              | Lists all service namespaces in the program                                                                                                                    |
+| `resolveOperationId`                           | `(context, operation, honorRenaming?) => string`                                     | Calculates operation ID                                                                                                                                        |
+| `isHttpMetadata`                               | `(context, property: SdkModelPropertyType) => boolean`                               | Checks if a property is HTTP metadata                                                                                                                          |
+| `getNamespaceFromType`                         | `(type) => Namespace \| undefined`                                                   | Extracts namespace from a type                                                                                                                                 |
+| `getClientOptions`                             | `<T extends DecoratedType>(type: T, key: string) => unknown`                         | Gets a `@clientOption` value by key from a decorated type                                                                                                      |
 
 Exported from `decorators.ts` (key helper functions):
 

@@ -1,6 +1,6 @@
 {
-  "lastCommit": "cd640d45e5140c7a93d83e40a8743e9ae8738c8e",
-  "lastUpdated": "2026-03-16T10:24:28.813Z",
+  "lastCommit": "c9960f6bdd5ba4d7f1ad41ddd2841d39e2cabc08",
+  "lastUpdated": "2026-03-16T10:59:31.255Z",
   "analyzedPaths": [
     "packages/typespec-client-generator-core/src",
     "packages/typespec-client-generator-core/lib",
