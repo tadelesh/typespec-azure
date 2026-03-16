@@ -944,3 +944,116 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+You can also use `@apiVersion(false)` to explicitly mark a parameter as **not** an API version parameter, even if its name matches the default detection pattern (e.g., `api-version`):
+
+```typespec
+op get(
+  @apiVersion(false)
+  @query
+  api-version: string,
+): void;
+```
+
+In this case, the `api-version` parameter will remain as a regular operation parameter and will not be elevated to the client level.
+
+## Extending Client API Versions with `@clientApiVersions`
+
+The `@clientApiVersions` decorator lets you specify additional API versions that the client supports beyond those defined in the service's `@versioned` configuration. This is particularly useful when:
+
+- You want to expose a complete API version enum without annotating the entire spec with versioning decorators
+- The client needs to support versions that aren't in the service specification
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/versioning";
+import "@typespec/http";
+using Versioning;
+using Http;
+
+@versioned(Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v4: "v4",
+  v5: "v5",
+}
+
+@route("/resource")
+@get
+op getResource(): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core;
+
+namespace Customizations;
+
+enum ClientApiVersions {
+  v1: "v1",
+  v2: "v2",
+  v3: "v3",
+  ...My.Service.Versions,
+}
+
+@@clientApiVersions(My.Service, ClientApiVersions);
+```
+
+```python
+# The client will expose all versions: v1, v2, v3, v4, v5
+from my.service import MyServiceClient
+
+client = MyServiceClient(endpoint=..., credential=..., api_version="v3")
+```
+
+```csharp
+// ServiceVersion enum includes all versions
+public enum ServiceVersion
+{
+    V1 = 1,
+    V2 = 2,
+    V3 = 3,
+    V4 = 4,
+    V5 = 5,
+}
+```
+
+```typescript
+export enum KnownVersions {
+  V1 = "v1",
+  V2 = "v2",
+  V3 = "v3",
+  V4 = "v4",
+  V5 = "v5",
+}
+```
+
+```java
+public enum ServiceServiceVersion implements ServiceVersion {
+    V1("v1"),
+    V2("v2"),
+    V3("v3"),
+    V4("v4"),
+    V5("v5");
+
+    public static ServiceServiceVersion getLatest() {} // V5
+}
+```
+
+```go
+type Versions string
+
+const (
+	V1 Versions = "v1"
+	V2 Versions = "v2"
+	V3 Versions = "v3"
+	V4 Versions = "v4"
+	V5 Versions = "v5"
+)
+```
+
+</ClientTabs>

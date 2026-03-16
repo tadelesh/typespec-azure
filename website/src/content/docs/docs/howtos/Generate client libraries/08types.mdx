@@ -475,8 +475,9 @@ Suppose you want your generated client library to use a type from an external pa
 ```typespec
 @alternateType(
   {
-    fullyQualifiedName: "externallib.ExternalModel",
+    identity: "externallib.ExternalModel",
     package: "externallib",
+    minVersion: "1.0.0",
   },
   "python"
 )
@@ -485,7 +486,17 @@ model MyModel {
 }
 ```
 
-In this example, instead of generating `MyModel` in the Python sdk, the emitter will reference `ExternalModel` from `externallib` instead.
+In this example, instead of generating `MyModel` in the Python SDK, the emitter will reference `ExternalModel` from `externallib` (version 1.0.0 or later) instead.
+
+The `ExternalType` model has the following properties:
+
+- **`identity`** (required): The identity of the external type, e.g., `"pystac.Collection"`.
+- **`package`** (optional): The package that exports the external type, e.g., `"pystac"`.
+- **`minVersion`** (optional): The minimum version of the package to use, e.g., `"1.13.0"`.
+
+:::note
+External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union). To change a model property's type, use a TypeSpec type directly instead of an `ExternalType`.
+:::
 
 ### Use Cases
 
@@ -496,6 +507,8 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 ### Notes
 
 - The referenced type should be compatible with the intended usage in the generated client library.
+- When the source type is `Scalar`, the alternate type must also be `Scalar`.
+- `@encode` on the original type will be overridden by the one defined in the alternate type.
 
 ## Client Default Values (Legacy)
 
@@ -1378,6 +1391,76 @@ const (
 ```
 
 </ClientTabItem>
+</ClientTabs>
+
+### Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a `string` (or `string`-derived scalar) property should be deserialized as `null` when its value is an empty string (`""`). This is useful for services that return empty strings where `null` is the intended semantic value.
+
+<ClientTabs>
+
+```typespec
+model ResourceProperties {
+  @deserializeEmptyStringAsNull
+  description?: string;
+
+  @deserializeEmptyStringAsNull
+  externalId?: string;
+
+  name: string;
+}
+```
+
+```python
+class ResourceProperties:
+    # When the service returns description: "", the SDK will set this to None
+    description: Optional[str] = rest_field()
+    # When the service returns external_id: "", the SDK will set this to None
+    external_id: Optional[str] = rest_field(name="externalId")
+    name: str = rest_field()
+```
+
+```csharp
+public class ResourceProperties
+{
+    // When the service returns description: "", the SDK will set this to null
+    public string Description { get; set; }
+    // When the service returns externalId: "", the SDK will set this to null
+    public string ExternalId { get; set; }
+    public string Name { get; set; }
+}
+```
+
+```typescript
+export interface ResourceProperties {
+  // When the service returns description: "", the SDK will set this to null
+  description?: string | null;
+  // When the service returns externalId: "", the SDK will set this to null
+  externalId?: string | null;
+  name: string;
+}
+```
+
+```java
+public class ResourceProperties {
+    // When the service returns description: "", the SDK will set this to null
+    public String getDescription();
+    // When the service returns externalId: "", the SDK will set this to null
+    public String getExternalId();
+    public String getName();
+}
+```
+
+```go
+type ResourceProperties struct {
+    // When the service returns Description: "", the SDK will set this to nil
+    Description *string
+    // When the service returns ExternalID: "", the SDK will set this to nil
+    ExternalID *string
+    Name *string
+}
+```
+
 </ClientTabs>
 
 ### Flattening

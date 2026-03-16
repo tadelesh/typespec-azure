@@ -268,3 +268,24 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## Legacy LRO Decorator
+
+:::caution
+The `@markAsLro` decorator is legacy functionality. It should only be used when standard TypeSpec LRO patterns (such as `@pollingOperation`) are not feasible.
+:::
+
+### `@markAsLro`
+
+Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators, even when the operation is not long-running on the service side. When applied, SDK generators will generate polling mechanisms (pollers) and return LRO-specific return types.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsLro
+@route("/deployments/{deploymentId}")
+@post
+op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
+```
+
+:::note
+When using `@markAsLro`, you should verify the operation and add tests for the generated code to ensure the end-to-end works for library users, since forcing an operation to be LRO may result in runtime errors.
+:::

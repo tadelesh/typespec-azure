@@ -1647,6 +1647,158 @@ func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (*Resp
 
 </ClientTabs>
 
+## Scoping operations to specific languages with `@scope`
+
+The `@scope` decorator allows you to limit an operation or model property to specific language emitters. By default, all operations are generated for all languages. With `@scope`, you can include or exclude specific languages.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace ScopeDemo;
+
+// This operation is generated for all languages except C#
+@scope("!csharp")
+@route("/all-except-csharp")
+@get
+op getAllExceptCsharp(): void;
+
+// This operation is only generated for Go
+@scope("go")
+@route("/go-only")
+@get
+op getGoOnly(): void;
+
+// This operation is generated for all languages (default behavior)
+@route("/all-languages")
+@get
+op getAllLanguages(): void;
+
+model ScopedModel {
+  commonProp: string;
+
+  // This property only appears in the Python SDK
+  @scope("python")
+  pythonOnlyProp?: string;
+}
+```
+
+```python
+# getAllExceptCsharp and getAllLanguages are generated
+# getGoOnly is NOT generated (scoped to Go only)
+
+class ScopeDemo:
+    def get_all_except_csharp(self, **kwargs: Any) -> None: ...
+    def get_all_languages(self, **kwargs: Any) -> None: ...
+
+class ScopedModel:
+    common_prop: str = rest_field(name="commonProp")
+    python_only_prop: Optional[str] = rest_field(name="pythonOnlyProp")
+```
+
+```csharp
+// getAllExceptCsharp is NOT generated (excluded from C#)
+// getGoOnly is NOT generated (scoped to Go only)
+
+public class ScopeDemo
+{
+    public virtual Response GetAllLanguages(CancellationToken cancellationToken = default);
+}
+
+public class ScopedModel
+{
+    public string CommonProp { get; set; }
+    // pythonOnlyProp is NOT generated (scoped to Python only)
+}
+```
+
+```typescript
+// getAllExceptCsharp and getAllLanguages are generated
+// getGoOnly is NOT generated (scoped to Go only)
+
+export class ScopeDemo {
+  async getAllExceptCsharp(): Promise<void>;
+  async getAllLanguages(): Promise<void>;
+}
+```
+
+```java
+// getAllExceptCsharp and getAllLanguages are generated
+// getGoOnly is NOT generated (scoped to Go only)
+
+public final class ScopeDemo {
+    public void getAllExceptCsharp();
+    public void getAllLanguages();
+}
+```
+
+```go
+// getGoOnly and getAllLanguages are generated
+// getAllExceptCsharp is generated (Go is not excluded)
+
+func (client *ScopeDemoClient) GetAllExceptCsharp(ctx context.Context, options *ScopeDemoClientGetAllExceptCsharpOptions) (ScopeDemoClientGetAllExceptCsharpResponse, error)
+func (client *ScopeDemoClient) GetGoOnly(ctx context.Context, options *ScopeDemoClientGetGoOnlyOptions) (ScopeDemoClientGetGoOnlyResponse, error)
+func (client *ScopeDemoClient) GetAllLanguages(ctx context.Context, options *ScopeDemoClientGetAllLanguagesOptions) (ScopeDemoClientGetAllLanguagesResponse, error)
+```
+
+</ClientTabs>
+
+The scope parameter supports the same patterns as other TCGC decorators:
+
+- Single language: `"python"`
+- Multiple languages: `"python, java"`
+- Negation: `"!csharp"` or `"!(java, python)"`
+
+## Modeling HEAD operations as boolean with `@responseAsBool`
+
+The `@responseAsBool` decorator indicates that a HEAD operation should return a boolean value. When applied:
+
+- A 2xx response returns `true`
+- A 404 response returns `false` (instead of raising an error)
+- All other status codes still raise errors
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace ResourceService;
+
+@responseAsBool
+@head
+@route("/resources/{name}")
+op exists(@path name: string): void;
+```
+
+```python
+class ResourceServiceClient:
+    def exists(self, name: str, **kwargs: Any) -> bool: ...
+```
+
+```csharp
+public class ResourceServiceClient
+{
+    public virtual Response<bool> Exists(string name, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class ResourceServiceClient {
+  async exists(name: string): Promise<boolean>;
+}
+```
+
+```java
+public final class ResourceServiceClient {
+    public boolean exists(String name);
+}
+```
+
+```go
+func (client *ResourceServiceClient) Exists(ctx context.Context, name string, options *ResourceServiceClientExistsOptions) (ResourceServiceClientExistsResponse, error)
+```
+
+</ClientTabs>
+
 ## Using `@clientLocation` to control parameter placement
 
 The `@clientLocation` decorator allows you to explicitly move parameters between client and operation levels.
