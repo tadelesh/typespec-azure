@@ -92,7 +92,11 @@ Defines a sub-client (operation group). Cannot be used with `@clientLocation`. C
 #### `@convenientAPI`
 
 ```typespec
-extern dec convenientAPI(target: Operation | Namespace | Interface, flag?: valueof boolean, scope?: valueof string);
+extern dec convenientAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 ```
 
 Controls whether convenience methods are generated. When applied to namespace/interface, affects all operations within unless overridden.
@@ -100,7 +104,11 @@ Controls whether convenience methods are generated. When applied to namespace/in
 #### `@protocolAPI`
 
 ```typespec
-extern dec protocolAPI(target: Operation | Namespace | Interface, flag?: valueof boolean, scope?: valueof string);
+extern dec protocolAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 ```
 
 Controls whether protocol (low-level) methods are generated. When applied to namespace/interface, affects all operations within unless overridden.
@@ -108,7 +116,11 @@ Controls whether protocol (low-level) methods are generated. When applied to nam
 #### `@usage`
 
 ```typespec
-extern dec usage(target: Model | Enum | Union | Namespace, value: EnumMember | Union, scope?: valueof string);
+extern dec usage(
+  target: Model | Enum | Union | Namespace,
+  value: EnumMember | Union,
+  scope?: valueof string
+);
 ```
 
 Adds additional usage info. Usage propagates to properties, parent models, discriminated sub-models.
@@ -125,7 +137,11 @@ enum Usage {
 #### `@access`
 
 ```typespec
-extern dec access(target: ModelProperty | Model | Operation | Enum | Union | Namespace, value: EnumMember, scope?: valueof string);
+extern dec access(
+  target: ModelProperty | Model | Operation | Enum | Union | Namespace,
+  value: EnumMember,
+  scope?: valueof string
+);
 ```
 
 Overrides access (visibility). Setting access on an operation influences models used by that operation. Access propagates to properties, parent models, discriminated sub-models.
@@ -148,7 +164,11 @@ Customizes a method's parameter signature in the generated SDK. Used as augment 
 #### `@clientInitialization`
 
 ```typespec
-extern dec clientInitialization(target: Namespace | Interface, options: ClientInitializationOptions, scope?: valueof string);
+extern dec clientInitialization(
+  target: Namespace | Interface,
+  options: ClientInitializationOptions,
+  scope?: valueof string
+);
 ```
 
 Customizes how clients are initialized. Elevates operation-level parameters to client-level. Used as augment decorator (`@@clientInitialization`).
@@ -179,7 +199,11 @@ Aliases a client parameter name. Used with `@clientInitialization` to rename ele
 #### `@clientNamespace`
 
 ```typespec
-extern dec clientNamespace(target: Namespace | Interface | Model | Enum | Union, rename: valueof string, scope?: valueof string);
+extern dec clientNamespace(
+  target: Namespace | Interface | Model | Enum | Union,
+  rename: valueof string,
+  scope?: valueof string
+);
 ```
 
 Changes the namespace of a generated type in the client SDK.
@@ -187,7 +211,11 @@ Changes the namespace of a generated type in the client SDK.
 #### `@alternateType`
 
 ```typespec
-extern dec alternateType(target: ModelProperty | Scalar | Model | Enum | Union, alternate: unknown | ExternalType, scope?: valueof string);
+extern dec alternateType(
+  target: ModelProperty | Scalar | Model | Enum | Union,
+  alternate: unknown | ExternalType,
+  scope?: valueof string
+);
 ```
 
 Sets an alternate type for SDK generation. When source is `Scalar`, alternate must also be `Scalar`. External types (with `identity` property) cannot be applied to model properties.
@@ -251,7 +279,11 @@ Indicates a model needs a custom JSON converter. Primarily for backward compatib
 #### `@clientLocation`
 
 ```typespec
-extern dec clientLocation(source: Operation | ModelProperty, target: Interface | Namespace | Operation | (valueof string), scope?: valueof string);
+extern dec clientLocation(
+  source: Operation | ModelProperty,
+  target: Interface | Namespace | Operation | (valueof string),
+  scope?: valueof string
+);
 ```
 
 Moves an operation to a different client, or moves a parameter between operation and client levels. Cannot be used with `@client`/`@operationGroup`. Supports:
@@ -265,7 +297,12 @@ Moves an operation to a different client, or moves a parameter between operation
 #### `@clientDoc`
 
 ```typespec
-extern dec clientDoc(target: unknown, documentation: valueof string, mode: EnumMember, scope?: valueof string);
+extern dec clientDoc(
+  target: unknown,
+  documentation: valueof string,
+  mode: EnumMember,
+  scope?: valueof string
+);
 ```
 
 Overrides documentation for client libraries with append or replace modes.
@@ -280,7 +317,12 @@ enum DocumentationMode {
 #### `@clientOption`
 
 ```typespec
-extern dec clientOption(target: unknown, name: valueof string, value: valueof unknown, scope?: valueof string);
+extern dec clientOption(
+  target: unknown,
+  name: valueof string,
+  value: valueof unknown,
+  scope?: valueof string
+);
 ```
 
 Passes experimental flags/options to emitters. Always emits a warning that must be suppressed. Intended for temporary workarounds.
@@ -340,7 +382,11 @@ Specifies the HTTP verb for next link operations in paging. Defaults to GET.
 #### `@clientDefaultValue`
 
 ```typespec
-extern dec clientDefaultValue(target: ModelProperty, value: valueof string | boolean | numeric, scope?: valueof string);
+extern dec clientDefaultValue(
+  target: ModelProperty,
+  value: valueof string | boolean | numeric,
+  scope?: valueof string
+);
 ```
 
 Sets a client-level default value for a property/parameter. For brownfield backward compatibility.
@@ -386,9 +432,7 @@ interface TCGCContext {
   getPackageVersions(): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
-  getClientOrOperationGroup(
-    type: Namespace | Interface,
-  ): SdkClient | SdkOperationGroup | undefined;
+  getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
   getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
   getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
 }
@@ -466,11 +510,7 @@ interface SdkClientInitializationType extends SdkTypeBase {
   kind: "clientinitialization";
   name: string;
   isGeneratedName: boolean;
-  parameters: (
-    | SdkEndpointParameter
-    | SdkCredentialParameter
-    | SdkMethodParameter
-  )[];
+  parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
   initializedBy: InitializedByFlags;
 }
 ```
@@ -884,14 +924,7 @@ interface SdkBodyParameter extends SdkModelPropertyTypeBase {
 #### `CollectionFormat`
 
 ```typescript
-type CollectionFormat =
-  | "multi"
-  | "csv"
-  | "ssv"
-  | "tsv"
-  | "pipes"
-  | "simple"
-  | "form";
+type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 ```
 
 #### `SdkHttpParameter` (union)
@@ -994,18 +1027,9 @@ interface SdkPagingServiceMetadata<TServiceOperation> {
   nextLinkSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
   nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
   nextLinkVerb?: "GET" | "POST";
-  nextLinkReInjectedParametersSegments?: (
-    | SdkMethodParameter
-    | SdkModelPropertyType
-  )[][];
-  continuationTokenParameterSegments?: (
-    | SdkMethodParameter
-    | SdkModelPropertyType
-  )[];
-  continuationTokenResponseSegments?: (
-    | SdkServiceResponseHeader
-    | SdkModelPropertyType
-  )[];
+  nextLinkReInjectedParametersSegments?: (SdkMethodParameter | SdkModelPropertyType)[][];
+  continuationTokenParameterSegments?: (SdkMethodParameter | SdkModelPropertyType)[];
+  continuationTokenResponseSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
   pageItemsSegments?: SdkModelPropertyType[];
   pageSizeParameterSegments?: (SdkMethodParameter | SdkModelPropertyType)[];
 }
@@ -1028,16 +1052,8 @@ interface SdkLroServiceMetadata {
   pollingInfo: SdkPollingOperationStep;
   envelopeResult: SdkModelType;
   logicalPath?: string;
-  finalResult?:
-    | SdkModelType
-    | SdkArrayType
-    | SdkBuiltInType<"unknown">
-    | "void";
-  finalEnvelopeResult?:
-    | SdkModelType
-    | SdkArrayType
-    | SdkBuiltInType<"unknown">
-    | "void";
+  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
+  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
   finalResultPath?: string;
 }
 ```
@@ -1069,12 +1085,7 @@ interface SdkHttpOperation {
   path: string;
   uriTemplate: string;
   verb: HttpVerb;
-  parameters: (
-    | SdkPathParameter
-    | SdkQueryParameter
-    | SdkHeaderParameter
-    | SdkCookieParameter
-  )[];
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   bodyParam?: SdkBodyParameter;
   responses: SdkHttpResponse[];
   exceptions: SdkHttpErrorResponse[];
