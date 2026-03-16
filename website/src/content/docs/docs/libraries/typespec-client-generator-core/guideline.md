@@ -319,7 +319,7 @@ TCGC uses the following steps to detect all the types in one spec:
 9. If type is an `EnumMember`, finds types for the enum the member belongs to.
 10. If type is a `UnionVariant`, finds types for the union the variant belongs to.
 11. Iterates parameters defined in `@server` and finds types.
-12. Iterates user-defined namespace for `Model`, `Enum` and `Union` to find orphan types (not referred by `Operation`).
+12. Finds orphan types (not referred by any `Operation`). Only types decorated with `@usage` or `@hierarchyBuilding` are considered. When `@usage` is applied to a `Namespace`, all `Model`, `Enum`, and `Union` types within that namespace are included as orphan types.
 13. Handles API version `Enum` used in `@versioned`.
 
 ### Access Calculation
