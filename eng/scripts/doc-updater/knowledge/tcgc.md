@@ -3,7 +3,7 @@
 ## Package Info
 
 - **Package**: `@azure-tools/typespec-client-generator-core`
-- **Version**: 0.66.0
+- **Version**: 0.66.2
 - **Decorator definitions**: `lib/decorators.tsp` (main), `lib/legacy.tsp` (legacy)
 - **Public types**: `src/interfaces.ts`
 
@@ -62,7 +62,7 @@
 | `@scope`                        | `azure/client-generator-core/scope/`                            |
 | `@clientApiVersions`            | `azure/client-generator-core/client-api-versions/`              |
 
-## Key Type Names (current as of v0.66.0)
+## Key Type Names (current as of v0.66.2)
 
 | Type Name                     | Location        | Notes                                  |
 | ----------------------------- | --------------- | -------------------------------------- |
@@ -72,6 +72,22 @@
 | `SdkServiceMethod`            | `interfaces.ts` | Method on a client                     |
 | `SdkHttpOperation`            | `interfaces.ts` | HTTP operation details                 |
 
+## Per-Language Decorator Support
+
+Some decorators are not supported by all language emitters. When a language does not support a decorator, its `<ClientTabItem>` tab must show a single code comment (in that language's comment style) stating the decorator is not supported. **Do not show generated model/client code** for unsupported decorator–language pairs — even if the doc-example-generator skill produces output for that language.
+
+| Decorator                       | Unsupported Languages | Note                             |
+| ------------------------------- | --------------------- | -------------------------------- |
+| `@deserializeEmptyStringAsNull` | Go                    | Go emitter does not support this |
+
+**Format for unsupported tabs:**
+
+- Go: `// Go does not support @decoratorName`
+- Python: `# Python does not support @decoratorName`
+- C#: `// C# does not support @decoratorName`
+- TypeScript: `// TypeScript does not support @decoratorName`
+- Java: `// Java does not support @decoratorName`
+
 ## Doc Conventions
 
 - Howto docs use `.mdx` with Astro imports: `import { ClientTabs, ClientTabItem } from "@components/client-tabs"`
@@ -80,3 +96,5 @@
 - Legacy decorators require `#suppress "@azure-tools/typespec-azure-core/no-legacy-usage"` in examples
 - Design docs are plain markdown in `design-docs/` directory
 - `@scope` parameter pattern: single (`"python"`), multi (`"python, java"`), negation (`"!csharp"`, `"!(java, python)"`)
+- When a language does not support a decorator, do **not** show generated code — use a single-line comment in that language's style (see "Per-Language Decorator Support" above)
+- The doc-example-generator skill may produce code for languages that don't actually support a decorator; always cross-check against the "Per-Language Decorator Support" table and override the skill output when needed
