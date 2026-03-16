@@ -185,7 +185,7 @@ jobs:
             jq '.lastPrNumber = ${{ steps.create-pr.outputs.pull-request-number }}' "$META_FILE" > tmp.json && mv tmp.json "$META_FILE"
             git add "$META_FILE"
             git commit -m "chore: record PR number in metadata"
-            git push
+            git push origin HEAD
           fi
 
       - name: Job Summary
