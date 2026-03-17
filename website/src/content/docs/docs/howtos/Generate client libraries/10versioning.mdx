@@ -944,3 +944,80 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Extending API Versions with `@clientApiVersions`
+
+The `@clientApiVersions` decorator allows you to add API versions that the client should support beyond those defined in the `@versioned` enum. This is useful when a client needs to support older API versions that existed before the TypeSpec definition, or when a client needs to support additional versions not present in the service definition.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/versioning";
+
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+
+@service(#{ title: "Widget Service" })
+@versioned(Versions)
+namespace WidgetService;
+
+enum Versions {
+  v2: "v2",
+  v3: "v3",
+}
+
+model Widget {
+  id: string;
+  name: string;
+}
+
+@route("/widgets")
+@get
+op listWidgets(@query("api-version") apiVersion: string): Widget[];
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+enum ClientApiVersions {
+  v1: "v1",
+  ...WidgetService.Versions,
+}
+
+@@clientApiVersions(WidgetService, ClientApiVersions);
+```
+
+```python
+# The client now supports v1, v2, and v3 (v1 was added via @clientApiVersions)
+class WidgetServiceClient:
+    def __init__(self, endpoint: str, *, api_version: str = "v3", **kwargs: Any): ...
+    def list_widgets(self, **kwargs: Any) -> List[Widget]: ...
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+// The ServiceVersion enum includes only the original service versions
+public enum WidgetServiceServiceVersion implements ServiceVersion {
+    V2("v2"),
+    V3("v3");
+
+    public static WidgetServiceServiceVersion getLatest(); // V3
+}
+```
+
+```go
+// Go does not export the API version enum - no impact
+```
+
+</ClientTabs>

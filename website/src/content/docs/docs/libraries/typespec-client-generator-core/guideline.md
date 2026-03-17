@@ -228,9 +228,9 @@ For [`SdkModelExampleValue`](../reference/js-api/interfaces/sdkmodelexamplevalue
 
 ### Client Detection
 
-The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, `@operationGroup` and `@moveTo`.
+The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, `@operationGroup` and `@clientLocation`.
 
-If there is no explicitly defined `@client` or `@operationGroup`, then the first namespace with `@service` is a root client. The nested namespaces and interfaces under that namespace are sub clients with hierarchy. Meanwhile, any operations with `@moveTo` a `string` type target, is a sub client under the root client.
+If there is no explicitly defined `@client` or `@operationGroup`, then the first namespace with `@service` is a root client. The nested namespaces and interfaces under that namespace are sub clients with hierarchy. Meanwhile, any operations with `@clientLocation` targeting a `string` type, is a sub client under the root client.
 
 If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
 
@@ -258,9 +258,9 @@ With `@clientInitialization` decorator, the default behavior may change. New cli
 
 ### Method Detection
 
-The methods depend on the combination usage of `Operation`, `@scope`, and `@moveTo`.
+The methods depend on the combination usage of `Operation`, `@scope`, and `@clientLocation`.
 
-A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@moveTo` current client, deducting any operations with `@scope` out of current emitter or `@moveTo` another client.
+A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@clientLocation` targeting the current client, deducting any operations with `@scope` out of current emitter or `@clientLocation` targeting another client.
 
 ### Method Parameters Handling
 

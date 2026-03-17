@@ -268,3 +268,95 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## LRO Legacy Decorators
+
+:::caution
+The following decorator is in the `Azure.ClientGenerator.Core.Legacy` namespace and should only be used for legacy services with explicit approval. New services should use standard LRO patterns with `@pollingOperation`.
+:::
+
+### `@markAsLro`
+
+The `@markAsLro` decorator forces a regular operation to be treated as a long-running operation. The generated method will return a poller type instead of the response directly.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service(#{ title: "Deployment Service" })
+namespace DeploymentService;
+
+model DeploymentConfig {
+  targetRegion: string;
+  instanceCount: int32;
+}
+
+model DeploymentResult {
+  id: string;
+  status: string;
+}
+
+@route("/deployments/{deploymentId}")
+@post
+op startDeployment(@path deploymentId: string, @body config: DeploymentConfig): DeploymentResult;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@@markAsLro(DeploymentService.startDeployment);
+```
+
+```python
+from azure.core.polling import LROPoller
+
+class DeploymentServiceClient:
+    def begin_start_deployment(
+        self, deployment_id: str, config: DeploymentConfig, **kwargs: Any
+    ) -> LROPoller[DeploymentResult]: ...
+```
+
+```csharp
+public partial class DeploymentServiceClient
+{
+    public virtual Operation<DeploymentResult> StartDeployment(WaitUntil waitUntil, string deploymentId, DeploymentConfig config, CancellationToken cancellationToken = default);
+    public virtual async Task<Operation<DeploymentResult>> StartDeploymentAsync(WaitUntil waitUntil, string deploymentId, DeploymentConfig config, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+import { PollerLike, OperationState } from "@azure/core-lro";
+
+export function startDeployment(
+  context: Client,
+  deploymentId: string,
+  config: DeploymentConfig,
+  options?: StartDeploymentOptionalParams,
+): PollerLike<OperationState<DeploymentResult>, DeploymentResult>;
+```
+
+```java
+import com.azure.core.util.polling.SyncPoller;
+
+public final class DeploymentServiceClient {
+    public SyncPoller<DeploymentResult, DeploymentResult> beginStartDeployment(
+        String deploymentId, DeploymentConfig config);
+}
+```
+
+```go
+func (client *DeploymentServiceClient) BeginStartDeployment(
+    ctx context.Context,
+    deploymentID string,
+    config DeploymentConfig,
+    options *DeploymentServiceClientBeginStartDeploymentOptions,
+) (*runtime.Poller[DeploymentServiceClientStartDeploymentResponse], error)
+```
+
+</ClientTabs>
