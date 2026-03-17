@@ -427,3 +427,226 @@ model Page {
   ]>;
 }
 ```
+
+## Paging Legacy Decorators
+
+:::caution
+The following decorators are in the `Azure.ClientGenerator.Core.Legacy` namespace and should only be used for legacy services with explicit approval. New services should use standard paging patterns.
+:::
+
+### `@markAsPageable`
+
+The `@markAsPageable` decorator forces a regular operation to be treated as a pageable operation. The response model must contain a property annotated with `@pageItems`.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service(#{ title: "Item Service" })
+namespace ItemService;
+
+model Item {
+  id: string;
+  name: string;
+}
+
+model ItemListResult {
+  @pageItems
+  items: Item[];
+
+  nextLink?: string;
+}
+
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@@markAsPageable(ItemService.listItems);
+```
+
+```python
+class ItemServiceClient:
+    def list_items(self, **kwargs: Any) -> ItemPaged[Item]: ...
+```
+
+```csharp
+public partial class ItemServiceClient
+{
+    public virtual Pageable<Item> GetItems(CancellationToken cancellationToken = default);
+    public virtual AsyncPageable<Item> GetItemsAsync(CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export function listItems(
+  context: Client,
+  options?: ListItemsOptionalParams,
+): PagedAsyncIterableIterator<Item>;
+```
+
+```java
+public final class ItemServiceClient {
+    public PagedIterable<Item> listItems();
+}
+```
+
+```go
+func (client *ItemServiceClient) NewListItemsPager(options *ItemServiceClientListItemsOptions) *runtime.Pager[ItemServiceClientListItemsResponse]
+```
+
+</ClientTabs>
+
+### `@disablePageable`
+
+The `@disablePageable` decorator prevents a list operation from being treated as pageable. The response is returned as the full model instead of being unwrapped into a paged iterator of items.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service(#{ title: "Item Service" })
+namespace ItemService;
+
+model Item {
+  id: string;
+  name: string;
+}
+
+model ItemListResult {
+  @pageItems
+  items: Item[];
+
+  nextLink?: string;
+}
+
+@route("/items")
+@get
+@list
+op listItems(...Item): ItemListResult;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@@disablePageable(ItemService.listItems);
+```
+
+```python
+# Returns the full model instead of a paged iterator
+class ItemServiceClient:
+    def list_items(self, *, id: str, name: str, **kwargs: Any) -> ItemListResult: ...
+```
+
+```csharp
+// Returns the full ItemListResult model, not a Pageable<Item>
+public partial class ItemServiceClient
+{
+    public virtual Response<ItemListResult> GetItems(string id, string name, CancellationToken cancellationToken = default);
+    public virtual async Task<Response<ItemListResult>> GetItemsAsync(string id, string name, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+// Returns the full ItemListResult model, not a PagedIterable<Item>
+public final class ItemServiceClient {
+    public ItemListResult listItems(String id, String name);
+}
+```
+
+```go
+// Returns the full response, not a Pager
+func (client *ItemServiceClient) ListItems(ctx context.Context, id string, name string, options *ItemServiceClientListItemsOptions) (ItemServiceClientListItemsResponse, error)
+```
+
+</ClientTabs>
+
+### `@nextLinkVerb`
+
+The `@nextLinkVerb` decorator specifies the HTTP verb (`"GET"` or `"POST"`) to use when following next-link pagination URLs. By default, next-link requests use `GET`. Use this decorator when the service requires `POST` for pagination.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service(#{ title: "Item Service" })
+namespace ItemService;
+
+model Item {
+  id: string;
+  name: string;
+}
+
+model ItemListResult {
+  @pageItems
+  items: Item[];
+
+  @nextLink
+  nextLink?: string;
+}
+
+@route("/items")
+@get
+@list
+op listItems(...Item): ItemListResult;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@@nextLinkVerb(ItemService.listItems, "POST");
+```
+
+```python
+# Paging uses POST for next-link requests internally
+class ItemServiceClient:
+    def list_items(self, *, id: str, name: str, **kwargs: Any) -> ItemPaged[Item]: ...
+```
+
+```csharp
+// Paging uses POST for next-link requests internally
+public partial class ItemServiceClient
+{
+    public virtual Pageable<Item> GetItems(string id, string name, CancellationToken cancellationToken = default);
+    public virtual AsyncPageable<Item> GetItemsAsync(string id, string name, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+// NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

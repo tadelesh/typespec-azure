@@ -1751,3 +1751,160 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Using `@scope` to limit operations to specific languages
+
+The `@scope` decorator controls which language emitters include a given operation or model property. When applied, the operation is only generated for the specified language(s) and excluded from all others.
+
+Scope values can be a single language (`"python"`), multiple languages (`"python, java"`), or a negation (`"!csharp"` or `"!(java, python)"`).
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service(#{ title: "Pet Store" })
+namespace PetStore;
+
+model Pet {
+  id: string;
+  name: string;
+}
+
+@route("/pets")
+namespace Pets {
+  @get
+  op list(): Pet[];
+
+  @route("/{petId}")
+  @get
+  op get(@path petId: string): Pet;
+
+  @route("/internal")
+  @get
+  op internalOp(): Pet[];
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@scope(PetStore.Pets.internalOp, "python");
+```
+
+```python
+# Python includes all three operations (internalOp is scoped to python)
+class PetsOperations:
+    def list(self, **kwargs: Any) -> List[Pet]: ...
+    def get(self, pet_id: str, **kwargs: Any) -> Pet: ...
+    def internal_op(self, **kwargs: Any) -> List[Pet]: ...
+```
+
+```csharp
+// C# does NOT include internalOp — it is scoped to python only
+public partial class Pets
+{
+    public virtual Response<IReadOnlyList<Pet>> GetAll(CancellationToken cancellationToken = default);
+    public virtual Response<Pet> Get(string petId, CancellationToken cancellationToken = default);
+    // internalOp is not generated
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+// Java does NOT include internalOp — it is scoped to python only
+public final class PetStoreClient {
+    public List<Pet> list();
+    public Pet get(String petId);
+    // internalOp is not generated
+}
+```
+
+```go
+// Go does NOT include internalOp — it is scoped to python only
+func (client *PetStorePetsClient) List(ctx context.Context, options *PetStorePetsClientListOptions) (PetStorePetsClientListResponse, error)
+func (client *PetStorePetsClient) Get(ctx context.Context, petID string, options *PetStorePetsClientGetOptions) (PetStorePetsClientGetResponse, error)
+// internalOp is not generated
+```
+
+</ClientTabs>
+
+## Using `@responseAsBool` for HEAD operations
+
+The `@responseAsBool` decorator transforms a HEAD operation's response into a boolean value. A `2xx` response maps to `true`, and a `404` response maps to `false`. This is the recommended pattern for "exists" checks.
+
+:::note
+This decorator can only be applied to `@head` operations.
+:::
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service(#{ title: "Resource Service" })
+namespace ResourceService;
+
+model Resource {
+  id: string;
+  name: string;
+}
+
+@route("/resources/{resourceId}")
+@head
+op checkExists(@path resourceId: string): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(ResourceService.checkExists);
+```
+
+```python
+class ResourceServiceClient:
+    def check_exists(self, resource_id: str, **kwargs: Any) -> bool: ...
+```
+
+```csharp
+public partial class ResourceServiceClient
+{
+    public virtual Response<bool> CheckExists(string resourceId, CancellationToken cancellationToken = default);
+    public virtual async Task<Response<bool>> CheckExistsAsync(string resourceId, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export type CheckExistsResponse = { body: boolean };
+
+export async function checkExists(
+  context: Client,
+  resourceId: string,
+  options?: CheckExistsOptionalParams,
+): Promise<CheckExistsResponse>;
+```
+
+```java
+public final class ResourceServiceClient {
+    public BinaryData checkExists(String resourceId);
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
