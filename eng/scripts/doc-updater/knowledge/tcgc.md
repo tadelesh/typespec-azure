@@ -3,15 +3,41 @@
 ## Package Info
 
 - **Package**: `@azure-tools/typespec-client-generator-core`
-- **Version**: 0.66.0
+- **Version**: 0.66.2+
 - **TSP Main**: `./lib/main.tsp`
+
+## Breaking Changes (post-0.66.0)
+
+### SdkOperationGroup → SdkClient Consolidation
+
+The `SdkOperationGroup` type has been removed and consolidated into `SdkClient`. Key renames:
+
+| Before                             | After                        |
+| ---------------------------------- | ---------------------------- |
+| `SdkOperationGroup`                | `SdkClient`                  |
+| `subOperationGroups`               | `subClients`                 |
+| `groupPath`                        | `clientPath`                 |
+| `SdkClient.service` (single)       | `SdkClient.services` (array) |
+| `getOperationGroup()`              | `getClient()`                |
+| `listOperationGroups()`            | `listSubClients()`           |
+| `listOperationsInOperationGroup()` | `listOperationsInClient()`   |
+| `isOperationGroup()`               | removed                      |
+
+### @operationGroup Deprecated
+
+`@operationGroup` now delegates to `@client` and will be removed in a future release. Sub-clients should use `@client` instead.
+
+### @client Signature Changes
+
+- `service` option now accepts `Namespace | Namespace[]` (multi-service support)
+- New `autoMergeService?: boolean` option for auto-merging service content
 
 ## Decorator → Doc Page Mapping
 
 | Decorator                       | Namespace | Doc Page                   | Section                                 |
 | ------------------------------- | --------- | -------------------------- | --------------------------------------- |
 | `@client`                       | Core      | `03client.mdx`             | Default behavior / Customizations       |
-| `@operationGroup`               | Core      | `03client.mdx`             | Operation Groups                        |
+| `@operationGroup`               | Legacy    | `03client.mdx`             | Operation Groups (deprecated)           |
 | `@clientName`                   | Core      | `09renaming.mdx`           | Renaming models/operations/parameters   |
 | `@clientNamespace`              | Core      | `02package.mdx`            | Namespace customization                 |
 | `@clientLocation`               | Core      | `03client.mdx`, `04method` | Move operations / parameters            |
@@ -46,8 +72,8 @@ Valid scopes: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`, negation
 
 ### Key Signatures
 
-- `@client(target, options?: {name?, service?}, scope?)` — Define root client
-- `@operationGroup(target, scope?)` — Define sub-client
+- `@client(target, options?: {name?, service?: Namespace|Namespace[], autoMergeService?: boolean}, scope?)` — Define root or sub client
+- `@operationGroup(target, scope?)` — _(deprecated)_ Define sub-client; delegates to `@client`
 - `@clientName(target, rename: string, scope?)` — Override name
 - `@access(target, value: Access.public|internal, scope?)` — Access level
 - `@usage(target, value: Usage.input|output|json|xml, scope?)` — Usage flags
@@ -74,9 +100,31 @@ Valid scopes: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`, negation
 - Legacy decorators marked with `:::caution` admonitions
 - TypeSpec examples can have `title` attribute: ` ```typespec title="main.tsp" `
 
+#### Internal-only decorators (no language code examples)
+
+Some decorators only affect internal implementation (serialization, HTTP behavior) and do NOT change the public API surface or model shape. For these decorators:
+
+- **Do NOT generate language-specific code examples** (python, csharp, typescript, java, go)
+- **Only include the TypeSpec example** showing how to apply the decorator
+- **State the behavior change in the description**, e.g., "This decorator only affects the internal implementation and does not change the public API surface."
+- The `<ClientTabs>` block should contain only `typespec` and `client.tsp` code blocks, with no language tabs
+
+Known internal-only decorators:
+
+- `@nextLinkVerb` — changes the HTTP verb used for next-link pagination internally; no public surface impact
+- `@deserializeEmptyStringAsNull` — changes deserialization behavior internally; no public model surface impact
+
+#### Language-specific notes for code examples
+
+- **Go does not export API version enums.** When documenting `@clientApiVersions`, the Go tab should say `// Go does not export the API version enum - no impact` instead of showing generated code.
+- **Do not assume NOT_SUPPORTED.** Many TCGC decorators (especially paging-related ones like `@disablePageable`) work through the TCGC type graph and do not require emitter-specific work. All emitters that follow the type graph support them automatically. Verify actual support before marking a language as `// NOT_SUPPORTED`.
+
 ### Emitter developer docs (`guideline.md`)
 
-- References TCGC type graph: `SdkClient`, `SdkOperationGroup`, `SdkPackage`, etc.
+- References TCGC type graph: `SdkClient` (now includes former `SdkOperationGroup`), `SdkPackage`, etc.
+- `SdkClient.services` is an array of `Namespace[]` (supports multi-service)
+- `SdkClient.subClients` replaces former `subOperationGroups`
+- `SdkClient.clientPath` replaces former `groupPath`
 - Uses `@clientLocation` (not the old `@moveTo` which was renamed)
 
 ### Design docs (`design-docs/`)

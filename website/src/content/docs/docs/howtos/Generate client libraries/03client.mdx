@@ -1112,7 +1112,11 @@ petActionClient.Pet(context.Background(), &PetActionClientPetOptions{})
 
 ### One Client and Two Sub Clients
 
-Two sub clients that separate the operations can be declared using the `@client` decorator (or the `@operationGroup` decorator, which is an alias) from `typespec-client-generator-core`:
+Two sub clients that separate the operations can be declared using the `@client` decorator from `typespec-client-generator-core`:
+
+:::caution
+The `@operationGroup` decorator is deprecated. Use `@client` instead — `@operationGroup` now simply delegates to `@client` and will be removed in a future release.
+:::
 
 <ClientTabs>
 
@@ -1231,25 +1235,19 @@ opGrp2Client.pet();
 // generated petstore_client.go
 type PetStoreClient struct {}
 
-func NewPetStoreClient() *PetStoreClient{
-  return &PetStoreClient{}
-}
+func NewPetStoreClientWithNoCredential(endpoint string, options *PetStoreClientOptions) (*PetStoreClient, error) {}
 
-func (client *PetStoreClient)NewOpGrp1Client() *OpGrp1Client{
-  return &OpGrp1Client{}
-}
+func (client *PetStoreClient) NewPetStoreOpGrp1Client() *PetStoreOpGrp1Client {}
 
-func (client *PetStoreClient)NewOpGrp2Client() *OpGrp2Client{
-  return &OpGrp2Client{}
-}
+func (client *PetStoreClient) NewPetStoreOpGrp2Client() *PetStoreOpGrp2Client {}
 
 // generated petstoreopgrp1_client.go
-type OpGrp1Client struct {}
+type PetStoreOpGrp1Client struct {}
 
 func (client *PetStoreOpGrp1Client) Feed(ctx context.Context, options *PetStoreOpGrp1ClientFeedOptions) (PetStoreOpGrp1ClientFeedResponse, error) {}
 
 // generated petstoreopgrp2_client.go
-type OpGrp2Client struct {}
+type PetStoreOpGrp2Client struct {}
 
 func (client *PetStoreOpGrp2Client) Pet(ctx context.Context, options *PetStoreOpGrp2ClientPetOptions) (PetStoreOpGrp2ClientPetResponse, error) {}
 
@@ -1262,11 +1260,11 @@ type PetStoreOpGrp1ClientFeedResponse struct {}
 type PetStoreOpGrp2ClientPetResponse struct {}
 
 // Usage Sample
-petStoreClient := NewPetStoreClient()
-opGrp1Client := petStoreClient.NewOpGrp1Client()
+petStoreClient, _ := NewPetStoreClientWithNoCredential("endpoint", nil)
+opGrp1Client := petStoreClient.NewPetStoreOpGrp1Client()
 opGrp1Client.Feed(context.Background(), &PetStoreOpGrp1ClientFeedOptions{})
-opGrp2Client := petStoreClient.NewOpGrp2Client()
-opGrp2Client.Pet(context.Background(),&PetStoreOpGrp2ClientPetOptions{})
+opGrp2Client := petStoreClient.NewPetStoreOpGrp2Client()
+opGrp2Client.Pet(context.Background(), &PetStoreOpGrp2ClientPetOptions{})
 ```
 
 </ClientTabs>
