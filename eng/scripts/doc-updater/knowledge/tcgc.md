@@ -3,7 +3,7 @@
 ## Package Info
 
 - **Package**: `@azure-tools/typespec-client-generator-core`
-- **Version**: 0.66.0
+- **Version**: 0.66.2
 - **TSP Main**: `./lib/main.tsp`
 
 ## Decorator → Doc Page Mapping
@@ -73,6 +73,20 @@ Valid scopes: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`, negation
 - Code examples use `<ClientTabs>` with six language blocks in order: typespec, python, csharp, typescript, java, go
 - Legacy decorators marked with `:::caution` admonitions
 - TypeSpec examples can have `title` attribute: ` ```typespec title="main.tsp" `
+
+#### Internal-only decorators (no language code examples)
+
+Some decorators only affect internal emitter implementation (e.g., serialization, deserialization, HTTP request behavior) and do **not** change the public API surface or model shape. For these decorators, the `<ClientTabs>` block must contain **only the TypeSpec examples** (main.tsp and client.tsp). Do NOT include language-specific output tabs (python, csharp, typescript, java, go) because there is nothing observable in the generated API surface. Instead, add a sentence to the prose description noting that the decorator only affects internal behavior.
+
+Decorators in this category:
+
+- `@nextLinkVerb` — affects which HTTP verb is used internally for next-link pagination requests; no change to the public paging API
+- `@deserializeEmptyStringAsNull` — affects internal deserialization behavior; no change to the public model surface
+
+#### Language-specific support notes
+
+- **TypeScript supports `@disablePageable`**: When `@disablePageable` is applied, TypeScript returns `Promise<ModelType>` instead of `PagedAsyncIterableIterator<ItemType>`. Do NOT mark TypeScript as `// NOT_SUPPORTED` for this decorator. All emitters support `@disablePageable` — they simply follow the TCGC type graph to determine if an operation is pageable.
+- **Go does not export API version enums**: When documenting `@clientApiVersions` or API version features, the Go tab should say `// Go does not export the API version enum - no impact` rather than showing a generated function signature.
 
 ### Emitter developer docs (`guideline.md`)
 
