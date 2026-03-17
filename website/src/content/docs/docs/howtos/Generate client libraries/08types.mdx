@@ -2633,7 +2633,7 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 
 ### `@deserializeEmptyStringAsNull`
 
-The `@deserializeEmptyStringAsNull` decorator marks string properties so that empty strings (`""`) are deserialized as `null` values. This is useful for URL-typed or optional string properties where an empty string should be treated as absent.
+The `@deserializeEmptyStringAsNull` decorator marks string properties so that empty strings (`""`) are deserialized as `null` values. This is useful for URL-typed or optional string properties where an empty string should be treated as absent. This decorator only affects the internal deserialization behavior and does not change the public model surface.
 
 <ClientTabs>
 
@@ -2665,46 +2665,6 @@ import "@azure-tools/typespec-client-generator-core";
 using Azure.ClientGenerator.Core;
 
 @@deserializeEmptyStringAsNull(PetStore.Pet.profileImageUrl);
-```
-
-```python
-class Pet(Model):
-    id: str
-    name: str
-    # Empty string values for profile_image_url will be deserialized as None
-    profile_image_url: str
-```
-
-```csharp
-public partial class Pet
-{
-    // Empty string values for ProfileImageUrl will be deserialized as null
-    public Uri ProfileImageUrl { get; }
-}
-```
-
-```typescript
-// The decorator is consumed by emitters at deserialization time.
-// The model shape is unchanged:
-export interface Pet {
-  id: string;
-  name: string;
-  profileImageUrl: string;
-}
-```
-
-```java
-// The decorator is consumed by emitters at deserialization time.
-// The model shape is unchanged:
-public final class Pet {
-    public String getId();
-    public String getName();
-    public String getProfileImageUrl();
-}
-```
-
-```go
-// NOT_SUPPORTED
 ```
 
 </ClientTabs>

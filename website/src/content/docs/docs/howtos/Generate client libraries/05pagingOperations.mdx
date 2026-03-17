@@ -563,7 +563,13 @@ public partial class ItemServiceClient
 ```
 
 ```typescript
-// NOT_SUPPORTED
+// Returns the full ItemListResult model, not a PagedAsyncIterableIterator<Item>
+export function listItems(
+  context: Client,
+  id: string,
+  name: string,
+  options?: ListItemsOptionalParams,
+): Promise<ItemListResult>;
 ```
 
 ```java
@@ -582,7 +588,7 @@ func (client *ItemServiceClient) ListItems(ctx context.Context, id string, name 
 
 ### `@nextLinkVerb`
 
-The `@nextLinkVerb` decorator specifies the HTTP verb (`"GET"` or `"POST"`) to use when following next-link pagination URLs. By default, next-link requests use `GET`. Use this decorator when the service requires `POST` for pagination.
+The `@nextLinkVerb` decorator specifies the HTTP verb (`"GET"` or `"POST"`) to use when following next-link pagination URLs. By default, next-link requests use `GET`. Use this decorator when the service requires `POST` for pagination. This decorator only affects the internal implementation of paging and does not change the public API surface.
 
 <ClientTabs>
 
@@ -620,33 +626,6 @@ import "@azure-tools/typespec-client-generator-core";
 using Azure.ClientGenerator.Core.Legacy;
 
 @@nextLinkVerb(ItemService.listItems, "POST");
-```
-
-```python
-# Paging uses POST for next-link requests internally
-class ItemServiceClient:
-    def list_items(self, *, id: str, name: str, **kwargs: Any) -> ItemPaged[Item]: ...
-```
-
-```csharp
-// Paging uses POST for next-link requests internally
-public partial class ItemServiceClient
-{
-    public virtual Pageable<Item> GetItems(string id, string name, CancellationToken cancellationToken = default);
-    public virtual AsyncPageable<Item> GetItemsAsync(string id, string name, CancellationToken cancellationToken = default);
-}
-```
-
-```typescript
-// NOT_SUPPORTED
-```
-
-```java
-// NOT_SUPPORTED
-```
-
-```go
-// NOT_SUPPORTED
 ```
 
 </ClientTabs>
