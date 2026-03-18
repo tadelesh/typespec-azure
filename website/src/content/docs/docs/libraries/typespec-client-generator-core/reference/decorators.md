@@ -318,7 +318,7 @@ op test(
 ### `@client` {#@Azure.ClientGenerator.Core.client}
 
 Define the client generated in the client SDK.
-If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+If there is any `@client` definition, then each top-level `@client` is a root client and each nested `@client` is a sub client with hierarchy.
 This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
 
 ```typespec
@@ -845,6 +845,10 @@ model MyModel {
 ```
 
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
+
+:::caution[Deprecated]
+`@operationGroup` is deprecated. Use `@client` instead. Sub clients should be represented using nested `@client` decorators. `@operationGroup` currently delegates to `@client` for backwards compatibility and will be removed in a future release.
+:::
 
 ```typespec
 @Azure.ClientGenerator.Core.operationGroup(scope?: valueof string)
