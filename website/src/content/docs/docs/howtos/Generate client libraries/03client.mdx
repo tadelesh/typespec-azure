@@ -1112,7 +1112,11 @@ petActionClient.Pet(context.Background(), &PetActionClientPetOptions{})
 
 ### One Client and Two Sub Clients
 
-Two sub clients that separate the operations can be declared using the `@client` decorator (or the `@operationGroup` decorator, which is an alias) from `typespec-client-generator-core`:
+Two sub clients that separate the operations can be declared using the `@client` decorator from `typespec-client-generator-core`:
+
+:::note
+The `@operationGroup` decorator is deprecated in favor of `@client`. Use `@client` to define sub clients instead.
+:::
 
 <ClientTabs>
 
@@ -1137,12 +1141,12 @@ using Azure.ClientGenerator.Core;
 })
 namespace PetStoreRenamed; // this namespace will be the namespace of the clients and sub clients defined in this customization file
 
-@operationGroup
+@client
 interface OpGrp1 {
   feed is PetStore.feed;
 }
 
-@operationGroup
+@client
 interface OpGrp2 {
   pet is PetStore.pet;
 }
