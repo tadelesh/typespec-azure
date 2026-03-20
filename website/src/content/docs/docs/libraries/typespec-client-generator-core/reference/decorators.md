@@ -318,7 +318,7 @@ op test(
 ### `@client` {#@Azure.ClientGenerator.Core.client}
 
 Define the client generated in the client SDK.
-If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+If there is any `@client` definition, then each root `@client` is a root client and nested `@client` definitions are sub clients with hierarchy. The `@operationGroup` decorator is deprecated and delegates to `@client`.
 This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
 
 ```typespec
@@ -513,7 +513,7 @@ model MyServiceClientOptions {
 
 ### `@clientLocation` {#@Azure.ClientGenerator.Core.clientLocation}
 
-Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
+Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` decorators.
 Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in `@clientInitialization` decorator.
 
 ```typespec
@@ -845,6 +845,10 @@ model MyModel {
 ```
 
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
+
+:::caution[Deprecated]
+`@operationGroup` is deprecated. Use `@client` instead. Sub clients should be represented using `@client`. `@operationGroup` currently delegates to `@client` and will be removed in a future release.
+:::
 
 ```typespec
 @Azure.ClientGenerator.Core.operationGroup(scope?: valueof string)
