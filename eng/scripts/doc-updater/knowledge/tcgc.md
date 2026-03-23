@@ -3,41 +3,41 @@
 ## Package Info
 
 - **Package**: `@azure-tools/typespec-client-generator-core`
-- **Version**: 0.66.0
+- **Version**: 0.66.3
 - **TSP Main**: `./lib/main.tsp`
 
 ## Decorator → Doc Page Mapping
 
-| Decorator                       | Namespace | Doc Page                   | Section                                 |
-| ------------------------------- | --------- | -------------------------- | --------------------------------------- |
-| `@client`                       | Core      | `03client.mdx`             | Default behavior / Customizations       |
-| `@operationGroup`               | Core      | `03client.mdx`             | Operation Groups                        |
-| `@clientName`                   | Core      | `09renaming.mdx`           | Renaming models/operations/parameters   |
-| `@clientNamespace`              | Core      | `02package.mdx`            | Namespace customization                 |
-| `@clientLocation`               | Core      | `03client.mdx`, `04method` | Move operations / parameters            |
-| `@clientInitialization`         | Core      | `03client.mdx`             | Client init parameters                  |
-| `@paramAlias`                   | Core      | `03client.mdx`             | Parameter aliasing                      |
-| `@convenientAPI`                | Core      | `04method.mdx`             | Convenience vs protocol methods         |
-| `@protocolAPI`                  | Core      | `04method.mdx`             | Convenience vs protocol methods         |
-| `@access`                       | Core      | `04method.mdx`             | Make methods private/internal           |
-| `@usage`                        | Core      | `04method.mdx`             | Decide model usage                      |
-| `@override`                     | Core      | `04method.mdx`             | Prevent spreading                       |
-| `@scope`                        | Core      | `04method.mdx`             | Limit operations to specific languages  |
-| `@responseAsBool`               | Core      | `04method.mdx`             | HEAD operations returning boolean       |
-| `@alternateType`                | Core      | `08types.mdx`              | External type references                |
-| `@clientDoc`                    | Core      | `08types.mdx`              | Client Documentation                    |
-| `@deserializeEmptyStringAsNull` | Core      | `08types.mdx`              | Serialization Decorators                |
-| `@useSystemTextJsonConverter`   | Core      | (reference only)           | C#-specific JSON converter              |
-| `@apiVersion`                   | Core      | `10versioning.mdx`         | Overriding Client Api Version Parameter |
-| `@clientApiVersions`            | Core      | `10versioning.mdx`         | Extending API Versions                  |
-| `@clientOption`                 | Core      | `12clientOptions.mdx`      | Client Options                          |
-| `@flattenProperty`              | Legacy    | `08types.mdx`              | Flattening (legacy)                     |
-| `@hierarchyBuilding`            | Legacy    | `11hierarchyBuilding.mdx`  | Multi-layer discriminator hierarchy     |
-| `@markAsLro`                    | Legacy    | `06longRunningOperations`  | LRO Legacy Decorators                   |
-| `@markAsPageable`               | Legacy    | `05pagingOperations.mdx`   | Paging Legacy Decorators                |
-| `@disablePageable`              | Legacy    | `05pagingOperations.mdx`   | Paging Legacy Decorators                |
-| `@nextLinkVerb`                 | Legacy    | `05pagingOperations.mdx`   | Paging Legacy Decorators                |
-| `@clientDefaultValue`           | Legacy    | `08types.mdx`              | Client Default Values (Legacy)          |
+| Decorator                       | Namespace  | Doc Page                   | Section                                 |
+| ------------------------------- | ---------- | -------------------------- | --------------------------------------- |
+| `@client`                       | Core       | `03client.mdx`             | Default behavior / Customizations       |
+| `@operationGroup`               | Deprecated | `03client.mdx`             | Operation Groups (deprecated alias)     |
+| `@clientName`                   | Core       | `09renaming.mdx`           | Renaming models/operations/parameters   |
+| `@clientNamespace`              | Core       | `02package.mdx`            | Namespace customization                 |
+| `@clientLocation`               | Core       | `03client.mdx`, `04method` | Move operations / parameters            |
+| `@clientInitialization`         | Core       | `03client.mdx`             | Client init parameters                  |
+| `@paramAlias`                   | Core       | `03client.mdx`             | Parameter aliasing                      |
+| `@convenientAPI`                | Core       | `04method.mdx`             | Convenience vs protocol methods         |
+| `@protocolAPI`                  | Core       | `04method.mdx`             | Convenience vs protocol methods         |
+| `@access`                       | Core       | `04method.mdx`             | Make methods private/internal           |
+| `@usage`                        | Core       | `04method.mdx`             | Decide model usage                      |
+| `@override`                     | Core       | `04method.mdx`             | Prevent spreading                       |
+| `@scope`                        | Core       | `04method.mdx`             | Limit operations to specific languages  |
+| `@responseAsBool`               | Core       | `04method.mdx`             | HEAD operations returning boolean       |
+| `@alternateType`                | Core       | `08types.mdx`              | External type references                |
+| `@clientDoc`                    | Core       | `08types.mdx`              | Client Documentation                    |
+| `@deserializeEmptyStringAsNull` | Core       | `08types.mdx`              | Serialization Decorators                |
+| `@useSystemTextJsonConverter`   | Core       | (reference only)           | C#-specific JSON converter              |
+| `@apiVersion`                   | Core       | `10versioning.mdx`         | Overriding Client Api Version Parameter |
+| `@clientApiVersions`            | Core       | `10versioning.mdx`         | Extending API Versions                  |
+| `@clientOption`                 | Core       | `12clientOptions.mdx`      | Client Options                          |
+| `@flattenProperty`              | Legacy     | `08types.mdx`              | Flattening (legacy)                     |
+| `@hierarchyBuilding`            | Legacy     | `11hierarchyBuilding.mdx`  | Multi-layer discriminator hierarchy     |
+| `@markAsLro`                    | Legacy     | `06longRunningOperations`  | LRO Legacy Decorators                   |
+| `@markAsPageable`               | Legacy     | `05pagingOperations.mdx`   | Paging Legacy Decorators                |
+| `@disablePageable`              | Legacy     | `05pagingOperations.mdx`   | Paging Legacy Decorators                |
+| `@nextLinkVerb`                 | Legacy     | `05pagingOperations.mdx`   | Paging Legacy Decorators                |
+| `@clientDefaultValue`           | Legacy     | `08types.mdx`              | Client Default Values (Legacy)          |
 
 ## Decorator Signatures (from lib/decorators.tsp)
 
@@ -46,8 +46,8 @@ Valid scopes: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`, negation
 
 ### Key Signatures
 
-- `@client(target, options?: {name?, service?}, scope?)` — Define root client
-- `@operationGroup(target, scope?)` — Define sub-client
+- `@client(target, options?: {name?, service?, autoMergeService?}, scope?)` — Define root/sub client. `service` accepts `Namespace | Namespace[]` for multi-service support.
+- `@operationGroup(target, scope?)` — **DEPRECATED**: Use `@client` instead. Delegates to `@client` internally.
 - `@clientName(target, rename: string, scope?)` — Override name
 - `@access(target, value: Access.public|internal, scope?)` — Access level
 - `@usage(target, value: Usage.input|output|json|xml, scope?)` — Usage flags
@@ -74,9 +74,29 @@ Valid scopes: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`, negation
 - Legacy decorators marked with `:::caution` admonitions
 - TypeSpec examples can have `title` attribute: ` ```typespec title="main.tsp" `
 
+#### Internal-only decorators (no language examples)
+
+Some decorators only affect internal emitter behavior (serialization, deserialization, HTTP
+request details) and do **not** change the public API surface or model shape. For these decorators:
+
+- The `<ClientTabs>` block must contain **only the TypeSpec examples** (`main.tsp` and `client.tsp`).
+  Do NOT include language-specific code blocks (python, csharp, typescript, java, go).
+- The prose description must explicitly state that the decorator does not change the public
+  API/model surface, e.g., "This decorator only affects the internal implementation of paging
+  and does not change the public API surface."
+
+Decorators in this category:
+
+- `@nextLinkVerb` — changes the HTTP verb used internally for next-link pagination; no public API change
+- `@deserializeEmptyStringAsNull` — changes internal deserialization behavior; no public model surface change
+
 ### Emitter developer docs (`guideline.md`)
 
-- References TCGC type graph: `SdkClient`, `SdkOperationGroup`, `SdkPackage`, etc.
+- References TCGC type graph: `SdkClient`, `SdkPackage`, etc.
+- `SdkOperationGroup` has been consolidated into `SdkClient`
+- `SdkClient` properties: `kind`, `name`, `services` (plural), `type?`, `subClients`, `clientPath`, `parent?`, `autoMergeService?`
+- Key functions: `listClients()`, `getClient()`, `listSubClients()`, `listOperationsInClient()`
+- Removed: `SdkOperationGroup`, `isOperationGroup()`, `getOperationGroup()`, `listOperationGroups()`, `listOperationsInOperationGroup()`
 - Uses `@clientLocation` (not the old `@moveTo` which was renamed)
 
 ### Design docs (`design-docs/`)
@@ -107,3 +127,23 @@ response-as-bool, usage
 - `design-docs/multiple-services.md` documents multi-service `@client` with service arrays
 - Auto-generated reference docs at `libraries/typespec-client-generator-core/reference/decorators.md`
 - Test files at `packages/typespec-client-generator-core/test/decorators/` (28 test files)
+
+## Language-Specific Behavior Notes
+
+These notes capture language-specific behaviors that emitters produce. Use these to avoid
+incorrectly marking features as `NOT_SUPPORTED` or generating wrong examples.
+
+### Paging
+
+- **TypeScript supports `@disablePageable`**: When paging is disabled, TypeScript returns the full
+  response model (e.g., `Promise<ItemListResult>`) instead of `PagedAsyncIterableIterator<Item>`.
+  Do NOT mark TypeScript as `NOT_SUPPORTED` for `@disablePageable`.
+- **Paging decorators follow the TCGC type graph**: Emitters do not need decorator-specific logic
+  for `@markAsPageable` or `@disablePageable`. They only need to follow the TCGC type graph to
+  determine if an operation is pageable. All languages should support these decorators.
+
+### Versioning
+
+- **Go does not export API version enums**: The `@clientApiVersions` decorator has no visible
+  impact on Go output. When documenting Go examples for `@clientApiVersions`, use:
+  `// Go does not export the API version enum - no impact`

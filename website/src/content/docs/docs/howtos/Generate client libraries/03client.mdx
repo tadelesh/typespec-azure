@@ -1112,7 +1112,11 @@ petActionClient.Pet(context.Background(), &PetActionClientPetOptions{})
 
 ### One Client and Two Sub Clients
 
-Two sub clients that separate the operations can be declared using the `@client` decorator (or the `@operationGroup` decorator, which is an alias) from `typespec-client-generator-core`:
+Two sub clients that separate the operations can be declared using the `@client` decorator (or the deprecated `@operationGroup` decorator, which is an alias) from `typespec-client-generator-core`:
+
+:::caution
+The `@operationGroup` decorator is deprecated. Use `@client` on sub-client interfaces instead. `@operationGroup` still works as an alias for `@client` but will be removed in a future release.
+:::
 
 <ClientTabs>
 
@@ -1135,7 +1139,7 @@ using Azure.ClientGenerator.Core;
   name: "PetStoreClient",
   service: PetStore,
 })
-namespace PetStoreRenamed; // this namespace will be the namespace of the clients and sub clients defined in this customization file
+namespace PetStoreRenamed;
 
 @operationGroup
 interface OpGrp1 {
@@ -1157,26 +1161,25 @@ class PetStoreClient:
 class OpGrp1Operations:
 
     @distributed_trace
-    def feed(self, **kwargs: Any) -> None:
+    def feed(self, **kwargs: Any) -> None: ...
 
 class OpGrp2Operations:
 
     @distributed_trace
-    def pet(self, **kwargs: Any) -> None:
+    def pet(self, **kwargs: Any) -> None: ...
 
-#usage sample
-from pet_store_renamed import PetStoreClient
+# usage
+from petstorerenamed import PetStoreClient
 
-client = PetStoreClient()
-
-client.op_grp_1.feed()
-client.op_grp_2.pet()
+client = PetStoreClient(endpoint="<endpoint>")
+client.op_grp1.feed()
+client.op_grp2.pet()
 ```
 
 ```csharp
 using PetStoreRenamed;
 
-PetStoreClient client = new PetStoreClient();
+PetStoreClient client = new PetStoreClient(new Uri("<endpoint>"));
 
 client.GetOpGrp1Client().Feed();
 client.GetOpGrp2Client().Pet();
@@ -1185,7 +1188,7 @@ client.GetOpGrp2Client().Pet();
 ```typescript
 import { PetStoreClient } from "@azure/package-name";
 
-const client = new PetStoreClient();
+const client = new PetStoreClient("<endpoint>");
 client.opGrp1.feed();
 client.opGrp2.pet();
 ```
@@ -1200,7 +1203,6 @@ public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuil
     ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
 
     public OpGrp1Client buildOpGrp1Client();
-
     public OpGrp2Client buildOpGrp2Client();
 }
 
@@ -1216,57 +1218,38 @@ public final class OpGrp2Client {
 }
 
 // Usage
-package petstorerenamed;
-
-PetStoreClientBuilder builder = new PetStoreClientBuilder();
-
+PetStoreClientBuilder builder = new PetStoreClientBuilder().endpoint("<endpoint>");
 OpGrp1Client opGrp1Client = builder.buildOpGrp1Client();
 opGrp1Client.feed();
-
 OpGrp2Client opGrp2Client = builder.buildOpGrp2Client();
 opGrp2Client.pet();
 ```
 
 ```go
 // generated petstore_client.go
-type PetStoreClient struct {}
+type PetStoreClient struct{}
 
-func NewPetStoreClient() *PetStoreClient{
-  return &PetStoreClient{}
-}
+func NewPetStoreClientWithNoCredential(endpoint string, options *PetStoreClientOptions) (*PetStoreClient, error)
 
-func (client *PetStoreClient)NewOpGrp1Client() *OpGrp1Client{
-  return &OpGrp1Client{}
-}
-
-func (client *PetStoreClient)NewOpGrp2Client() *OpGrp2Client{
-  return &OpGrp2Client{}
-}
+func (client *PetStoreClient) NewPetStoreOpGrp1Client() *PetStoreOpGrp1Client
+func (client *PetStoreClient) NewPetStoreOpGrp2Client() *PetStoreOpGrp2Client
 
 // generated petstoreopgrp1_client.go
-type OpGrp1Client struct {}
+type PetStoreOpGrp1Client struct{}
 
-func (client *PetStoreOpGrp1Client) Feed(ctx context.Context, options *PetStoreOpGrp1ClientFeedOptions) (PetStoreOpGrp1ClientFeedResponse, error) {}
+func (client *PetStoreOpGrp1Client) Feed(ctx context.Context, options *PetStoreOpGrp1ClientFeedOptions) (PetStoreOpGrp1ClientFeedResponse, error)
 
 // generated petstoreopgrp2_client.go
-type OpGrp2Client struct {}
+type PetStoreOpGrp2Client struct{}
 
-func (client *PetStoreOpGrp2Client) Pet(ctx context.Context, options *PetStoreOpGrp2ClientPetOptions) (PetStoreOpGrp2ClientPetResponse, error) {}
+func (client *PetStoreOpGrp2Client) Pet(ctx context.Context, options *PetStoreOpGrp2ClientPetOptions) (PetStoreOpGrp2ClientPetResponse, error)
 
-// generated options.go
-type PetStoreOpGrp1ClientFeedOptions struct {}
-type PetStoreOpGrp2ClientPetOptions struct {}
-
-// generated response.go
-type PetStoreOpGrp1ClientFeedResponse struct {}
-type PetStoreOpGrp2ClientPetResponse struct {}
-
-// Usage Sample
-petStoreClient := NewPetStoreClient()
-opGrp1Client := petStoreClient.NewOpGrp1Client()
-opGrp1Client.Feed(context.Background(), &PetStoreOpGrp1ClientFeedOptions{})
-opGrp2Client := petStoreClient.NewOpGrp2Client()
-opGrp2Client.Pet(context.Background(),&PetStoreOpGrp2ClientPetOptions{})
+// Usage
+petStoreClient, _ := NewPetStoreClientWithNoCredential("<endpoint>", nil)
+opGrp1Client := petStoreClient.NewPetStoreOpGrp1Client()
+opGrp1Client.Feed(context.Background(), nil)
+opGrp2Client := petStoreClient.NewPetStoreOpGrp2Client()
+opGrp2Client.Pet(context.Background(), nil)
 ```
 
 </ClientTabs>
