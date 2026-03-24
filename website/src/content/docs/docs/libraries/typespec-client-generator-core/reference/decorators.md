@@ -846,6 +846,10 @@ model MyModel {
 
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
+:::caution[Deprecated]
+`@operationGroup` is deprecated. Use `@client` instead. Sub clients should be represented using `@client`. This decorator will be removed in a future release.
+:::
+
 ```typespec
 @Azure.ClientGenerator.Core.operationGroup(scope?: valueof string)
 ```
