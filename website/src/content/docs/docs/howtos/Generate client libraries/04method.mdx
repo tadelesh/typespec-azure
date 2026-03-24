@@ -1647,6 +1647,180 @@ func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (*Resp
 
 </ClientTabs>
 
+## Scoping operations to specific languages
+
+The `@scope` decorator controls which language emitters generate a given operation or model property. By default, all operations are generated for all languages. Use `@scope` to include an operation for specific languages only, or to exclude it from certain languages.
+
+**Supported scope patterns:**
+
+- Single language: `"python"`
+- Multiple languages (comma-separated): `"python, java"`
+- Negation (exclude): `"!csharp"` or `"!(java, python)"`
+
+<ClientTabs>
+
+```typespec title=main.tsp
+@service
+namespace PetStore;
+
+model Pet {
+  name: string;
+  age: int32;
+}
+
+@route("/pets/{name}")
+@get
+op read(@path name: string): Pet;
+
+@route("/pets")
+@get
+op list(): Pet[];
+
+@route("/pets/{name}")
+@delete
+op deletePet(@path name: string): void;
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// The `deletePet` operation will only be generated for Python and Java clients
+@@scope(PetStore.deletePet, "python, java");
+```
+
+```python
+class PetStoreClient:
+    # `read` and `list` are generated for all languages
+    def read(self, name: str, **kwargs: Any) -> Pet: ...
+    def list(self, **kwargs: Any) -> List[Pet]: ...
+
+    # `delete_pet` is generated because Python is in scope
+    def delete_pet(self, name: str, **kwargs: Any) -> None: ...
+```
+
+```csharp
+public partial class PetStoreClient
+{
+    // `Read` and `GetAll` are generated for all languages
+    public virtual Response<Pet> Read(string name, CancellationToken cancellationToken = default);
+    public virtual Response<IReadOnlyList<Pet>> GetAll(CancellationToken cancellationToken = default);
+
+    // `DeletePet` is NOT generated — C# is not in scope
+}
+```
+
+```typescript
+// TypeScript does not currently filter operations based on @scope
+export class PetStoreClient {
+  read(name: string, options?: ReadOptionalParams): Promise<Pet>;
+  list(options?: ListOptionalParams): Promise<ListResponse>;
+  deletePet(name: string, options?: DeletePetOptionalParams): Promise<void>;
+}
+```
+
+```java
+public final class PetStoreClient {
+    // `read` and `list` are generated for all languages
+    public Pet read(String name);
+    public List<Pet> list();
+
+    // `deletePet` is generated because Java is in scope
+    public void deletePet(String name);
+}
+```
+
+```go
+// `Read` and `List` are generated for all languages
+func (client *PetStoreClient) Read(ctx context.Context, name string, options *PetStoreClientReadOptions) (PetStoreClientReadResponse, error)
+func (client *PetStoreClient) List(ctx context.Context, options *PetStoreClientListOptions) (PetStoreClientListResponse, error)
+
+// `DeletePet` is NOT generated — Go is not in scope
+```
+
+</ClientTabs>
+
+## Modeling HEAD operations as boolean responses
+
+The `@responseAsBool` decorator transforms a HEAD operation so that it returns a boolean instead of `void`:
+
+- **2xx** status codes return `true`
+- **404** returns `false` (no error is raised)
+- Other status codes still raise an error
+
+This is useful for "exists" checks.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+@service
+namespace PetStore;
+
+model Pet {
+  name: string;
+  age: int32;
+}
+
+@route("/pets/{name}")
+@head
+op exists(@path name: string): void;
+
+@route("/pets/{name}")
+@get
+op read(@path name: string): Pet;
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(PetStore.exists);
+```
+
+```python
+class PetStoreClient:
+    # Returns True if the pet exists (2xx), False if not found (404)
+    def exists(self, name: str, **kwargs: Any) -> bool: ...
+    def read(self, name: str, **kwargs: Any) -> Pet: ...
+```
+
+```csharp
+public partial class PetStoreClient
+{
+    // Returns Response<bool>: true for 2xx, false for 404
+    public virtual Response<bool> Exists(string name, CancellationToken cancellationToken = default);
+    public virtual async Task<Response<bool>> ExistsAsync(string name, CancellationToken cancellationToken = default);
+    public virtual Response<Pet> Read(string name, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class PetStoreClient {
+  exists(name: string, options?: ExistsOptionalParams): Promise<ExistsResponse>;
+  read(name: string, options?: ReadOptionalParams): Promise<Pet>;
+}
+
+// ExistsResponse wraps the boolean result
+type ExistsResponse = { body: boolean };
+```
+
+```java
+public final class PetStoreClient {
+    public BinaryData exists(String name);
+    public Pet read(String name);
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
 ## Using `@clientLocation` to control parameter placement
 
 The `@clientLocation` decorator allows you to explicitly move parameters between client and operation levels.

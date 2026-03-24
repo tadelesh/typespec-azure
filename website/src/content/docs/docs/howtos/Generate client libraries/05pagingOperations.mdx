@@ -427,3 +427,60 @@ model Page {
   ]>;
 }
 ```
+
+## Legacy Paging Decorators
+
+:::caution
+The following decorators are legacy functionality in the `Azure.ClientGenerator.Core.Legacy` namespace. They should **only** be used when standard TypeSpec paging patterns are not feasible. **New services should NOT use these decorators.**
+:::
+
+### Force paging with `@markAsPageable`
+
+The `@markAsPageable` decorator forces an operation to be treated as a pageable operation, even when it does not follow standard paging patterns. The response model should have a property decorated with `@pageItems`, or a property named `value`.
+
+```tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model MyListResult {
+  @pageItems items: MyItem[];
+  @nextLink nextLink?: string;
+}
+
+@route("/items")
+@get
+@markAsPageable
+op listItems(): MyListResult;
+```
+
+### Disable paging with `@disablePageable`
+
+The `@disablePageable` decorator prevents an operation from being treated as pageable, even when it follows standard paging patterns (e.g., decorated with `@list`). The response will be the paged model itself, not the list of items.
+
+```tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@route("/items")
+@get
+@disablePageable
+@list
+op listItems(): MyPagedResult;
+```
+
+### Override next link HTTP verb with `@nextLinkVerb`
+
+The `@nextLinkVerb` decorator specifies the HTTP verb to use when fetching the next page. Only `"GET"` and `"POST"` are supported. By default, next link requests use GET.
+
+```tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@route("/items")
+@get
+@nextLinkVerb("POST")
+op listItems(): MyPagedResult;
+```

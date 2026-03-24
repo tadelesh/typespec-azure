@@ -497,6 +497,86 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 
 - The referenced type should be compatible with the intended usage in the generated client library.
 
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator instructs client code generators to treat empty strings (`""`) as `null` during deserialization. This is useful when a service returns empty strings to represent absent values.
+
+This decorator can only be applied to model properties of type `string` or scalar types derived from `string`.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+@service
+namespace PetStore;
+
+model Pet {
+  name: string;
+  tag: string;
+  age: int32;
+}
+
+@route("/pets/{name}")
+@get
+op read(@path name: string): Pet;
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// When the `tag` property is an empty string, deserialize it as null
+@@deserializeEmptyStringAsNull(PetStore.Pet.tag);
+```
+
+```python
+class Pet:
+    name: str = rest_field()
+    # When tag is "", it will be deserialized as None
+    tag: str = rest_field()
+    age: int = rest_field()
+```
+
+```csharp
+public partial class Pet
+{
+    public string Name { get; }
+    // When Tag is "", it will be deserialized as null
+    public string Tag { get; }
+    public int Age { get; }
+}
+```
+
+```typescript
+export interface Pet {
+  name: string;
+  // When tag is "", it will be deserialized as null
+  tag: string;
+  age: number;
+}
+```
+
+```java
+public final class Pet {
+    public String getName();
+    // When tag is "", it will be deserialized as null
+    public String getTag();
+    public int getAge();
+}
+```
+
+```go
+type Pet struct {
+    Name *string
+    // When Tag is "", it will be deserialized as nil
+    Tag  *string
+    Age  *int32
+}
+```
+
+</ClientTabs>
+
 ## Client Default Values (Legacy)
 
 :::caution
