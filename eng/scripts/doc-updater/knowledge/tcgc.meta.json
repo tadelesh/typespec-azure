@@ -1,0 +1,9 @@
+{
+  "lastCommit": "a455d127a8c783c4ce3cc270b42c8798b9758c39",
+  "lastUpdated": "2026-03-24T10:08:44.063Z",
+  "analyzedPaths": [
+    "packages/typespec-client-generator-core/src",
+    "packages/typespec-client-generator-core/lib",
+    "packages/typespec-client-generator-core/test"
+  ]
+}
