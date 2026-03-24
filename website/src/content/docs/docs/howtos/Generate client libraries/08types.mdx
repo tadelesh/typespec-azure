@@ -654,6 +654,99 @@ model Config {
 </ClientTabItem>
 </ClientTabs>
 
+## Deserialize Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator instructs emitters to deserialize an empty string (`""`) as `null` for the annotated property. This is useful for properties that may receive empty strings from the service when the value is semantically absent.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/versioning";
+
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+
+@service(#{ title: "Widget Service" })
+@versioned(Versions)
+namespace WidgetService;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+}
+
+model Widget {
+  name: string;
+
+  @doc("The callback URL. An empty string means no callback is configured.")
+  callbackUrl?: url;
+}
+
+@route("/widgets")
+interface Widgets {
+  @get read(@path name: string): Widget;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@deserializeEmptyStringAsNull(WidgetService.Widget.callbackUrl);
+```
+
+```python
+class Widget(_Model):
+    callback_url: Optional[str] = rest_field(name="callbackUrl")
+    """The callback URL. An empty string means no callback is configured."""
+
+    def __init__(self, *, name: str, callback_url: Optional[str] = None) -> None:
+        ...
+```
+
+```csharp
+public partial class Widget
+{
+    public string Name { get; }
+
+    /// <summary> The callback URL. An empty string means no callback is configured. </summary>
+    public Uri CallbackUrl { get; }
+}
+```
+
+```typescript
+export interface Widget {
+  name: string;
+  /** The callback URL. An empty string means no callback is configured. */
+  callbackUrl?: string;
+}
+```
+
+```java
+public final class Widget {
+    private final String name;
+    private String callbackUrl;
+
+    public String getCallbackUrl() {
+        return this.callbackUrl;
+    }
+}
+```
+
+```go
+type Widget struct {
+	// REQUIRED
+	Name *string
+
+	// The callback URL. An empty string means no callback is configured.
+	CallbackURL *string
+}
+```
+
+</ClientTabs>
+
 ## Models
 
 ### Models with additional properties of any type

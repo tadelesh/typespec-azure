@@ -171,10 +171,14 @@ TCGC always puts the following things in initialization parameters:
 4. Subscription ID parameter: if the service is an ARM service, then the subscription ID parameter on method will be elevated to client.
 
 The `SdkClientInitializationType` has `initializedBy` property.
-The value could be `InitializedBy.parent (2)` (the client could be initialized by parent client),
-`InitializedBy.individually (1)` (the client could be initialized individually) or `InitializedBy.parent | InitializedBy.individually (3)` (both).
+The possible values are:
 
-Default value of `initializedBy` for a root client is `InitializedBy.individually`, while `InitializedBy.parent` for a sub client.
+- `InitializedBy.individually (1)` — the client can be initialized on its own
+- `InitializedBy.parent (2)` — the client can be initialized by its parent client
+- `InitializedBy.parent | InitializedBy.individually (3)` — the client can be initialized either way
+- `InitializedBy.customizeCode (4)` — client initialization should be omitted from generated code and handled manually
+
+The default value of `initializedBy` for a root client is `InitializedBy.individually`, while `InitializedBy.parent` for a sub client. When no explicit initialization decorator is set, the value is `InitializedBy.Default (0)`.
 
 For above example 1, you will get TCGC types like this:
 
@@ -495,7 +499,7 @@ namespace TestClient {
 
 @@clientInitialization(TestClient.SubClient,
   {
-    intializedBy: InitializedBy.individually | InitializedBy.parent,
+    initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
 );
 ```
@@ -519,7 +523,7 @@ model SubClientOptions {
 @@clientInitialization(TestClient.SubClient,
   {
     parameters: SubClientOptions,
-    intializedBy: InitializedBy.individually | InitializedBy.parent,
+    initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
 );
 ```

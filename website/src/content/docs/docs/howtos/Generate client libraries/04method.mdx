@@ -1751,3 +1751,184 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Using `@responseAsBool` for HEAD operations
+
+The `@responseAsBool` decorator tells emitters that a HEAD operation should return a boolean value. When applied, a `200 OK` response maps to `true`, a `404 Not Found` maps to `false`, and any other status code raises an error.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/versioning";
+
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+
+@service(#{ title: "Widget Service" })
+@versioned(Versions)
+namespace WidgetService;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+}
+
+model Widget {
+  @key
+  name: string;
+
+  color: string;
+}
+
+@route("/widgets")
+interface Widgets {
+  @head
+  @route("/{name}")
+  checkExists(@path name: string): OkResponse | NotFoundResponse;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(WidgetService.Widgets.checkExists);
+```
+
+```python
+class WidgetServiceClient:
+    def check_exists(self, name: str, **kwargs: Any) -> bool:
+        ...
+```
+
+```csharp
+public partial class Widgets
+{
+    public virtual Response<bool> CheckExists(string name, string accept, CancellationToken cancellationToken = default)
+    {
+        ...
+    }
+
+    public virtual async Task<Response<bool>> CheckExistsAsync(string name, string accept, CancellationToken cancellationToken = default)
+    {
+        ...
+    }
+}
+```
+
+```typescript
+export type WidgetsCheckExistsResponse = { body: boolean };
+
+export interface WidgetsOperations {
+  checkExists: (
+    name: string,
+    options?: WidgetsCheckExistsOptionalParams,
+  ) => Promise<WidgetsCheckExistsResponse>;
+}
+```
+
+```java
+// TODO: fill in Java example manually — emitter returns BinaryData instead of boolean
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+## Using `@scope` to limit operations to specific languages
+
+The `@scope` decorator restricts an operation or model property to a specific set of language emitters. Operations decorated with `@scope` will only appear in the SDKs for the specified languages.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/versioning";
+
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+
+@service(#{ title: "Pet Store" })
+@versioned(Versions)
+namespace PetStore;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+}
+
+model Pet {
+  name: string;
+  age: int32;
+}
+
+@route("/pets")
+interface Pets {
+  @get list(): Pet[];
+  @post create(@body pet: Pet): Pet;
+}
+
+@route("/internal")
+interface InternalOps {
+  @get diagnostics(): string;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// The diagnostics operation will only be generated for Python
+@@scope(PetStore.InternalOps.diagnostics, "python");
+```
+
+```python
+# Python includes the diagnostics operation
+class PetStoreClient:
+    pets: PetsOperations
+    internal_ops: InternalOpsOperations  # present only in Python
+
+class InternalOpsOperations:
+    def diagnostics(self, **kwargs: Any) -> str:
+        ...
+```
+
+```csharp
+// C# does NOT include the diagnostics operation
+public partial class PetStoreClient
+{
+    public virtual Pets GetPetsClient();
+    // No InternalOps client
+}
+```
+
+```typescript
+// TypeScript does NOT include the diagnostics operation
+export class PetStoreClient {
+  public readonly pets: PetsOperations;
+  // No internalOps property
+}
+```
+
+```java
+// Java does NOT include the diagnostics operation
+public final class PetStoreClient {
+    public List<Pet> list();
+    public Pet create(Pet pet);
+    // No diagnostics method
+}
+```
+
+```go
+// Go does NOT include the diagnostics operation
+type PetStoreClient struct {}
+func (client *PetStoreClient) NewPetStorePetsClient() *PetStorePetsClient
+// No InternalOps client
+```
+
+</ClientTabs>

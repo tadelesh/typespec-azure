@@ -121,7 +121,18 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 
 ### Client
 
-Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
+Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Key properties include:
+
+- `kind` — always `"client"`
+- `name` — the client name
+- `namespace` — the client's namespace
+- `crossLanguageDefinitionId` — a unique identifier used to map the client across different language emitters
+- `clientInitialization` — how to initialize the client (see below)
+- `methods` — the client's methods
+- `apiVersions` — supported API versions
+- `children` / `parent` — the client hierarchy
+
+Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
 
 `SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized: by parent client or by itself.
 

@@ -944,3 +944,106 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Extending Client API Versions with `@clientApiVersions`
+
+The `@clientApiVersions` decorator lets you specify additional API versions that a client should support, beyond those defined via `@versioned`. This is useful when you want the generated SDK to expose versions that aren't yet fully annotated in the TypeSpec service definition.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/versioning";
+
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+
+@service(#{ title: "Widget Service" })
+@versioned(AllVersions)
+namespace WidgetService;
+
+enum AllVersions {
+  v2023_01_01: "2023-01-01",
+  v2024_01_01: "2024-01-01",
+  v2024_06_01: "2024-06-01",
+}
+
+model Widget {
+  name: string;
+  color: string;
+}
+
+@route("/widgets")
+interface Widgets {
+  @get list(): Widget[];
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Define the complete set of API versions the client should support,
+// including an additional version beyond what's in the service spec.
+enum ClientVersions {
+  v2023_01_01: "2023-01-01",
+  v2024_01_01: "2024-01-01",
+  v2024_06_01: "2024-06-01",
+  v2025_01_01: "2025-01-01",
+}
+
+@@clientApiVersions(WidgetService, ClientVersions);
+```
+
+```python
+# Python handles API versions at the client configuration level.
+# The extra version "2025-01-01" is available as a client option.
+client = WidgetServiceClient(endpoint=..., credential=..., api_version="2025-01-01")
+```
+
+```csharp
+// C# includes all four versions in the ServiceVersion enum
+public enum ServiceVersion
+{
+    V2023_01_01 = 1,
+    V2024_01_01 = 2,
+    V2024_06_01 = 3,
+    V2025_01_01 = 4  // extra version from @clientApiVersions
+}
+
+// Latest version defaults to 2025-01-01
+public partial class WidgetServiceClientOptions
+{
+    private const ServiceVersion LatestVersion = ServiceVersion.V2025_01_01;
+}
+```
+
+```typescript
+export enum KnownClientVersions {
+  V20230101 = "2023-01-01",
+  V20240101 = "2024-01-01",
+  V20240601 = "2024-06-01",
+  V20250101 = "2025-01-01", // extra version from @clientApiVersions
+}
+```
+
+```java
+public enum WidgetServiceVersion implements ServiceVersion {
+    V2023_01_01("2023-01-01"),
+    V2024_01_01("2024-01-01"),
+    V2024_06_01("2024-06-01");
+
+    // Note: Java emitter may not yet include additional client API versions
+    public static WidgetServiceVersion getLatest() {
+        return V2024_06_01;
+    }
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
