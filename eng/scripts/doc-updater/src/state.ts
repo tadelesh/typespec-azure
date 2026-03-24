@@ -218,3 +218,77 @@ export function getHumanFeedback(prNumber: number): HumanFeedback | null {
     return null;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Branch & PR management
+// ---------------------------------------------------------------------------
+
+/** Check if the working tree has uncommitted changes. */
+export function hasUncommittedChanges(): boolean {
+  const status = execSync("git status --porcelain", {
+    encoding: "utf-8",
+    cwd: REPO_ROOT,
+  }).trim();
+  return status.length > 0;
+}
+
+export interface PullRequestResult {
+  /** PR number */
+  number: number;
+  /** PR URL */
+  url: string;
+}
+
+/**
+ * Commit all changes, push to a new branch, and create a pull request via `gh`.
+ *
+ * Returns the PR number and URL, or null if there are no changes to commit.
+ */
+export function createPullRequest(opts: {
+  configName: string;
+  branch: string;
+  title: string;
+  body: string;
+  commitMessage: string;
+}): PullRequestResult | null {
+  if (!hasUncommittedChanges()) {
+    return null;
+  }
+
+  // Create and switch to the PR branch
+  execSync(`git checkout -b "${opts.branch}"`, {
+    encoding: "utf-8",
+    cwd: REPO_ROOT,
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+
+  // Stage and commit all changes
+  execSync("git add -A", { encoding: "utf-8", cwd: REPO_ROOT });
+  execSync(`git commit -m "${opts.commitMessage}"`, {
+    encoding: "utf-8",
+    cwd: REPO_ROOT,
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+
+  // Push the branch
+  execSync(`git push origin "${opts.branch}"`, {
+    encoding: "utf-8",
+    cwd: REPO_ROOT,
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+
+  // Create the PR via gh CLI
+  const prUrl = execSync(
+    `gh pr create --base main --head "${opts.branch}" --title "${opts.title}" --body "${opts.body}"`,
+    { encoding: "utf-8", cwd: REPO_ROOT, stdio: ["pipe", "pipe", "pipe"] },
+  ).trim();
+
+  // Extract the PR number from the URL (e.g. https://github.com/org/repo/pull/123)
+  const match = prUrl.match(/\/pull\/(\d+)$/);
+  if (!match) {
+    console.error(`[state] Could not parse PR number from: ${prUrl}`);
+    return null;
+  }
+
+  return { number: parseInt(match[1], 10), url: prUrl };
+}

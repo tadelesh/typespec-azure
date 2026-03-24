@@ -16,6 +16,7 @@ import { loadConfig } from "./config.js";
 import { buildDocUpdatePrompt, buildFeedbackPrompt, loadPromptFile } from "./prompts.js";
 import { buildGitHubMcpConfig, log, runAgentSession } from "./session.js";
 import {
+  createPullRequest,
   getCurrentCommit,
   getHumanFeedback,
   listCommitsSince,
@@ -163,13 +164,63 @@ async function main(): Promise<void> {
     });
 
     // Record the commit we just analyzed
-    await writeMeta(config.name, {
+    const newMeta = {
       lastCommit: getCurrentCommit(),
       lastUpdated: new Date().toISOString(),
       analyzedPaths: config.sourceCodePaths,
-    });
+    };
+
+    await writeMeta(config.name, newMeta);
 
     log("Doc update complete.");
+
+    // Step 3: Create PR if there are changes
+    if (!args.dryRun) {
+      const date = new Date().toISOString().split("T")[0];
+      const runId = process.env.GITHUB_RUN_ID ?? "local";
+      const runNumber = process.env.GITHUB_RUN_NUMBER ?? "0";
+      const branch = `automated/doc-update-${config.name}-${date}-${runNumber}`;
+      const title = `[Automated] Update ${config.name} documentation (${date})`;
+      const repoUrl =
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
+          : "";
+      const workflowLink = repoUrl
+        ? `\n\nCreated by [doc-update-scheduler](${repoUrl}/actions/runs/${runId}).`
+        : "";
+      const body = `Automated documentation update via Copilot SDK.\\n\\n**Config:** ${config.name}\\n**Model:** ${args.model}\\n**Date:** ${date}${workflowLink}`;
+
+      log("Checking for changes to submit as PR...");
+      const pr = createPullRequest({
+        configName: config.name,
+        branch,
+        title,
+        body,
+        commitMessage: `docs: automated ${config.name} update (${date})`,
+      });
+
+      if (pr) {
+        log(`PR created: ${pr.url}`);
+        // Record PR number so feedback can be checked on the next run
+        await writeMeta(config.name, { ...newMeta, lastPrNumber: pr.number });
+        // Push the updated metadata to the PR branch
+        try {
+          const { execSync } = await import("node:child_process");
+          execSync(
+            'git add -A && git commit -m "chore: record PR number in metadata" && git push origin HEAD',
+            {
+              encoding: "utf-8",
+              cwd: repoRoot,
+              stdio: ["pipe", "pipe", "pipe"],
+            },
+          );
+        } catch {
+          log("Warning: could not push metadata update to PR branch.");
+        }
+      } else {
+        log("No changes detected — skipping PR creation.");
+      }
+    }
   } finally {
     await client.stop();
   }

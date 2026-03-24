@@ -31,8 +31,7 @@ on:
         type: string
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   # -----------------------------------------------------------------------
@@ -76,11 +75,12 @@ jobs:
       fail-fast: false
     env:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-      GH_TOKEN: ${{ github.token }}
+      GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.COPILOT_GITHUB_TOKEN }}
           fetch-depth: 0
           submodules: recursive
 
@@ -151,43 +151,6 @@ jobs:
             --config "${{ matrix.config }}" \
             --model "$MODEL" \
             $REBUILD_FLAG
-
-      - name: Set run date
-        id: date
-        run: echo "value=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
-
-      - name: Create Pull Request
-        id: create-pr
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ github.token }}
-          branch: automated/doc-update-${{ matrix.config }}-${{ steps.date.outputs.value }}-${{ github.run_number }}
-          title: "[Automated] Update ${{ matrix.config }} documentation (${{ steps.date.outputs.value }})"
-          body: |
-            Automated documentation update via Copilot SDK.
-
-            **Config:** ${{ matrix.config }}
-            **Full rebuild:** ${{ github.event.inputs.full_rebuild || 'false' }}
-            **Model:** ${{ github.event.inputs.model || 'claude-opus-4.6' }}
-            **Date:** ${{ steps.date.outputs.value }}
-
-            This PR was created by the [doc-update-scheduler workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
-          commit-message: "docs: automated ${{ matrix.config }} update (${{ steps.date.outputs.value }})"
-          delete-branch: true
-
-      - name: Record PR number in metadata
-        if: steps.create-pr.outputs.pull-request-number
-        env:
-          PR_BRANCH: automated/doc-update-${{ matrix.config }}-${{ steps.date.outputs.value }}-${{ github.run_number }}
-        run: |
-          git checkout "$PR_BRANCH"
-          META_FILE="eng/scripts/doc-updater/knowledge/${{ matrix.config }}.meta.json"
-          if [ -f "$META_FILE" ]; then
-            jq '.lastPrNumber = ${{ steps.create-pr.outputs.pull-request-number }}' "$META_FILE" > tmp.json && mv tmp.json "$META_FILE"
-            git add "$META_FILE"
-            git commit -m "chore: record PR number in metadata"
-            git push origin HEAD
-          fi
 
       - name: Job Summary
         run: |
