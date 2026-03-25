@@ -1751,3 +1751,51 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Using `@scope` to exclude HTTP parameters per language emitter
+
+The `@scope` decorator can be applied to HTTP parameters (headers, query parameters, path parameters, and cookie parameters) to exclude them from the generated method signature in specific language emitters. This is useful when a service requires a certain header or parameter that a particular SDK wants to handle internally rather than exposing it to callers.
+
+> **Note:** When a required parameter is scoped out, TCGC emits a `required-parameter-scoped-out` warning. Make sure the parameter is provided through other means (e.g., middleware or custom headers) at runtime to avoid errors.
+
+### Excluding a header parameter from a specific language
+
+Use a negation scope (e.g., `"!python"`) to exclude a parameter from one language while keeping it visible in all others:
+
+```tsp title="main.tsp"
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@service
+namespace WidgetService;
+
+op getData(
+  @header("X-Custom-Header")
+  @scope("!python")
+  customHeader: string;
+): void;
+```
+
+In this example, `customHeader` appears in the method signature for all language emitters **except** Python.
+
+### Including a parameter only for specific languages
+
+Use a plain scope value to make a parameter visible only to listed languages:
+
+```tsp title="main.tsp"
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@service
+namespace WidgetService;
+
+op getData(
+  @query
+  @scope("python, java")
+  debugMode: boolean;
+): void;
+```
+
+Here, `debugMode` is only included in the Python and Java SDK method signatures.

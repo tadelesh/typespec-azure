@@ -872,6 +872,24 @@ extern dec alternateType(
  *   csharpOnlyProp: string;
  * }
  * ```
+ *
+ * @example Exclude an HTTP header parameter from a specific language
+ * ```typespec
+ * op func(
+ *   @header("X-Custom-Header")
+ *   @scope("!python")
+ *   customHeader: string;
+ * ): void;
+ * ```
+ *
+ * @example Include an HTTP query parameter only for specific languages
+ * ```typespec
+ * op func(
+ *   @query
+ *   @scope("python, java")
+ *   debugMode: boolean;
+ * ): void;
+ * ```
  */
 extern dec scope(target: Operation | ModelProperty, scope?: valueof string);
 
