@@ -1101,6 +1101,18 @@ model TestModel {
 }
 ```
 
+##### Exclude an HTTP operation parameter from a specific language
+
+When `@scope` is applied to an HTTP parameter (header, query, path, or cookie), the parameter is excluded from the SDK for the specified emitter(s). A warning is emitted if a required parameter is scoped out, since the SDK will need to supply it through other means (e.g., internally via custom policy headers).
+
+```typespec
+op upload(
+  @header("X-Custom-Header")
+  @scope("!python")
+  customHeader?: string,
+): void;
+```
+
 ### `@usage` {#@Azure.ClientGenerator.Core.usage}
 
 Add usage for models/enums.
