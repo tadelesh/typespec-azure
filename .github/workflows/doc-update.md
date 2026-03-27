@@ -42,11 +42,20 @@ steps:
   - name: Setup pnpm
     uses: pnpm/action-setup@v4
 
+  - name: Setup Maven
+    run: |
+      MAVEN_VERSION="3.9.9"
+      wget -q "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
+      tar -xzf "apache-maven-${MAVEN_VERSION}-bin.tar.gz" -C "$HOME"
+      rm -f "apache-maven-${MAVEN_VERSION}-bin.tar.gz"
+      echo "$HOME/apache-maven-${MAVEN_VERSION}/bin" >> $GITHUB_PATH
+
   - name: Install repo dependencies
     run: pnpm install
 
   - name: Install doc-updater dependencies
-    run: npm ci --prefix eng/scripts/doc-updater
+    working-directory: eng/scripts/doc-updater
+    run: npm install
 
   - name: Pre-compute context
     env:
