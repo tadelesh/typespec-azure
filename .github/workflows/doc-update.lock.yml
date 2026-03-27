@@ -20,7 +20,7 @@
 # For more information: https://github.com/github/gh-aw/blob/main/.github/aw/github-agentic-workflows.md
 #
 #
-# frontmatter-hash: 5086f4b95acac8531ec2e2eaca1f0825c9fc38e9fb2987813e6f75335c5e7348
+# frontmatter-hash: 28c7cdf08c39ad1667b8ded800c510de8bc1357d750997e441f17592578aa55a
 
 name: "Documentation Update Agent"
 "on":

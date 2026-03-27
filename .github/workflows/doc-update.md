@@ -77,8 +77,6 @@ tools:
   edit:
   bash: ["pnpm", "npx"]
   glob: true
-  grep: true
-
 network:
   allowed:
     - defaults
