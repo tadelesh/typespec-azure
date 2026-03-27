@@ -168,7 +168,25 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 - **Only modify files** whose paths start with one of the `allowedPaths` entries
 - **In incremental mode**, analyze the provided diffs in `changes.commits` to determine which documentation is affected. Only update affected pages.
 - **When feedback is provided**, study the code diffs in `feedback.humanCommitDiffs` to understand what reviewers corrected for last documentation update. Update the knowledge base to capture these corrections so future runs don't repeat the same mistakes.
-- **Update the knowledge base** at `knowledgePath` as you work — record API signatures, feature-to-doc mappings, and conventions you discover
+- **Update the knowledge base** at `knowledgePath` as you work.
+
+## Knowledge Base Rules
+
+Record only information that directly helps future documentation maintenance:
+
+- **API signatures and behaviors** — exact parameter types, default values, and verified edge cases
+- **Feature-to-doc mapping** — which documented feature areas or pages should stay in sync with which source capabilities
+- **Doc conventions** — heading hierarchy, admonition usage, formatting patterns, and example style
+- **Cross-references** — relationships between documentation sections and important source concepts
+
+Do **not** record:
+
+- Environment or tooling setup details
+- Transient state such as commit hashes, workflow run IDs, timestamps, or PR numbers
+- Full source code copies
+- General knowledge unrelated to the package being documented
+
+After updating the knowledge base, run `pnpm format:dir <knowledgePath>` to format it.
 
 ## Incremental Mode
 
@@ -184,3 +202,10 @@ merging it. The `feedback.humanCommitDiffs` array contains the code diffs from
 their commits. Study these diffs to understand what they corrected — factual
 errors, formatting preferences, missing context — and update the knowledge base
 accordingly.
+
+When learning from feedback:
+
+- If humans corrected a factual error, fix the corresponding knowledge
+- If humans added clarification or context, incorporate it
+- If humans changed formatting or conventions, capture that convention
+- If humans effectively rejected a prior change, record what should not be done again
