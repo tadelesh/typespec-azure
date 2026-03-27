@@ -74,10 +74,6 @@ steps:
         --output /tmp/gh-aw/agent/context.json \
         $REBUILD_FLAG
 
-tools:
-  edit:
-  bash: ["pnpm", "npx"]
-  glob: true
 network:
   allowed:
     - defaults
