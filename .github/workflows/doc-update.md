@@ -45,6 +45,9 @@ steps:
   - name: Install repo dependencies
     run: pnpm install
 
+  - name: Install doc-updater dependencies
+    run: npm ci --prefix eng/scripts/doc-updater
+
   - name: Pre-compute context
     env:
       CONFIG_INPUT: ${{ github.event.inputs.config }}

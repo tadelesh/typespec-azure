@@ -20,7 +20,7 @@
 # For more information: https://github.com/github/gh-aw/blob/main/.github/aw/github-agentic-workflows.md
 #
 #
-# frontmatter-hash: 5f028f17bacfbfd88165b56c373f7af51db216f441da9ea34cdb7abb7cd819a0
+# frontmatter-hash: 629ae602d78679186c423c7231c7ce7d635be4216c687da4d136d58bd4fc8ba3
 
 name: "Documentation Update Agent"
 "on":
@@ -130,6 +130,8 @@ jobs:
         uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
       - name: Install repo dependencies
         run: pnpm install
+      - name: Install doc-updater dependencies
+        run: npm ci --prefix eng/scripts/doc-updater
       - env:
           CONFIG_INPUT: ${{ github.event.inputs.config }}
           FULL_REBUILD_INPUT: ${{ github.event.inputs.full_rebuild }}
