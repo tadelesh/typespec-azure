@@ -427,3 +427,170 @@ model Page {
   ]>;
 }
 ```
+
+## Legacy: Overriding next link HTTP verb
+
+:::caution
+`@nextLinkVerb` is legacy functionality from `Azure.ClientGenerator.Core.Legacy`. Use it only when the service fetches subsequent pages using `POST` instead of `GET`. This is against guidelines for new services.
+:::
+
+By default, paging operations fetch subsequent pages with an HTTP `GET` request on the next link URL. When a service requires a `POST` request for subsequent pages, use `@Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")`.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Http;
+using Azure.ClientGenerator.Core;
+using Azure.ClientGenerator.Core.Legacy;
+
+@service(#{ title: "Widget Service" })
+namespace WidgetService;
+
+model Widget {
+  id: string;
+  name: string;
+}
+
+model WidgetPage {
+  @pageItems
+  widgets: Widget[];
+
+  @nextLink
+  nextLink?: url;
+}
+
+/** List widgets — subsequent pages are fetched via POST */
+@nextLinkVerb("POST")
+@list
+@route("/widgets")
+@post
+op listWidgets(): WidgetPage;
+```
+
+```python
+class WidgetServiceClient:
+    def list_widgets(self, **kwargs: Any) -> ItemPaged["Widget"]:
+        """List widgets — subsequent pages are fetched via POST.
+
+        :return: An iterator like instance of Widget
+        :rtype: ~azure.core.paging.ItemPaged[~widgetservice.models.Widget]
+        """
+        ...
+```
+
+```csharp
+public partial class WidgetServiceClient
+{
+    public virtual Pageable<Widget> GetWidgets(CancellationToken cancellationToken = default);
+    public virtual AsyncPageable<Widget> GetWidgetsAsync(CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class WidgetServiceClient {
+  listWidgets(
+    options: ListWidgetsOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<Widget>;
+}
+```
+
+```java
+public final class WidgetServiceClient {
+    public PagedIterable<Widget> listWidgets();
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+## Legacy: Disabling pageable behavior
+
+:::caution
+`@disablePageable` is legacy functionality from `Azure.ClientGenerator.Core.Legacy`. Use it only when an operation matches standard paging patterns (e.g. has a `@nextLink` field or is decorated with `@list`) but should NOT be treated as pageable. This is rare and should only be used when explicitly instructed.
+:::
+
+By default, operations that match standard paging patterns are generated as pageable (returning iterators). Use `@Azure.ClientGenerator.Core.Legacy.disablePageable` to prevent an operation from being treated as pageable — the response will be returned as the raw paged model type rather than an iterator.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Http;
+using Azure.ClientGenerator.Core;
+using Azure.ClientGenerator.Core.Legacy;
+
+@service(#{ title: "Widget Service" })
+namespace WidgetService;
+
+model Widget {
+  id: string;
+  name: string;
+}
+
+model WidgetPage {
+  @pageItems
+  widgets: Widget[];
+
+  @nextLink
+  nextLink?: url;
+}
+
+/**
+ * List all widgets — returns the full paged model, not an iterator.
+ * Even though the response has a nextLink, paging is disabled.
+ */
+@disablePageable
+@list
+@route("/widgets/all")
+@get
+op getAllWidgets(): WidgetPage;
+```
+
+```python
+class WidgetServiceClient:
+    def get_all_widgets(self, **kwargs: Any) -> WidgetPage:
+        """List all widgets. Returns the raw WidgetPage model (not an iterator).
+
+        :return: WidgetPage
+        :rtype: ~widgetservice.models.WidgetPage
+        """
+        ...
+```
+
+```csharp
+public partial class WidgetServiceClient
+{
+    // Returns WidgetPage directly, not Pageable<Widget>
+    public virtual Response<WidgetPage> GetAllWidgets(CancellationToken cancellationToken = default);
+    public virtual async Task<Response<WidgetPage>> GetAllWidgetsAsync(CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class WidgetServiceClient {
+  getAllWidgets(
+    options: GetAllWidgetsOptionalParams = { requestOptions: {} },
+  ): Promise<WidgetPage>;
+}
+```
+
+```java
+public final class WidgetServiceClient {
+    // Returns WidgetPage directly, not PagedIterable<Widget>
+    public WidgetPage getAllWidgets();
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

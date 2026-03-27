@@ -466,26 +466,42 @@ If called with `replace`, `@clientDoc` replaces `@doc` completely. If called wit
 
 ## Using `@alternateType` to Reference External Types
 
-The `@alternateType` decorator allows you to override the emitted type for a model, union, or enum in generated client libraries. With recent updates, you can now reference types defined in external namespaces or imported libraries.
+The `@alternateType` decorator allows you to override the emitted type for a model, union, scalar, enum, or union in generated client libraries. It can reference TypeSpec-defined types or external types from other packages.
+
+### Example: Changing a Property Type
+
+You can override a model property type inline or from `client.tsp`:
+
+```typespec
+model Foo {
+  date: utcDateTime;
+}
+@@alternateType(Foo.date, string);
+```
 
 ### Example: Referencing an External Type
 
-Suppose you want your generated client library to use a type from an external package instead of the default emitted type.
+To reference a type from an external package, use an `ExternalType` object with the `identity` field (fully-qualified type name), an optional `package` name, and an optional `minVersion`:
 
 ```typespec
 @alternateType(
   {
-    fullyQualifiedName: "externallib.ExternalModel",
-    package: "externallib",
+    identity: "pystac.Collection",
+    package: "pystac",
+    minVersion: "1.13.0",
   },
   "python"
 )
-model MyModel {
-  prop: string;
+model ItemCollection {
+  // ... properties
 }
 ```
 
-In this example, instead of generating `MyModel` in the Python sdk, the emitter will reference `ExternalModel` from `externallib` instead.
+In this example, instead of generating `ItemCollection` in the Python SDK, the emitter will reference `pystac.Collection` from the `pystac` package.
+
+:::note
+External types cannot be applied to model properties — apply them to the type definition instead. Applying an external type to a model property will emit a warning.
+:::
 
 ### Use Cases
 
@@ -495,7 +511,107 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 
 ### Notes
 
-- The referenced type should be compatible with the intended usage in the generated client library.
+- The `ExternalType` model has three fields: `identity` (required, fully-qualified name), `package` (optional), and `minVersion` (optional).
+- When the source type is a `Scalar`, the alternate type must also be a `Scalar`.
+- `@encode` from the source type is overridden by the alternate type's encoding.
+
+## Deserializing empty strings as null
+
+The `@deserializeEmptyStringAsNull` decorator marks a `string` (or `string`-based scalar) model property so that an empty string value (`""`) returned from the service is deserialized as `null` in the client. This is useful for brownfield services that use empty strings to signal absent values rather than `null`.
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Http;
+using Azure.ClientGenerator.Core;
+
+@service(#{ title: "Pet Store" })
+namespace PetStore;
+
+model Pet {
+  name: string;
+
+  /** An empty string from the service is treated as null */
+  @deserializeEmptyStringAsNull
+  nickname: string;
+}
+
+@route("/pets/{name}")
+@get
+op getPet(@path name: string): Pet;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+class Pet(_model_base.Model):
+    name: str = rest_field()
+    """Required."""
+    nickname: str = rest_field()
+    """An empty string from the service is treated as null. Required."""
+
+# Usage
+pet = client.get_pet(name="fluffy")
+# pet.nickname will be None if the service returned ""
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+namespace PetStore.Models
+{
+    public partial class Pet
+    {
+        public string Name { get; }
+        // Empty string from service is deserialized as null at runtime
+        public string Nickname { get; }
+    }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+export interface Pet {
+  name: string;
+  /** An empty string from the service is treated as null */
+  nickname: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+package petstore.models;
+
+public final class Pet {
+    public String getName() {}
+    /** An empty string from the service is treated as null */
+    public String getNickname() {}
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+type Pet struct {
+    Name     string
+    // Empty string from service is deserialized as nil at runtime
+    Nickname *string
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
 
 ## Client Default Values (Legacy)
 

@@ -2231,3 +2231,97 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## HEAD operations with boolean response
+
+The `@responseAsBool` decorator marks a HEAD operation to return a `bool` instead of a raw response object. When applied:
+
+- A `2xx` response returns `true`
+- A `404` response returns `false` (does not raise an error)
+- All other status codes still raise errors
+
+This is useful for existence-check patterns where you want idiomatic boolean return types in client SDKs.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Http;
+using Azure.ClientGenerator.Core;
+
+@service(#{ title: "Pet Store" })
+namespace PetStore;
+
+model Pet {
+  name: string;
+  age: int32;
+}
+
+@route("/pets/{name}")
+@get
+op getPet(@path name: string): Pet;
+
+@responseAsBool
+@route("/pets/{name}")
+@head
+op petExists(@path name: string): void;
+```
+
+```python
+class PetStoreClient:
+    def pet_exists(self, name: str, **kwargs: Any) -> bool:
+        """Check whether a pet exists. Returns True if found, False if not found.
+
+        :param name: Required.
+        :type name: str
+        :return: bool
+        :rtype: bool
+        :raises ~azure.core.exceptions.HttpResponseError:
+        """
+        ...
+```
+
+```csharp
+namespace PetStore
+{
+    public partial class PetStoreClient
+    {
+        // protocol method
+        public virtual Response PetExists(string name, RequestContext context) {}
+        public virtual async Task<Response> PetExistsAsync(string name, RequestContext context) {}
+        // convenience method — returns bool
+        public virtual Response<bool> PetExists(string name, CancellationToken cancellationToken = default) {}
+        public virtual async Task<Response<bool>> PetExistsAsync(string name, CancellationToken cancellationToken = default) {}
+    }
+}
+```
+
+```typescript
+export type PetExistsResponse = { body: boolean };
+
+export class PetStoreClient {
+  petExists(
+    name: string,
+    options: PetExistsOptionalParams = { requestOptions: {} },
+  ): Promise<PetExistsResponse>;
+}
+```
+
+```java
+package petstore;
+public final class PetStoreClient {
+    // protocol method
+    public Response<BinaryData> petExistsWithResponse(String name, String accept, RequestOptions requestOptions) {}
+    // convenient method
+    public BinaryData petExists(String name, String accept) {}
+}
+```
+
+```go
+// NOT_SUPPORTED
+// The Go emitter does not currently support @responseAsBool
+```
+
+</ClientTabs>

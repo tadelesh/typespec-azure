@@ -268,3 +268,86 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## Legacy: Forcing an operation to be treated as an LRO
+
+:::caution
+`@markAsLro` is legacy functionality from `Azure.ClientGenerator.Core.Legacy`. Use it only when an operation is not a standard LRO on the service side but must be surfaced as one in client SDKs for backward compatibility. Requires testing to verify end-to-end behavior.
+:::
+
+Use `@Azure.ClientGenerator.Core.Legacy.markAsLro` to force an operation to be treated as a Long Running Operation by SDK generators, even when the operation does not follow standard TypeSpec LRO patterns. When applied, generators will produce polling mechanisms and LRO-specific return types.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Http;
+using Azure.ClientGenerator.Core;
+using Azure.ClientGenerator.Core.Legacy;
+
+@service(#{ title: "Deploy Service" })
+namespace DeployService;
+
+model DeploymentResult {
+  id: string;
+  status: string;
+}
+
+/** Force this operation to be treated as an LRO for backward compatibility */
+@markAsLro
+@route("/deployments")
+@post
+op startDeployment(
+  @body body: { name: string },
+): DeploymentResult;
+```
+
+```python
+class DeployServiceClient:
+    def begin_start_deployment(
+        self, body: StartDeploymentRequest, **kwargs: Any
+    ) -> LROPoller[DeploymentResult]:
+        """Start a deployment. Treated as an LRO.
+
+        :param body: Required.
+        :type body: ~deployservice.models.StartDeploymentRequest
+        :return: An instance of LROPoller that returns DeploymentResult.
+        :rtype: ~azure.core.polling.LROPoller[~deployservice.models.DeploymentResult]
+        """
+        ...
+```
+
+```csharp
+public partial class DeployServiceClient
+{
+    // protocol method
+    public virtual Operation<BinaryData> StartDeployment(WaitUntil waitUntil, RequestContent content, RequestContext context = null);
+    public virtual async Task<Operation<BinaryData>> StartDeploymentAsync(WaitUntil waitUntil, RequestContent content, RequestContext context = null);
+    // convenience method
+    public virtual Operation<DeploymentResult> StartDeployment(WaitUntil waitUntil, StartDeploymentRequest body, CancellationToken cancellationToken = default);
+    public virtual async Task<Operation<DeploymentResult>> StartDeploymentAsync(WaitUntil waitUntil, StartDeploymentRequest body, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class DeployServiceClient {
+  startDeployment(
+    body: { name: string },
+    options: StartDeploymentOptionalParams = { requestOptions: {} },
+  ): PollerLike<OperationState<DeploymentResult>, DeploymentResult>;
+}
+```
+
+```java
+public final class DeployServiceClient {
+    public SyncPoller<DeploymentResult, DeploymentResult> beginStartDeployment(StartDeploymentRequest body);
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
