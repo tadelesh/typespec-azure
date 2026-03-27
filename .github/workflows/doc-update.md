@@ -38,6 +38,7 @@ steps:
     with:
       fetch-depth: 0
       submodules: recursive
+      persist-credentials: false
 
   - name: Setup pnpm
     uses: pnpm/action-setup@v4
