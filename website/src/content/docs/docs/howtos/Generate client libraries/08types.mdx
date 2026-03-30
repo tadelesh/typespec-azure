@@ -1395,7 +1395,7 @@ model Properties {
 }
 
 model Foo {
-  @flattenProperty
+  @Azure.ClientGenerator.Core.Legacy.flattenProperty
   prop: Properties;
 }
 ```
@@ -1512,7 +1512,7 @@ export function _fooPropDeserializer(item: any) {
 </ClientTabItem>
 <ClientTabItem lang="java" >
 
-In Java, `@flattenProperty` have no effect on generated libraries.
+In Java, `@Azure.ClientGenerator.Core.Legacy.flattenProperty` have no effect on generated libraries.
 
 ```java
 @Fluent
@@ -1534,7 +1534,7 @@ Legacy multi-level inheritance is NOT a recommended pattern, and you shouldn't u
 
 The `@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding` decorator enables client-level multiple levels of inheritance for discriminated models. This decorator modifies the inheritance chain in generated client libraries to create deeper hierarchies than what TypeSpec natively supports.
 
-Use `@hierarchyBuilding` when you need to represent complex inheritance hierarchies in discriminated models where:
+Use `@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding` when you need to represent complex inheritance hierarchies in discriminated models where:
 
 - You have multiple levels of inheritance (grandparent → parent → child)
 - You need to share common properties across multiple inheritance levels
