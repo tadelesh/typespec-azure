@@ -2627,4 +2627,22 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 ```
 </ClientTabItem>
 </ClientTabs>
+
+## Deserializing empty strings as null with `@deserializeEmptyStringAsNull`
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a model property of type `string` (or a scalar derived from `string`) should be deserialized as `null` when its value is an empty string (`""`).
+
+This is useful when a service returns empty strings to represent absent values, and your client code expects `null` instead.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+model MyModel {
+  @deserializeEmptyStringAsNull
+  displayName: string;
+}
 ```
+
+When the service returns `{"displayName": ""}`, the generated client will deserialize the `displayName` property as `null` rather than an empty string.

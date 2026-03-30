@@ -1752,6 +1752,82 @@ public final class ContosoProviderHubClient {
 
 </ClientTabs>
 
+## Scoping operations and properties to specific languages with `@scope`
+
+The `@scope` decorator lets you restrict an operation or model property to specific language emitters. By default, all operations and properties apply to every language. With `@scope`, you can include or exclude certain languages.
+
+This is useful when a service has language-specific operations, or when certain model properties only make sense in specific SDKs.
+
+### Omit an operation from a specific language
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// This operation will not appear in the C# SDK
+@scope("!csharp")
+op test(): void;
+```
+
+### Include an operation for a specific language only
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// This operation will only appear in the Go SDK
+@scope("go")
+op goSpecificOperation(): void;
+```
+
+### Scope a model property
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+model TestModel {
+  commonProp: string;
+
+  // This property only appears in the C# SDK
+  @scope("csharp")
+  csharpOnlyProp: string;
+}
+```
+
+The `scope` parameter supports the same patterns as other TCGC decorators: single language (`"python"`), comma-separated (`"python, java"`), and negation (`"!csharp"` or `"!(java, python)"`).
+
+## Modeling HEAD operations as boolean with `@responseAsBool`
+
+The `@responseAsBool` decorator transforms a HEAD operation so that it returns a boolean instead of the full response. When applied:
+
+- A `2xx` status code returns `true`
+- A `404` status code returns `false` (without raising an error)
+- All other status codes still raise errors
+
+This is useful for "exists" checks where you only care whether a resource exists.
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+@responseAsBool
+@head
+@route("/resources/{id}")
+op checkResourceExists(@path id: string): void;
+```
+
+With this decorator, instead of having to inspect the HTTP response status code, the generated client method returns a simple `bool`/`boolean` value.
+
 ## Customizing method signatures with `@override`
 
 The `@override` decorator allows you to customize method signatures in generated client SDKs. This is useful when you need to:
