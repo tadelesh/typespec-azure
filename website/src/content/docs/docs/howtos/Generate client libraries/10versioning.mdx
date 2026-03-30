@@ -241,9 +241,9 @@ export async function stableFunctionality(
 ```java
 // ServiceVersion enum
 public enum ServiceServiceVersion implements ServiceVersion {
-    V2023_11_01("2023-11-02");
+    V2023_11_02("2023-11-02");
 
-    public static ServiceServiceVersion getLatest() {} // V2023_11_01
+    public static ServiceServiceVersion getLatest() {} // V2023_11_02
 }
 
 // Client API
@@ -944,3 +944,48 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Specifying Additional Client API Versions
+
+The `@clientApiVersions` decorator lets you specify additional API versions that the client should support beyond those defined by the `@versioned` decorator. This is useful when the client SDK needs to support API versions that are not part of the TypeSpec service definition, for example when adding forward-compatible version support.
+
+The decorator takes an enum that must include all versions from the service's `@versioned` enum, plus any additional versions:
+
+```typespec
+// main.tsp
+import "@typespec/versioning";
+import "@typespec/http";
+using Versioning;
+using Http;
+
+@versioned(Versions)
+@service
+namespace MyService;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+  v2024_06_01: "2024-06-01",
+}
+```
+
+```typespec
+// client.tsp
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core;
+
+enum AdditionalVersions {
+  v2024_01_01: "2024-01-01",
+  v2024_06_01: "2024-06-01",
+  v2024_09_01: "2024-09-01", // additional version not in the service definition
+}
+
+@@clientApiVersions(MyService, AdditionalVersions);
+```
+
+:::note
+The enum passed to `@clientApiVersions` must include **all** service versions. Omitting any version will produce a `missing-service-versions` warning.
+:::
+
+:::caution
+Emitter support for `@clientApiVersions` varies. Check your target language emitter documentation for current support status.
+:::

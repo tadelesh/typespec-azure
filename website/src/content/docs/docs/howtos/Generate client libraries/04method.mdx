@@ -2231,3 +2231,83 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## HEAD operations as boolean with `@responseAsBool`
+
+The `@responseAsBool` decorator models a HEAD operation as returning a boolean value. When applied, `404` responses return `false`, `2xx` responses return `true`, and all other status codes raise an error. This is useful for "exists" checks.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service
+namespace ResourceService;
+
+model Resource {
+  id: string;
+  name: string;
+}
+
+@route("/resources/{id}")
+@get
+op getResource(@path id: string): Resource;
+
+@route("/resources/{id}")
+@head
+op checkResourceExists(@path id: string): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(ResourceService.checkResourceExists);
+```
+
+```python
+class ResourceServiceClient:
+    def get_resource(self, id: str, **kwargs: Any) -> Resource: ...
+
+    # @responseAsBool changes the return type from None to bool
+    def check_resource_exists(self, id: str, **kwargs: Any) -> bool: ...
+```
+
+```csharp
+public class ResourceServiceClient
+{
+    // @responseAsBool changes the return type to Response<bool>
+    public virtual Response<bool> CheckResourceExists(string id, CancellationToken cancellationToken = default);
+    public virtual async Task<Response<bool>> CheckResourceExistsAsync(string id, CancellationToken cancellationToken = default);
+
+    public virtual Response<Resource> GetResource(string id, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+// @responseAsBool changes the response to { body: boolean }
+export type CheckResourceExistsResponse = { body: boolean };
+
+export class ResourceServiceClient {
+  checkResourceExists(
+    id: string,
+    options?: CheckResourceExistsOptionalParams,
+  ): Promise<CheckResourceExistsResponse>;
+
+  getResource(id: string, options?: GetResourceOptionalParams): Promise<Resource>;
+}
+```
+
+```java
+// NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
