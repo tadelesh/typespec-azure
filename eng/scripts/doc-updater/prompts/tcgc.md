@@ -41,7 +41,14 @@ Purpose: Shows exported types and their meanings for emitter developers building
 Location: `packages/typespec-client-generator-core/design-docs/`
 Purpose: Detailed design documents for TCGC features.
 
-### 4. Test Samples (Spector)
+### 4. TSP Decorator Doc Comments (source of reference docs)
+
+Location: `packages/typespec-client-generator-core/lib/decorators.tsp` and `lib/legacy.tsp`
+Purpose: Doc comments on `extern dec` declarations in these files are the source for the auto-generated decorator reference docs. The reference docs at `website/src/content/docs/docs/libraries/typespec-client-generator-core/reference/` are produced by running `pnpm regen-docs` from `packages/typespec-client-generator-core/`.
+
+> When a doc comment in a `.tsp` file is inconsistent with the implementation in `src/`, fix the `.tsp` doc comment to match the implementation, then run `pnpm regen-docs` from `packages/typespec-client-generator-core/` to regenerate the reference docs. Do NOT edit the generated reference docs directly.
+
+### 5. Test Samples (Spector)
 
 Location: `packages/azure-http-specs/specs/`
 Purpose: Functional samples demonstrating TCGC features with runnable test scenarios.
@@ -56,9 +63,20 @@ You MUST complete ALL three steps below.
 
 1. **Read the source code, TSP declaration and unit tests first** — understand TCGC actual behavior: decorator logics, type graph building steps and corner cases. The implementation is the only reliable source of truth.
 
-2. **Audit ALL documentation areas** against what you learned:
+   **To understand how a decorator affects the client type graph**, follow this pattern in the source code:
+   - Decorators store data using `setScopedDecoratorData`
+   - Getter functions (e.g., `getAccess`, `getClientNameOverride`, `getUsageOverride`) retrieve that data
+   - Search where those getter functions are called in all source code — every call site is a place where the decorator impacts the final client type graph
+   - The call sites reveal the decorator's real effect: which client types, properties, methods, or clients are changed and how
+   - **You must trace ALL call sites**, not just the obvious ones. A decorator's getter may be called in multiple places affecting different parts of the type graph (e.g., a decorator might affect both client methods and their parameters, or both type definitions and property-level overrides). Documentation and examples must cover the full scope of impact discovered from the call sites.
+
+   **Legacy decorators need the same treatment.** Decorators in `lib/legacy.tsp` (the `Azure.ClientGenerator.Core.Legacy` namespace) are still functional and used in production. Audit their doc comments, user documentation, and Spector test coverage with the same rigor as core decorators.
+
+2. **Audit ALL documentation areas** against what you learned — this means every area listed above, including user docs, emitter developer docs (`guideline.md`), design docs, and TSP doc comments:
    - Decorator signatures in docs must match actual signatures in `lib/`
    - Behavioral descriptions in docs must match actual implementation logic in `src/`
+   - **Doc comments in `.tsp` files** must accurately describe the implementation — if a doc comment is wrong, incomplete, or misleading compared to the implementation, fix the doc comment in the `.tsp` file and run `pnpm regen-docs` from `packages/typespec-client-generator-core/` to regenerate reference docs
+   - **Emitter developer docs** (`guideline.md`) must have type descriptions aligned with the actual TCGC type graph — verify exported types, property names, and relationships match the current source
    - Every decorator and public feature in source must be documented somewhere
    - No documentation should contradict the actual implementation
 
@@ -70,7 +88,7 @@ This step is **mandatory**, not optional. Spector specs must cover all TCGC clie
 
 1. **Inventory existing Spector specs.** List all specs under `packages/azure-http-specs/specs/` and what features they test.
 
-2. **Map every decorator and public feature to a spec.** Every decorator found in `src/decorators.ts` should have at least one Spector spec demonstrating its behavior. Any decorator without a spec is a gap.
+2. **Map every decorator and public feature to a spec.** Every decorator found in `src/decorators.ts` should have at least one Spector spec demonstrating its behavior. Any decorator without a spec is a gap. This includes legacy decorators from `lib/legacy.tsp`. When a decorator supports multiple target types (e.g., both `Operation` and `ModelProperty`), ensure specs cover the different target types.
 
 3. **For each gap, read the relevant unit tests** in `packages/typespec-client-generator-core/test/` to understand expected behavior, then create a Spector spec following existing patterns and the guidelines in `.github/prompts/testserver-generation.md`.
 
