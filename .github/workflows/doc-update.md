@@ -160,13 +160,14 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 2. If `mode` is `"skip"`, report "No source changes detected" and stop.
 
 3. Read the detailed domain-specific instructions from:
-   `eng/scripts/doc-updater/prompts/${config.name}/doc-update.md`
+   `eng/scripts/doc-updater/prompts/${config.name}.md`
 
 ## Important Rules
 
 - **Only modify files** whose paths start with one of the `allowedPaths` entries
 - **In incremental mode**, analyze the provided diffs in `changes.commits` to determine which documentation is affected. Only update affected pages.
 - **When feedback is provided**, study the code diffs in `feedback.humanCommitDiffs` to understand what reviewers corrected for last documentation update. Update the knowledge base to capture these corrections so future runs don't repeat the same mistakes.
+- **Complete all steps in the domain-specific prompt.** The prompt may define multiple steps (e.g., documentation audit, Spector test review, finalization). You must complete ALL steps, not just the first one.
 - **Update the knowledge base** at `knowledgePath` as you work.
 
 ## Knowledge Base Rules
