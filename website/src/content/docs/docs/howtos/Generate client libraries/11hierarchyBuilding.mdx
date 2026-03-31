@@ -66,16 +66,17 @@ Without `@hierarchyBuilding`, Dog would extend Animal directly. With the decorat
 <ClientTabItem lang="python">
 
 ```python
-# _models.py
-from typing import Literal
-from .. import _model_base
-from .._model_base import rest_discriminator, rest_field
+class Animal(_Model):
+    """You probably want to use the sub-classes and not this class directly.
+    Known sub-classes are: Dog, Pet"""
 
-class Animal(_model_base.Model):
     kind: str = rest_discriminator(name="kind")
     name: str = rest_field()
 
 class Pet(Animal, discriminator="pet"):
+    """You probably want to use the sub-classes and not this class directly.
+    Known sub-classes are: Dog"""
+
     kind: Literal["pet"] = rest_discriminator(name="kind")
     trained: bool = rest_field()
 
@@ -88,67 +89,30 @@ class Dog(Pet, discriminator="dog"):  # Inherits from Pet, not Animal directly
 <ClientTabItem lang="csharp">
 
 ```csharp
-//TODO
+// Animal is the abstract base class. Derived classes: Pet, Dog.
+public abstract partial class Animal
+{
+    internal string Kind { get; set; }
+    public string Name { get; }
+}
+
+// Pet extends Animal (discriminator value: "pet")
+public partial class Pet : Animal
+{
+    public bool Trained { get; }
+}
+
+// Dog extends Pet (discriminator value: "dog") — not Animal directly
+public partial class Dog : Pet
+{
+    public string Breed { get; }
+}
 ```
 
 </ClientTabItem>
 <ClientTabItem lang="typescript">
 
 ```typescript
-export interface Pet extends Animal {
-  kind: "pet" | "dog";
-  /** Whether the pet is trained */
-  trained: boolean;
-}
-
-export function petSerializer(item: Pet): any {
-  return { kind: item["kind"], name: item["name"], trained: item["trained"] };
-}
-
-export function petDeserializer(item: any): Pet {
-  return {
-    kind: item["kind"],
-    name: item["name"],
-    trained: item["trained"],
-  };
-}
-
-/** Alias for PetUnion */
-export type PetUnion = Dog | Pet;
-
-export function petUnionSerializer(item: PetUnion): any {
-  switch (item.kind) {
-    default:
-      return petSerializer(item);
-  }
-}
-
-export function petUnionDeserializer(item: any): PetUnion {
-  switch (item.kind) {
-    case "dog":
-      return dogDeserializer(item as Dog);
-
-    default:
-      return petDeserializer(item);
-  }
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  /** The breed of the dog */
-  breed: string;
-}
-
-export function dogDeserializer(item: any): Dog {
-  return {
-    kind: item["kind"],
-    trained: item["trained"],
-    name: item["name"],
-    breed: item["breed"],
-  };
-}
-
 /** model interface Animal */
 export interface Animal {
   /** The kind of animal */
@@ -158,40 +122,24 @@ export interface Animal {
   name: string;
 }
 
-export function animalSerializer(item: Animal): any {
-  return { kind: item["kind"], name: item["name"] };
-}
-
-export function animalDeserializer(item: any): Animal {
-  return {
-    kind: item["kind"],
-    name: item["name"],
-  };
-}
-
 /** Alias for AnimalUnion */
 export type AnimalUnion = PetUnion | Animal;
 
-export function animalUnionSerializer(item: AnimalUnion): any {
-  switch (item.kind) {
-    case "pet":
-    case "dog":
-      return petUnionSerializer(item as PetUnion);
-
-    default:
-      return animalSerializer(item);
-  }
+/** model interface Pet */
+export interface Pet extends Animal {
+  kind: "pet" | "dog";
+  /** Whether the pet is trained */
+  trained: boolean;
 }
 
-export function animalUnionDeserializer(item: any): AnimalUnion {
-  switch (item.kind) {
-    case "pet":
-    case "dog":
-      return petUnionDeserializer(item as PetUnion);
+/** Alias for PetUnion */
+export type PetUnion = Dog | Pet;
 
-    default:
-      return animalDeserializer(item);
-  }
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  /** The breed of the dog */
+  breed: string;
 }
 ```
 
@@ -222,7 +170,35 @@ public final class Dog extends Pet {
 <ClientTabItem lang="go">
 
 ```go
-//TODO
+type Animal struct {
+    // REQUIRED; The kind of animal
+    Kind *string
+    // REQUIRED; Name of the animal
+    Name *string
+}
+
+type Pet struct {
+    // REQUIRED
+    Kind *string
+    // REQUIRED; Name of the animal
+    Name *string
+    // REQUIRED; Whether the pet is trained
+    Trained *bool
+}
+
+type Dog struct {
+    // REQUIRED; The breed of the dog
+    Breed *string
+    // REQUIRED
+    Kind *string
+    // REQUIRED; Name of the animal
+    Name *string
+    // REQUIRED; Whether the pet is trained
+    Trained *bool
+}
+
+// GetPet implements the PetClassification interface for type Dog.
+func (d *Dog) GetPet() *Pet { ... }
 ```
 
 </ClientTabItem>

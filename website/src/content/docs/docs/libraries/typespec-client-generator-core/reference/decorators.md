@@ -930,7 +930,7 @@ op myOperationCustomization(foo: string, bar: string): void;
 
 @@override(MyService.myOperation, myOperationCustomization)
 
-// method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
+// method signature is now `op myOperation(foo: string, bar: string)` with both parameters required
 ```
 
 ### `@paramAlias` {#@Azure.ClientGenerator.Core.paramAlias}
@@ -969,7 +969,7 @@ model MyServiceClientOptions {
   blob: string;
 }
 
-@@clientInitialization(MyService, MyServiceClientOptions)
+@@clientInitialization(MyService, {parameters: MyServiceClientOptions})
 @@paramAlias(MyServiceClientOptions.blob, "blobName")
 
 // The generated client will have `blobName` in it. We will also
@@ -1407,7 +1407,7 @@ model SportsCar extends Vehicle {
 Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
 even when the operation is not long-running on the service side.
 
-NOTE: When used, you will need to verify the operatio and add tests for the generated code
+NOTE: When used, you will need to verify the operation and add tests for the generated code
 to make sure the end-to-end works for library users, since there is a risk that forcing
 this operation to be LRO will result in errors.
 
