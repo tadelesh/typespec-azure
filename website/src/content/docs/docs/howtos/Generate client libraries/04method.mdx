@@ -186,7 +186,7 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@access(PetStoreNamespace.GetModel, "internal");
+@@access(PetStoreNamespace.GetModel, Access.internal);
 ```
 
 ```python
@@ -2231,3 +2231,99 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## Scoping operations and properties to specific languages
+
+The `@scope` decorator controls which language emitters include a particular operation or model property.
+By default, all operations and properties are emitted for every language. Use `@scope` to restrict an operation or property to specific languages, or to exclude it from certain languages using the `!` negation syntax.
+
+### Excluding an operation from specific languages
+
+<ClientTabs>
+
+```typespec
+@service
+namespace DemoService;
+
+/** Get resource status */
+@route("/resources/{id}")
+@get
+op getResource(@path id: string): {
+  @body result: string;
+};
+
+/** Delete a resource - excluded from C# and Go */
+@scope("!csharp, !go")
+@route("/resources/{id}")
+@delete
+op deleteResource(@path id: string): void;
+```
+
+```python
+class DemoServiceClient:
+    def get_resource(self, id: str, **kwargs: Any) -> str: ...
+    # deleteResource IS generated for Python (not excluded)
+    def delete_resource(self, id: str, **kwargs: Any) -> None: ...
+```
+
+```csharp
+public partial class DemoServiceClient
+{
+    // Only GetResource is generated — DeleteResource is excluded by @scope("!csharp, !go")
+    public virtual Response<string> GetResource(string id, CancellationToken cancellationToken = default);
+    public virtual async Task<Response<string>> GetResourceAsync(string id, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class DemoServiceClient {
+  getResource(id: string, options?: GetResourceOptionalParams): Promise<GetResourceResponse>;
+  // deleteResource IS generated for TypeScript (not excluded)
+  deleteResource(id: string, options?: DeleteResourceOptionalParams): Promise<void>;
+}
+```
+
+```java
+public final class DemoServiceClient {
+    public String getResource(String id);
+    // deleteResource IS generated for Java (not excluded)
+    public void deleteResource(String id);
+}
+```
+
+```go
+type DemoServiceClient struct {}
+
+// Only GetResource is generated — DeleteResource is excluded by @scope("!csharp, !go")
+func (client *DemoServiceClient) GetResource(ctx context.Context, id string, options *DemoServiceClientGetResourceOptions) (DemoServiceClientGetResourceResponse, error)
+```
+
+</ClientTabs>
+
+### Scope syntax
+
+| Pattern                   | Meaning                                     |
+| ------------------------- | ------------------------------------------- |
+| `@scope("python")`        | Only include in Python                      |
+| `@scope("python, java")`  | Include in Python and Java only             |
+| `@scope("!csharp")`       | Exclude from C#                             |
+| `@scope("!csharp, !go")`  | Exclude from C# and Go                      |
+| `@scope("!(csharp, go)")` | Exclude from C# and Go (alternative syntax) |
+
+### Scoping model properties
+
+You can also scope individual model properties to specific languages:
+
+```typespec
+model MyModel {
+  name: string;
+
+  /** This property only exists in Go */
+  @scope("go")
+  goOnlyField?: string;
+
+  /** This property is excluded from Python */
+  @scope("!python")
+  nonPythonField?: int32;
+}
+```

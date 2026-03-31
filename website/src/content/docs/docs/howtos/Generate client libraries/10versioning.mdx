@@ -944,3 +944,103 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Extending the Client API Version Enum
+
+By default, the client's API version enum only includes versions defined by the `@versioned` decorator on the service namespace. The `@clientApiVersions` decorator lets you extend this enum with additional versions — for example, older versions that existed before versioning decorators were added to the spec.
+
+This is particularly useful when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@typespec/versioning";
+import "@typespec/http";
+
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+
+@versioned(Versions)
+@service
+namespace DemoService;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+  v2024_07_01: "2024-07-01",
+}
+
+@route("/resources")
+@get
+op listResources(): {
+  @body result: string[];
+};
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+enum AllApiVersions {
+  v2023_01_01: "2023-01-01",
+  v2023_07_01: "2023-07-01",
+  ...DemoService.Versions,
+}
+
+@@clientApiVersions(DemoService, AllApiVersions);
+```
+
+```python
+# Python: The client accepts api_version as a keyword argument.
+# The extended versions are available for selection.
+from demoservice import DemoServiceClient
+
+client = DemoServiceClient(endpoint=..., credential=...)
+# Default is latest: "2024-07-01"
+
+client_with_old_version = DemoServiceClient(endpoint=..., credential=..., api_version="2023-01-01")
+# Can now specify older versions from the extended enum
+```
+
+```csharp
+// C# generates a ServiceVersion enum with all four versions
+public enum ServiceVersion
+{
+    V2023_01_01 = 1,
+    V2023_07_01 = 2,
+    V2024_01_01 = 3,
+    V2024_07_01 = 4,
+}
+
+// Default is the latest version
+DemoServiceClient client = new DemoServiceClient(endpoint);
+// Override with an older version
+DemoServiceClientOptions options = new DemoServiceClientOptions(ServiceVersion.V2023_01_01);
+DemoServiceClient clientOld = new DemoServiceClient(endpoint, options);
+```
+
+```typescript
+// TypeScript
+export enum KnownVersions {
+  V20240101 = "2024-01-01",
+  V20240701 = "2024-07-01",
+}
+```
+
+```java
+// Java generates a ServiceVersion enum
+// Note: Java may only include versions from @versioned, not the extended enum
+public enum DemoServiceVersion implements ServiceVersion {
+    V2024_01_01("2024-01-01"),
+    V2024_07_01("2024-07-01");
+
+    public static DemoServiceVersion getLatest() { return V2024_07_01; }
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

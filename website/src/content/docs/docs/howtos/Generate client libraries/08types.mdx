@@ -464,6 +464,109 @@ The `@clientDoc` decorator can be used on everything that the `@doc` decorator c
 When both `@doc` and `@clientDoc` are present, the generated code outputs the final documentation depending on the mode that you called `@clientDoc` with.
 If called with `replace`, `@clientDoc` replaces `@doc` completely. If called with `append`, `@clientDoc` is appended onto `@doc`.
 
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a model property of type `string` (or a scalar derived from `string`) should be deserialized as `null` when its value is an empty string (`""`).
+
+This is useful for services that return empty strings to represent missing or unset values.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+model UserProfile {
+  name: string;
+
+  @deserializeEmptyStringAsNull
+  nickname?: string;
+
+  @deserializeEmptyStringAsNull
+  bio?: string;
+}
+```
+
+:::note
+The decorator can only be applied to properties whose type is `string` or a scalar type derived from `string`. Applying it to other types will result in a diagnostic error.
+:::
+
+## HEAD Operations as Boolean Response
+
+The `@responseAsBool` decorator changes how a HEAD operation is modeled in the generated client SDK. Instead of returning the raw HTTP response, the operation returns a boolean:
+
+- `true` for 2xx responses (resource exists)
+- `false` for 404 responses (resource does not exist)
+- Other status codes still raise errors
+
+This decorator can only be applied to operations that use the `@head` HTTP verb.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace DemoService;
+
+model Resource {
+  name: string;
+  id: string;
+}
+
+@route("/resources/{name}")
+@get
+op getResource(@path name: string): Resource;
+
+@responseAsBool
+@route("/resources/{name}")
+@head
+op resourceExists(@path name: string): void;
+```
+
+```python
+class DemoServiceClient:
+    def get_resource(self, name: str, **kwargs: Any) -> Resource: ...
+    # Returns bool instead of raw response
+    def resource_exists(self, name: str, **kwargs: Any) -> bool: ...
+```
+
+```csharp
+public partial class DemoServiceClient
+{
+    public virtual Response<Resource> GetResource(string name, CancellationToken cancellationToken = default);
+    // Returns Response<bool> instead of raw Response
+    public virtual Response<bool> ResourceExists(string name, string accept, CancellationToken cancellationToken = default);
+    public virtual async Task<Response<bool>> ResourceExistsAsync(string name, string accept, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export type ResourceExistsResponse = { body: boolean };
+
+export async function resourceExists(
+  context: Client,
+  name: string,
+  options?: ResourceExistsOptionalParams,
+): Promise<ResourceExistsResponse>;
+```
+
+```java
+public final class DemoServiceClient {
+    public Resource getResource(String name);
+    public BinaryData resourceExists(String name, String accept);
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
 ## Using `@alternateType` to Reference External Types
 
 The `@alternateType` decorator allows you to override the emitted type for a model, union, or enum in generated client libraries. With recent updates, you can now reference types defined in external namespaces or imported libraries.
