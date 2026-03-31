@@ -165,7 +165,7 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 ## Important Rules
 
 - **Only modify files** whose paths start with one of the `allowedPaths` entries.
-- **Read and follow the domain-specific prompt completely.** It defines the full workflow — complete every step it describes.
+- **Complete every step in the domain-specific prompt.** Do not stop after finishing one step. After each step, explicitly state which step you just completed and which step you are starting next. Continue until all steps are done.
 - **Update the knowledge base** at `knowledgePath` as you work (see Knowledge Base Rules below).
 
 ## Knowledge Base Rules

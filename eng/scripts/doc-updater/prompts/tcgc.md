@@ -53,7 +53,7 @@ Purpose: Functional samples demonstrating TCGC features with runnable test scena
 
 ## Instructions
 
-You MUST complete ALL four steps below.
+You MUST complete ALL four steps below. After finishing each step, state: "Step N complete. Starting Step N+1." Do not stop until you have completed Step 4.
 
 ### Step 1: Read and Understand All Unit Tests
 
@@ -106,6 +106,8 @@ Spector specs must cover all TCGC features — both decorator customizations and
    ```
 
 ### Step 4: Finalize
+
+You should only reach this step after completing Steps 1–3.
 
 > ⚠️ **IMPORTANT:** If you added or modified any Spector specs in `packages/azure-http-specs/specs/`, you **MUST** run `pnpm change add` from the repo root and add a changeset for `@typespec/azure-http-specs` with type "new feature". The CI will fail without this changeset.
 
