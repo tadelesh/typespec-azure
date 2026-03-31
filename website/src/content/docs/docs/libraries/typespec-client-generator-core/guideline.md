@@ -98,6 +98,10 @@ Clients, models, enums, and unions include namespace information. Emitters can u
 - A flattened structure (`SdkPackage.clients`, `SdkPackage.enums`, `SdkPackage.models`, `SdkPackage.unions`)
 - A hierarchical structure (`SdkPackage.namespaces`) requiring iteration through nested namespaces.
 
+`SdkPackage.crossLanguagePackageId` provides a unique stable ID for the package across all language emitters.
+
+`SdkPackage.crossLanguageVersion` is a hash of all API-affecting elements in the package (operations, parameters, models, properties, enums). Emitters can use this hash to detect when the API surface has changed between spec updates, enabling cross-language SDK consistency checks.
+
 ### License Information
 
 Emitters can get package license info from `SdkPackage.licenseInfo`. The [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) contains license details for client code comments or license file generation.
