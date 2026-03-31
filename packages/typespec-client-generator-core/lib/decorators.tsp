@@ -552,7 +552,7 @@ extern dec access(
  *
  * @@override(MyService.myOperation, myOperationCustomization)
  *
- * // method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
+ * // method signature is now `op myOperation(foo: string, bar: string)`
  * ```
  */
 extern dec override(target: Operation, override: Operation, scope?: valueof string);
@@ -683,7 +683,7 @@ model ClientInitializationOptions {
  *   blob: string;
  * }
  *
- * @@clientInitialization(MyService, MyServiceClientOptions)
+ * @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
  * @@paramAlias(MyServiceClientOptions.blob, "blobName")
  *
  * // The generated client will have `blobName` in it. We will also

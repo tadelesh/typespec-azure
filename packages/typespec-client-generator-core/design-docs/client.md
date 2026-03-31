@@ -495,7 +495,7 @@ namespace TestClient {
 
 @@clientInitialization(TestClient.SubClient,
   {
-    intializedBy: InitializedBy.individually | InitializedBy.parent,
+    initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
 );
 ```
@@ -519,7 +519,7 @@ model SubClientOptions {
 @@clientInitialization(TestClient.SubClient,
   {
     parameters: SubClientOptions,
-    intializedBy: InitializedBy.individually | InitializedBy.parent,
+    initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
 );
 ```
