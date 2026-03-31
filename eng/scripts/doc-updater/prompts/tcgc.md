@@ -55,6 +55,8 @@ Purpose: Functional samples demonstrating TCGC features with runnable test scena
 
 You MUST complete ALL four steps below. After finishing each step, state: "Step N complete. Starting Step N+1." Do not stop until you have completed Step 4.
 
+**Do not defer work to future runs.** Every gap you find must be fixed in this run. Do not record "remaining gaps" or "future work" in the knowledge base — instead, do the work now. The knowledge base is for lessons learned, not a to-do list.
+
 ### Step 1: Read and Understand All Unit Tests
 
 **This is the learning phase.** Before checking or changing any documentation, read the unit tests to build a complete understanding of how TCGC works.
