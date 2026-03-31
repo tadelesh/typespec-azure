@@ -385,7 +385,7 @@ The target client for which you want to define additional API versions.
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| value | `Enum`           | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| value | `Enum`           | An Enum containing the complete list of API versions that the client should support. This enum typically spreads the service's versioning enum and adds additional versions.                                                                                                                                                                                                                                                                                                                                                                                                              |
 | scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
@@ -1032,13 +1032,16 @@ Indicates that a HEAD operation should be modeled as Response<bool>.
 404 will not raise an error, instead the service method will return `false`.
 2xx will return `true`. Everything else will still raise an error.
 
+This decorator can only be applied to HEAD operations. Applying it to operations
+using other HTTP verbs will result in a diagnostic error.
+
 ```typespec
 @Azure.ClientGenerator.Core.responseAsBool(scope?: valueof string)
 ```
 
 #### Target
 
-The target operation that you want to apply this behavior to.
+The target HEAD operation that you want to apply this behavior to.
 `Operation`
 
 #### Parameters
@@ -1407,7 +1410,7 @@ model SportsCar extends Vehicle {
 Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
 even when the operation is not long-running on the service side.
 
-NOTE: When used, you will need to verify the operatio and add tests for the generated code
+NOTE: When used, you will need to verify the operation and add tests for the generated code
 to make sure the end-to-end works for library users, since there is a risk that forcing
 this operation to be LRO will result in errors.
 
@@ -1460,6 +1463,9 @@ When applied, TCGC will treat the operation as pageable and SDK generators shoul
 - Generate paging mechanisms (iterators/async iterators)
 - Return appropriate pageable-specific return types
 - Handle the operation as a collection that may require multiple requests
+
+If the return model contains a property named `value` that is not already decorated with `@pageItems`,
+this decorator will automatically apply `@pageItems` to it.
 
 This decorator is considered legacy functionality and should only be used when
 standard TypeSpec paging patterns are not feasible.

@@ -178,7 +178,6 @@ extern dec protocolAPI(
  * interface MyInterface {}
  * ```
  *
- * @example
  */
 extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?: valueof string);
 
@@ -919,7 +918,7 @@ extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: va
  * This decorator is useful for extending the API version enum exposed by the client.
  * It is particularly beneficial when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators, as the generation process does not depend on versioning details.
  * @param target The target client for which you want to define additional API versions.
- * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
+ * @param value An Enum containing the complete list of API versions that the client should support. This enum typically spreads the service's versioning enum and adds additional versions.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -978,7 +977,11 @@ extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof s
  * Indicates that a HEAD operation should be modeled as Response<bool>.
  * 404 will not raise an error, instead the service method will return `false`.
  * 2xx will return `true`. Everything else will still raise an error.
- * @param target The target operation that you want to apply this behavior to.
+ *
+ * This decorator can only be applied to HEAD operations. Applying it to operations
+ * using other HTTP verbs will result in a diagnostic error.
+ *
+ * @param target The target HEAD operation that you want to apply this behavior to.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).

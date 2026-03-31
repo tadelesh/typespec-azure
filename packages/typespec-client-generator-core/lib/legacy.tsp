@@ -68,7 +68,7 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  * Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
  * even when the operation is not long-running on the service side.
  *
- * NOTE: When used, you will need to verify the operatio and add tests for the generated code
+ * NOTE: When used, you will need to verify the operation and add tests for the generated code
  * to make sure the end-to-end works for library users, since there is a risk that forcing
  * this operation to be LRO will result in errors.
  *
@@ -110,6 +110,9 @@ extern dec markAsLro(target: Operation, scope?: valueof string);
  * - Generate paging mechanisms (iterators/async iterators)
  * - Return appropriate pageable-specific return types
  * - Handle the operation as a collection that may require multiple requests
+ *
+ * If the return model contains a property named `value` that is not already decorated with `@pageItems`,
+ * this decorator will automatically apply `@pageItems` to it.
  *
  * This decorator is considered legacy functionality and should only be used when
  * standard TypeSpec paging patterns are not feasible.

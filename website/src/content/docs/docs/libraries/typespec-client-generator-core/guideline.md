@@ -196,20 +196,22 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Model Types:**
 
-- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type. Key properties include:
+  - `additionalProperties`: The type of additional properties the model can accept (if applicable)
+  - `baseModel`: The base model this model inherits from (if applicable)
+  - For discriminated models:
+    - `discriminatorProperty`: The property used as a discriminator
+    - `discriminatedSubtypes`: Map of discriminator values to their subtype models
+  - For subtypes of discriminated models:
+    - `discriminatorValue`: The discriminator value for this subtype
 
 **Model Property Types:**
 
 - [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
   - `flatten`: Indicates if the property can be flattened
-  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
-  - For discriminated models:
-    - `discriminatorProperty`: The property used as a discriminator
-    - `discriminatedSubtypes`: List of all subtypes of this discriminated model
-  - For subtypes of discriminated models:
-    - `discriminatorValue`: The instance value for the discriminator for this subtype
-  - For array properties:
-    - `arrayEncode`: Indicates the encoding style for array properties (if specified).
+  - `encode`: Indicates the encoding style for array properties (if specified). Possible values: `"pipeDelimited"`, `"spaceDelimited"`, `"commaDelimited"`, `"newlineDelimited"`
+
+Note: Discriminator-related properties (`discriminatorProperty`, `discriminatedSubtypes`, `discriminatorValue`) and `additionalProperties` are on [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/), not on `SdkModelPropertyType`.
 
 ### Example types
 
