@@ -944,3 +944,111 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Extending API Versions with `@clientApiVersions`
+
+By default, the generated client only exposes the API versions defined in the service's `@versioned` enum. If you need to extend the API version list — for example, to include older versions that existed before the spec was annotated with versioning decorators — you can use the `@clientApiVersions` decorator.
+
+This decorator takes an enum that includes both the additional versions and the service's existing versions (via spread), and applies it to the service namespace.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/versioning";
+import "@typespec/http";
+
+using Versioning;
+using Http;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2024_04_01: "2024-04-01",
+  v2024_10_01: "2024-10-01",
+}
+
+model User {
+  name: string;
+  role: string;
+}
+
+@route("/users")
+@get
+op getUser(@query name: string): User;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace MyCustomizations;
+
+// Include older versions not in the service's @versioned enum
+enum ClientApiVersions {
+  v2023_06_01: "2023-06-01",
+  v2023_11_01: "2023-11-01",
+  ...My.Service.Versions,
+}
+
+@@clientApiVersions(My.Service, ClientApiVersions);
+```
+
+```python
+from my.service import MyServiceClient
+
+# The client now supports all four API versions.
+# The default is still the latest: "2024-10-01"
+client = MyServiceClient(endpoint=...)
+
+# You can target an older version that was added via @clientApiVersions
+older_client = MyServiceClient(endpoint=..., api_version="2023-06-01")
+```
+
+```csharp
+// The ServiceVersion enum now includes all four versions
+public enum ServiceVersion
+{
+    V2023_06_01 = 1,
+    V2023_11_01 = 2,
+    V2024_04_01 = 3,
+    V2024_10_01 = 4
+}
+
+ServiceClient client = new ServiceClient(endpoint);
+// client's version defaults to "2024-10-01"
+
+ServiceClientOptions options = new ServiceClientOptions(ServiceClientOptions.ServiceVersion.V2023_06_01);
+ServiceClient olderClient = new ServiceClient(endpoint, options);
+// client's version is now "2023-06-01"
+```
+
+```typescript
+/** Known values of ClientApiVersions that the service accepts. */
+export enum KnownClientApiVersions {
+  V20230601 = "2023-06-01",
+  V20231101 = "2023-11-01",
+  V20240401 = "2024-04-01",
+  V20241001 = "2024-10-01",
+}
+```
+
+```java
+// The ServiceVersion enum now includes all four versions
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2024_04_01("2024-04-01"),
+    V2024_10_01("2024-10-01");
+
+    public static ServiceServiceVersion getLatest() {} // V2024_10_01
+}
+```
+
+```go
+// Go does not expose an API version enum directly.
+// The client sends the version configured at initialization.
+```
+
+</ClientTabs>

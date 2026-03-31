@@ -2231,3 +2231,75 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## Boolean response for HEAD operations
+
+The `@responseAsBool` decorator transforms a HEAD operation so that the generated client method returns a boolean instead of a response object. A `2xx` status code returns `true`, a `404` returns `false`, and all other status codes still raise an error.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using Http;
+
+@service
+namespace My.Service;
+
+model User {
+  name: string;
+  role: string;
+}
+
+@route("/users/{name}")
+@head
+op checkUserExists(@path name: string): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(My.Service.checkUserExists);
+```
+
+```python
+def check_user_exists(self, name: str, **kwargs: Any) -> bool:
+    """Check if a user exists.
+
+    :param name: Required.
+    :type name: str
+    :return: bool — True if user exists (2xx), False if not found (404)
+    :rtype: bool
+    """
+    ...
+```
+
+```csharp
+// Convenience method returns bool
+public virtual Response<bool> CheckUserExists(string name, string accept, CancellationToken cancellationToken = default);
+public virtual async Task<Response<bool>> CheckUserExistsAsync(string name, string accept, CancellationToken cancellationToken = default);
+```
+
+```typescript
+export type CheckUserExistsResponse = { body: boolean };
+
+export async function checkUserExists(
+  context: Client,
+  name: string,
+  options?: CheckUserExistsOptionalParams,
+): Promise<CheckUserExistsResponse>;
+```
+
+```java
+public BinaryData checkUserExists(String name, String accept);
+public Response<BinaryData> checkUserExistsWithResponse(String name, String accept, RequestOptions requestOptions);
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

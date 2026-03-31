@@ -427,3 +427,68 @@ model Page {
   ]>;
 }
 ```
+
+## Legacy Paging Decorators
+
+:::caution
+The decorators in this section are in the `Azure.ClientGenerator.Core.Legacy` namespace and are considered legacy functionality. They should only be used when standard TypeSpec paging patterns are not feasible. All support an optional `scope` parameter for language-specific targeting.
+:::
+
+### `@markAsPageable`
+
+Forces an operation to be treated as a pageable operation even when it does not follow standard paging patterns (e.g., not decorated with `@list`). When applied, SDK generators will generate paging mechanisms (iterators/async iterators) and return pageable-specific return types.
+
+The decorator will automatically apply `@pageItems` to a `value` property on the response model if it is not already decorated.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model ItemListResult {
+  value: Item[];
+  nextLink?: url;
+}
+
+@markAsPageable
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+### `@disablePageable`
+
+Prevents an operation from being treated as a pageable operation even when it follows standard paging patterns (e.g., decorated with `@list`). The response will be the paged model itself rather than a list of items, and no paging mechanisms will be generated.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model ItemListResult {
+  @pageItems value: Item[];
+  @nextLink nextLink?: url;
+}
+
+@disablePageable
+@list
+@route("/items")
+@get
+op listItems(): ItemListResult;
+// Returns ItemListResult directly, not an iterator of Item
+```
+
+### `@nextLinkVerb`
+
+Specifies the HTTP verb for fetching the next page in a paging scenario. By default, the next link operation uses `GET`. Use this decorator when the next page must be fetched with `POST` instead.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@nextLinkVerb("POST")
+@post
+op listItems(): PageResult;
+// The next page will be fetched using POST instead of GET
+```

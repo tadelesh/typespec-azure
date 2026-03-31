@@ -552,7 +552,7 @@ extern dec access(
  *
  * @@override(MyService.myOperation, myOperationCustomization)
  *
- * // method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
+ * // method signature is now `op myOperation(foo: string, bar: string)` (bar is no longer optional)
  * ```
  */
 extern dec override(target: Operation, override: Operation, scope?: valueof string);

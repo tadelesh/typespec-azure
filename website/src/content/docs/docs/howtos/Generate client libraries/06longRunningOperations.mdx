@@ -268,3 +268,44 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## Legacy LRO Decorator
+
+:::caution
+The `@markAsLro` decorator is in the `Azure.ClientGenerator.Core.Legacy` namespace and is considered legacy functionality. It should only be used when standard TypeSpec LRO patterns (such as `@pollingOperation`) are not feasible.
+:::
+
+### `@markAsLro`
+
+Forces an operation to be treated as a Long Running Operation by the SDK generators, even when the operation is not long-running on the service side. When applied, SDK generators will generate polling mechanisms (pollers) and return LRO-specific return types.
+
+:::danger
+When using `@markAsLro`, you must verify the operation behavior and add tests for the generated code. Forcing a non-LRO operation to be treated as LRO may result in runtime errors.
+:::
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model DeploymentResult {
+  id: string;
+  status: string;
+}
+
+@markAsLro
+@route("/deployments/{deploymentId}")
+@post
+op startDeployment(@path deploymentId: string): DeploymentResult;
+// SDK generators will generate this as an LRO with polling support
+```
+
+The decorator supports an optional `scope` parameter to target specific language emitters:
+
+```typespec
+// Only treat as LRO for Python
+@markAsLro("python")
+@route("/deployments/{deploymentId}")
+@post
+op startDeployment(@path deploymentId: string): DeploymentResult;
+```

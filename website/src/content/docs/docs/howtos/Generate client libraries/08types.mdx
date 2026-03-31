@@ -2628,3 +2628,75 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 </ClientTabItem>
 </ClientTabs>
 ```
+
+## Deserializing empty strings as null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a model property of type `string` (or a scalar derived from `string`) should be deserialized as `null` when the service returns an empty string (`""`). This is useful for services that use empty strings to represent null values.
+
+This decorator can only be applied to model properties whose type is `string` or a scalar type derived from `string`.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace My.Service;
+
+model Resource {
+  name: string;
+
+  @deserializeEmptyStringAsNull
+  description?: string;
+}
+
+@route("/resources")
+@get
+op getResource(@query name: string): Resource;
+```
+
+```python
+class Resource(_Model):
+    name: str = rest_field()
+    description: Optional[str] = rest_field()
+    # When the service returns description: "", it will be deserialized as None
+```
+
+```csharp
+public partial class Resource
+{
+    public string Name { get; }
+    // When the service returns description: "", it will be deserialized as null
+    public string Description { get; }
+}
+```
+
+```typescript
+export interface Resource {
+  name: string;
+  description?: string;
+  // When the service returns description: "", it will be deserialized as null/undefined
+}
+```
+
+```java
+public final class Resource {
+    private final String name;
+    // When the service returns description: "", it will be deserialized as null
+    private String description;
+}
+```
+
+```go
+type Resource struct {
+	Name        *string
+	Description *string
+	// When the service returns description: "", it will be deserialized as nil
+}
+```
+
+</ClientTabs>
