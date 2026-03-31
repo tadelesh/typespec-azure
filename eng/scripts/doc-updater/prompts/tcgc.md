@@ -41,7 +41,14 @@ Purpose: Shows exported types and their meanings for emitter developers building
 Location: `packages/typespec-client-generator-core/design-docs/`
 Purpose: Detailed design documents for TCGC features.
 
-### 4. Test Samples (Spector)
+### 4. TSP Decorator Doc Comments (source of reference docs)
+
+Location: `packages/typespec-client-generator-core/lib/decorators.tsp` and `lib/legacy.tsp`
+Purpose: Doc comments on `extern dec` declarations in these files are the source for the auto-generated decorator reference docs. The reference docs at `website/src/content/docs/docs/libraries/typespec-client-generator-core/reference/` are produced by running `pnpm regen-docs` from `packages/typespec-client-generator-core/`.
+
+> When a doc comment in a `.tsp` file is inconsistent with the implementation in `src/`, fix the `.tsp` doc comment to match the implementation, then run `pnpm regen-docs` from `packages/typespec-client-generator-core/` to regenerate the reference docs. Do NOT edit the generated reference docs directly.
+
+### 5. Test Samples (Spector)
 
 Location: `packages/azure-http-specs/specs/`
 Purpose: Functional samples demonstrating TCGC features with runnable test scenarios.
@@ -56,9 +63,16 @@ You MUST complete ALL three steps below.
 
 1. **Read the source code, TSP declaration and unit tests first** — understand TCGC actual behavior: decorator logics, type graph building steps and corner cases. The implementation is the only reliable source of truth.
 
+   **To understand how a decorator affects the client type graph**, follow this pattern in the source code:
+   - Decorators store data using `setScopedDecoratorData`
+   - Getter functions (e.g., `getAccess`, `getClientNameOverride`, `getUsageOverride`) retrieve that data
+   - Search where those getter functions are called in other source code where the decorator actually impacts the generated client type graph
+   - The call sites in the type graph builders reveal the decorator's real effect: which SDK types, properties, methods, or clients are changed and how
+
 2. **Audit ALL documentation areas** against what you learned:
    - Decorator signatures in docs must match actual signatures in `lib/`
    - Behavioral descriptions in docs must match actual implementation logic in `src/`
+   - **Doc comments in `.tsp` files** must accurately describe the implementation — if a doc comment is wrong, incomplete, or misleading compared to the implementation, fix the doc comment in the `.tsp` file and run `pnpm regen-docs` from `packages/typespec-client-generator-core/` to regenerate reference docs
    - Every decorator and public feature in source must be documented somewhere
    - No documentation should contradict the actual implementation
 
