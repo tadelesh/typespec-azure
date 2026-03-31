@@ -475,7 +475,7 @@ Suppose you want your generated client library to use a type from an external pa
 ```typespec
 @alternateType(
   {
-    fullyQualifiedName: "externallib.ExternalModel",
+    identity: "externallib.ExternalModel",
     package: "externallib",
   },
   "python"

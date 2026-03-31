@@ -683,7 +683,7 @@ model ClientInitializationOptions {
  *   blob: string;
  * }
  *
- * @@clientInitialization(MyService, MyServiceClientOptions)
+ * @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
  * @@paramAlias(MyServiceClientOptions.blob, "blobName")
  *
  * // The generated client will have `blobName` in it. We will also
