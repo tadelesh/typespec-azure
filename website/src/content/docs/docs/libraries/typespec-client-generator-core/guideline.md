@@ -119,6 +119,16 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 }
 ```
 
+### Cross-Language Version
+
+`SdkPackage.crossLanguageVersion` is a short hash (first 12 hex digits of a SHA-256) computed from the combined source text of all project-level TypeSpec files. It changes whenever any source file in the TypeSpec project changes and can be used by emitters to detect API surface changes and keep generated SDK versions in sync across languages.
+
+```typescript
+const hash: string = sdkContext.sdkPackage.crossLanguageVersion;
+```
+
+If you are building a cross-language SDK consistency tool, compare `crossLanguageVersion` across emitter outputs for the same TypeSpec project to determine whether they were generated from the same source revision.
+
 ### Client
 
 Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
