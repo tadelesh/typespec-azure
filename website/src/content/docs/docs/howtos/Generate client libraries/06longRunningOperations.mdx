@@ -268,3 +268,26 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## Forcing an operation to be LRO (Legacy)
+
+For brownfield services where an operation is not inherently long-running on the service side but should be treated as an LRO by SDK generators, use the `@markAsLro` decorator from `Azure.ClientGenerator.Core.Legacy`:
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model DeploymentResult {
+  id: string;
+  status: string;
+}
+
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "required for backward compatibility"
+@markAsLro
+@route("/deployments/{deploymentId}")
+@post
+op startDeployment(@path deploymentId: string): DeploymentResult;
+```
+
+When applied, TCGC treats the operation as an LRO and SDK generators will generate polling mechanisms, LRO-specific return types, and handle the operation as an asynchronous long-running process. The operation must return a model type.

@@ -159,6 +159,7 @@ export type ProtocolAPIDecorator = (
 /**
  * Define the client generated in the client SDK.
  * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+ * Note: The `@operationGroup` decorator is deprecated; use `@client` instead to define sub clients.
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
  *
  * @param target The target namespace or interface that you want to define as a client.
@@ -185,9 +186,6 @@ export type ProtocolAPIDecorator = (
  * @client({service: MyService, name: "MySpecialClient"})
  * interface MyInterface {}
  * ```
- * @example
- *
- *
  */
 export type ClientDecorator = (
   context: DecoratorContext,
@@ -305,7 +303,7 @@ export type UsageDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * Override access for operations, models, enums and model properties.
+ * Override access for operations, models, enums, unions, model properties, and namespaces.
  * When setting access for namespaces,
  * the access info will be propagated to the models and operations defined in the namespace.
  * If the model has an access override, the model override takes precedence.
@@ -934,8 +932,8 @@ export type ResponseAsBoolDecorator = (
  * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
  * Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in  `@clientInitialization` decorator.
  *
- * @param source The operation to change location for.
- * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
+ * @param source The operation or model property to change location for.
+ * @param target The target `Namespace`, `Interface`, `Operation`, or a string which can indicate the client. When the target is an `Operation`, it keeps the parameter on the operation level.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).

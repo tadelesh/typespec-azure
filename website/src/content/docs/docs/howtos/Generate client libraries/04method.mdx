@@ -116,7 +116,11 @@ As emitters global parameters:
 
 To set global emitters parameters, read the documentation of [emitters configuration](https://microsoft.github.io/typespec/introduction/configuration#configuration-file).
 
-For fine tuning, the set of decorators `@protocolAPI` and `@convenientAPI` can be used. They take a required boolean as parameter.
+For fine tuning, the set of decorators `@protocolAPI` and `@convenientAPI` can be used. They take a required boolean as parameter. These decorators can be applied at three levels:
+
+- **Operation level**: Controls a single operation.
+- **Interface level**: Applies to all operations in the interface, unless overridden at the operation level.
+- **Namespace level**: Applies to all operations in the namespace (including nested namespaces), unless overridden at the interface or operation level.
 
 #### Shifting the generation of protocol and convenience on and off
 
@@ -1751,6 +1755,42 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Limiting operations or properties to specific languages with `@scope`
+
+The `@scope` decorator allows you to include an operation or model property only for specific language emitters, or exclude it from certain languages. By default, all operations and model properties apply to all language emitters.
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// This operation is only generated for the C# emitter
+@@scope(MyService.specialCSharpOp, "csharp");
+
+// This operation is generated for all emitters except Python
+@@scope(MyService.notForPython, "!python");
+```
+
+Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`. You can also use negation (`"!python"`) or combine multiple languages (`"csharp, java"`).
+
+## Modeling HEAD operations as boolean with `@responseAsBool`
+
+The `@responseAsBool` decorator indicates that a HEAD operation should return a boolean instead of a void or response object. With this decorator:
+
+- A **2xx** response returns `true`
+- A **404** response returns `false` (and does NOT raise an error)
+
+This is useful for existence-check patterns.
+
+```typespec title=main.tsp
+@responseAsBool
+@head
+op exists(@path id: string): void;
+```
+
+The generated client method will return a boolean value.
 
 ## Customizing method signatures with `@override`
 

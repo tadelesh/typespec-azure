@@ -85,7 +85,16 @@ Most TCGC types share the following common properties:
 - **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters.
 - **`name`** and **`isGeneratedName`**: The type's name and whether the name was created by TCGC.
 - **`access`**: Indicates whether the type has public or private accessibility.
-- **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration.
+- **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration. Key flags include:
+  - `Input` / `Output`: Whether the type is used in request input or response output.
+  - `Json` / `Xml`: Whether the type is used with JSON or XML content types.
+  - `JsonMergePatch`: Used with `application/merge-patch+json` content type (also sets `Input` and `Json`).
+  - `MultipartFormData`: Used in multipart form data (also sets `Input`).
+  - `Spread`: Used in spread operations.
+  - `ApiVersionEnum`: The type is an API version enum.
+  - `Exception`: Used for exception/error output.
+  - `LroInitial` / `LroPolling` / `LroFinalEnvelope`: Used in LRO initial, polling, or final envelope responses.
+  - `External`: Only referenced by external types.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
 - **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
 
@@ -123,7 +132,15 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 
 Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
 
-`SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized: by parent client or by itself.
+`SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized.
+
+The `initializedBy` property uses [`InitializedByFlags`](../reference/js-api/enumerations/initializedbyflags/) to control initialization behavior:
+
+- `Default` (0): No user-specific initialization setting; the emitter decides.
+- `Individually` (1): The client can be initialized independently.
+- `Parent` (2): The client can be initialized through its parent client.
+- `CustomizeCode` (4): Client initialization should be omitted from generated code and handled manually in custom code.
+- `Individually` and `Parent` are bit flags that can be combined (e.g., `Individually | Parent` means the client supports both).
 
 The initialization parameter can be either [`SdkEndpointParameter`](../reference/js-api/interfaces/sdkendpointparameter/), [`SdkCredentialParameter`](../reference/js-api/interfaces/sdkcredentialparameter/) or [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/).
 
@@ -211,6 +228,10 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
   - For array properties:
     - `arrayEncode`: Indicates the encoding style for array properties (if specified).
 
+**Streaming Types:**
+
+- Streaming operations (e.g., JSONL streams, Server-Sent Events) are represented through stream metadata on `SdkBodyParameter`, `SdkMethodResponse`, and `SdkHttpResponse`. When a body parameter or response has stream metadata, emitters should handle the content as a stream rather than a single deserialized object.
+
 ### Example types
 
 Example types help model the examples that TypeSpec authors define to help users understand how to use the API. TCGC currently only supports examples based on HTTP payload, so the examples are available in `SdkHttpOperation.examples`.
@@ -227,9 +248,9 @@ For [`SdkModelExampleValue`](../reference/js-api/interfaces/sdkmodelexamplevalue
 
 ### Client Detection
 
-The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, and `@moveTo`.
+The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, and `@clientLocation`.
 
-If there is no explicitly defined `@client`, then each namespace with `@service` is a separate root client. The nested namespaces and interfaces under each service namespace are sub clients with hierarchy. Meanwhile, any operations with `@moveTo` a `string` type target, is a sub client under the root client.
+If there is no explicitly defined `@client`, then each namespace with `@service` is a separate root client. The nested namespaces and interfaces under each service namespace are sub clients with hierarchy. Meanwhile, any operations with `@clientLocation` targeting a `string` type, are placed in a sub client under the root client.
 
 If there is any `@client` definition, then each top-level `@client` is a root client and each nested `@client` is a sub client with hierarchy.
 
@@ -253,13 +274,13 @@ Normally, a client's initialization parameters include:
 
 The client's initialization way is `undefined`. Emitters can choose how to initialize all the clients.
 
-With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with initializing by parent client, initializing individually or both.
+With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with `InitializedBy.individually` (client is created directly), `InitializedBy.parent` (client is created through its parent), both combined, or `InitializedBy.customizeCode` (client initialization is omitted from generated code).
 
 ### Method Detection
 
-The methods depend on the combination usage of `Operation`, `@scope`, and `@moveTo`.
+The methods depend on the combination usage of `Operation`, `@scope`, and `@clientLocation`.
 
-A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@moveTo` current client, deducting any operations with `@scope` out of current emitter or `@moveTo` another client.
+A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@clientLocation` targeting the current client, deducting any operations with `@scope` out of current emitter or `@clientLocation` targeting another client.
 
 ### Method Parameters Handling
 

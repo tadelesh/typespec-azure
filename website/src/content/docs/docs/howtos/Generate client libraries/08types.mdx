@@ -654,6 +654,23 @@ model Config {
 </ClientTabItem>
 </ClientTabs>
 
+## Deserializing Empty Strings as Null (Legacy)
+
+The `@deserializeEmptyStringAsNull` decorator from `Azure.ClientGenerator.Core` indicates that a model property of type `string` (or a scalar derived from `string`) should be deserialized as `null` when its value is an empty string (`""`). This is useful for brownfield services that use empty strings to represent null values.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+model MyModel {
+  @deserializeEmptyStringAsNull("csharp")
+  name?: string;
+}
+```
+
+The decorator requires a language scope parameter. Only string-typed properties are valid targets.
+
 ## Models
 
 ### Models with additional properties of any type

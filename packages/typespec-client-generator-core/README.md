@@ -137,7 +137,7 @@ Available ruleSets:
 
 #### `@access`
 
-Override access for operations, models, enums and model properties.
+Override access for operations, models, enums, unions, model properties, and namespaces.
 When setting access for namespaces,
 the access info will be propagated to the models and operations defined in the namespace.
 If the model has an access override, the model override takes precedence.
@@ -446,6 +446,7 @@ op test(
 
 Define the client generated in the client SDK.
 If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+Note: The `@operationGroup` decorator is deprecated; use `@client` instead to define sub clients.
 This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
 
 ```typespec
@@ -649,14 +650,14 @@ Change the parameter location to operation or client. For this usage, the decora
 
 ##### Target
 
-The operation to change location for.
+The operation or model property to change location for.
 `Operation | ModelProperty`
 
 ##### Parameters
 
 | Name   | Type                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------ | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| target | `Interface \| Namespace \| Operation` \| `valueof string` | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| target | `Interface \| Namespace \| Operation` \| `valueof string` | The target `Namespace`, `Interface`, `Operation`, or a string which can indicate the client. When the target is an `Operation`, it keeps the parameter on the operation level.                                                                                                                                                                                                                                                                                                                                                                                                            |
 | scope  | `valueof string`                                          | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
@@ -1542,7 +1543,7 @@ model SportsCar extends Vehicle {
 Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
 even when the operation is not long-running on the service side.
 
-NOTE: When used, you will need to verify the operatio and add tests for the generated code
+NOTE: When used, you will need to verify the operation and add tests for the generated code
 to make sure the end-to-end works for library users, since there is a risk that forcing
 this operation to be LRO will result in errors.
 

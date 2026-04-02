@@ -427,3 +427,52 @@ model Page {
   ]>;
 }
 ```
+
+### Overriding the next link HTTP verb (Legacy)
+
+By default, the next link operation uses a `GET` request. In rare cases where a service uses `POST` for fetching the next page, you can use the `@nextLinkVerb` decorator from `Azure.ClientGenerator.Core.Legacy`:
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@nextLinkVerb("POST")
+@list
+@post
+op listItems(): ItemListResult;
+```
+
+### Forcing an operation to be pageable (Legacy)
+
+For brownfield services where an operation does not follow standard paging patterns but should be treated as pageable by SDK generators, use the `@markAsPageable` decorator:
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "required for backward compatibility"
+@markAsPageable
+op listItems(): ItemListResult;
+```
+
+The response model must have either a property decorated with `@pageItems` or a property named `value`.
+
+### Preventing an operation from being pageable (Legacy)
+
+When an operation follows paging patterns (e.g., decorated with `@list`) but should NOT be treated as pageable, use the `@disablePageable` decorator:
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "required for backward compatibility"
+@disablePageable
+@list
+@get
+op listItems(): ItemListResult;
+```
+
+With `@disablePageable`, the method will be generated as a basic method returning the full response model instead of a paged iterator.
