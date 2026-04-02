@@ -2231,3 +2231,72 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## Modeling HEAD operations as boolean with `@responseAsBool`
+
+The `@responseAsBool` decorator indicates that a HEAD operation should return a boolean instead of the standard response type. When applied:
+
+- A `2xx` response returns `true`
+- A `404` response returns `false` (instead of raising an error)
+- All other error status codes still raise an error
+
+This is useful for "exists" checks where you want a simple boolean result.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+model Resource {
+  name: string;
+  id: string;
+}
+
+@route("/resources/{name}")
+@head
+@responseAsBool
+op checkResourceExists(@path name: string): OkResponse;
+```
+
+```python
+# The method returns bool instead of a response object
+# 2xx -> True, 404 -> False
+def check_resource_exists(self, name: str, **kwargs: Any) -> bool:
+    ...
+```
+
+```csharp
+// Convenience method returns Response<bool>
+// 2xx -> true, 404 -> false
+public virtual Response<bool> CheckResourceExists(string name, ...);
+public virtual async Task<Response<bool>> CheckResourceExistsAsync(string name, ...);
+```
+
+```typescript
+export type CheckResourceExistsResponse = { body: boolean };
+
+export async function checkResourceExists(
+  context: Client,
+  name: string,
+  options?: CheckResourceExistsOptionalParams,
+): Promise<CheckResourceExistsResponse>;
+```
+
+```java
+// Protocol method
+public Response<BinaryData> checkResourceExistsWithResponse(
+    String name, RequestOptions requestOptions);
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

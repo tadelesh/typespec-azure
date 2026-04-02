@@ -185,9 +185,6 @@ export type ProtocolAPIDecorator = (
  * @client({service: MyService, name: "MySpecialClient"})
  * interface MyInterface {}
  * ```
- * @example
- *
- *
  */
 export type ClientDecorator = (
   context: DecoratorContext,
@@ -482,19 +479,19 @@ export type AccessDecorator = (
  * @service
  * namespace MyService;
  *
- * op myOperation(foo: string, bar: string): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
- *
- * // client.tsp
- * namespace MyCustomizations;
- *
  * model Params {
  *  foo: string;
  *  bar: string;
  * }
  *
+ * op myOperation(...Params): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
+ *
+ * // client.tsp
+ * namespace MyCustomizations;
+ *
  * op myOperationCustomization(params: MyService.Params): void;
  *
- * @@override(MyService.myOperation, myOperationCustomization); // method signature is now `op myOperation(params: Params)`
+ * @@override(MyService.myOperation, MyCustomizations.myOperationCustomization); // method signature is now `op myOperation(params: Params)`
  * ```
  * @example Customize a parameter to be required
  * ```typespec
@@ -509,9 +506,7 @@ export type AccessDecorator = (
  *
  * op myOperationCustomization(foo: string, bar: string): void;
  *
- * @@override(MyService.myOperation, myOperationCustomization)
- *
- * // method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
+ * @@override(MyService.myOperation, MyCustomizations.myOperationCustomization); // method signature is now `op myOperation(foo: string, bar: string)`
  * ```
  */
 export type OverrideDecorator = (
@@ -608,19 +603,21 @@ export type ClientInitializationDecorator = (
  * // main.tsp
  * namespace MyService;
  *
- * op upload(blobName: string): void;
+ * op download(@path blob: string): void;
+ * op upload(@path blobName: string): void;
  *
  * // client.tsp
  * namespace MyCustomizations;
  * model MyServiceClientOptions {
- *   blob: string;
+ *   @paramAlias("blob")
+ *   blobName: string;
  * }
  *
- * @@clientInitialization(MyService, MyServiceClientOptions)
- * @@paramAlias(MyServiceClientOptions.blob, "blobName")
+ * @@clientInitialization(MyService, {parameters: MyCustomizations.MyServiceClientOptions})
  *
- * // The generated client will have `blobName` in it. We will also
- * // elevate the existing `blob` parameter to the client level.
+ * // The generated client will have `blobName` as a client parameter.
+ * // The alias "blob" allows the `blobName` client parameter to also map to the
+ * // `blob` operation parameter in `download`, in addition to the `blobName` parameter in `upload`.
  * ```
  */
 export type ParamAliasDecorator = (

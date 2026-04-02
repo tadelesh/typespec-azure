@@ -597,8 +597,8 @@ Customizations SHOULD always be made in a file named `client.tsp` alongside `mai
 There are two ways to customize the client hierarchy: using `@clientLocation` to change the location of the operations, or use `@client` to restructure the client hierarchy.
 Be careful when you use both of them since `@clientLocation` could not move the client that is no longer exist with `@client` customization.
 
-The `@clientLocaton` decorator allows you to change the location of the operations in the client hierarchy.
-It can be used to move operations to an existed sub client defined by `Interface` or `Namespace`, or move the the root client of namespace with `@service` decorator.
+The `@clientLocation` decorator allows you to change the location of the operations in the client hierarchy.
+It can be used to move operations to an existing sub client defined by `Interface` or `Namespace`, or move to the root client of a namespace with `@service` decorator.
 This decorator is useful when you want to keep the default client hierarchy but need to change the location of some operations.
 
 The `@client` decorator allows you to totally restructure the client hierarchy.
@@ -2698,3 +2698,42 @@ serviceBOnly.SubOpB(context.Background(), &ServiceBOnlyClientSubOpBOptions{})
 ```
 
 </ClientTabs>
+
+### Scoping Operations or Properties to Specific Languages
+
+The `@scope` decorator allows you to control which language emitters generate a specific operation or model property.
+By default, all elements are generated for all languages. Use `@scope` to include an element only for specific languages or to exclude it from certain languages using the `!` prefix.
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+// This operation is only generated for Go
+@scope("go")
+@route("/internal")
+@get
+op goOnlyOperation(): void;
+
+// This operation is generated for all languages except C#
+@scope("!csharp")
+@route("/skip-csharp")
+@get
+op skipCsharpOperation(): void;
+
+model Config {
+  name: string;
+
+  // This property is only generated for Python and Java
+  @scope("python, java")
+  debugInfo?: string;
+}
+```
+
+The supported scope values are: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+You can combine multiple values with commas (e.g., `"python, java"`) or negate with `!` (e.g., `"!csharp"` or `"!(java, python)"`).

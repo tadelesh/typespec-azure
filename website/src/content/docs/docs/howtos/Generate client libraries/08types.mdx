@@ -497,6 +497,83 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 
 - The referenced type should be compatible with the intended usage in the generated client library.
 
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a model property of type `string` (or a scalar type derived from `string`) should be deserialized as `null` when its value is an empty string (`""`). This is useful when a service returns empty strings to represent absent values.
+
+This decorator can only be applied to properties whose type is `string` or a scalar derived from `string`.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+model UserProfile {
+  name: string;
+
+  @deserializeEmptyStringAsNull
+  nickname?: string;
+
+  @deserializeEmptyStringAsNull
+  bio?: string;
+}
+
+@route("/users")
+@post
+op createUser(@body user: UserProfile): UserProfile;
+```
+
+```python
+class UserProfile:
+    name: str  # Required
+    nickname: Optional[str]  # "" from the service is deserialized as None
+    bio: Optional[str]  # "" from the service is deserialized as None
+```
+
+```csharp
+public partial class UserProfile
+{
+    public UserProfile(string name) { ... }
+
+    public string Name { get; set; }
+    public string Nickname { get; set; }  // "" from the service is deserialized as null
+    public string Bio { get; set; }  // "" from the service is deserialized as null
+}
+```
+
+```typescript
+export interface UserProfile {
+  name: string;
+  nickname?: string; // "" from the service is deserialized as null
+  bio?: string; // "" from the service is deserialized as null
+}
+```
+
+```java
+public final class UserProfile {
+    private final String name;
+    private String nickname; // "" from the service is deserialized as null
+    private String bio; // "" from the service is deserialized as null
+}
+```
+
+```go
+type UserProfile struct {
+	Name     *string // REQUIRED
+	Nickname *string // "" from the service is deserialized as nil
+	Bio      *string // "" from the service is deserialized as nil
+}
+```
+
+</ClientTabs>
+
 ## Client Default Values (Legacy)
 
 :::caution
