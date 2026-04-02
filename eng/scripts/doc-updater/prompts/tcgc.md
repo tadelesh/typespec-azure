@@ -20,36 +20,42 @@ These rules are **non-negotiable** and apply to every action you take:
 
 ## Documentation Areas
 
-TCGC has several documentation areas. **All areas must be checked and updated.**
+TCGC has several documentation areas with different audiences and purposes. **All areas must be checked and updated.**
 
-### 1. User Documentation
+### 1. User Documentation (audience: TypeSpec spec authors)
 
 Location: `website/src/content/docs/docs/howtos/Generate client libraries/`
-Purpose: Guides TypeSpec users on how specs are generated to client code and how to customize generation.
+Audience: TypeSpec users writing `.tsp` specs who want to understand or customize how their specs translate to client SDKs.
+Content: How-to guides organized by topic — each file covers one specific topic (clients, methods, types, paging, versioning, etc.). Content should explain _what happens_ and _how to customize it_, not internal TCGC implementation details.
+
+**Put content in the correct file.** Each file owns a specific topic. Before editing any file, read it first to understand its scope. If your change is about methods, put it in the methods file, not the clients file. If a fix spans multiple topics, put each part in its respective file.
 
 > ⚠️ All `<ClientTabs>` code examples in this area MUST be produced by the @doc-example-generator skill (see Mandatory Rules above).
 
-### 2. Emitter Developer Documentation
+### 2. Emitter Developer Documentation (audience: SDK emitter authors)
 
 Location: `website/src/content/docs/docs/libraries/typespec-client-generator-core/guideline.md`
-Purpose: Shows exported types and their meanings for emitter developers building on TCGC.
+Audience: Developers building language-specific SDK emitters on top of TCGC (e.g., Python, Java, C# emitter teams).
+Content: TCGC's exported type system — `SdkClient`, `SdkMethod`, `SdkType`, `SdkModelType`, `SdkModelPropertyType`, etc. Explains the type graph structure, property meanings, and how emitters should interpret each type to generate correct SDK code. This is _not_ for TypeSpec spec authors — it's for people consuming TCGC's output programmatically.
 
-### 3. Design Documents
+### 3. Design Documents (audience: TCGC contributors)
 
 Location: `packages/typespec-client-generator-core/design-docs/`
-Purpose: Detailed design documents for TCGC features.
+Audience: TCGC developers and contributors.
+Content: Internal design decisions, feature proposals, and architecture documentation. Not user-facing.
 
-### 4. TSP Decorator Doc Comments (source of reference docs)
+### 4. TSP Decorator Doc Comments → Reference Docs (audience: TypeSpec spec authors)
 
 Location: `packages/typespec-client-generator-core/lib/decorators.tsp` and `lib/legacy.tsp`
-Purpose: Doc comments on `extern dec` declarations in these files are the source for the auto-generated decorator reference docs. The reference docs at `website/src/content/docs/docs/libraries/typespec-client-generator-core/reference/` are produced by running `pnpm regen-docs` from `packages/typespec-client-generator-core/`.
+Audience: TypeSpec users looking up decorator signatures and parameters.
+Content: Doc comments on `extern dec` declarations. These are the source for the auto-generated reference docs at `website/src/content/docs/docs/libraries/typespec-client-generator-core/reference/`. Doc comments should describe decorator parameters, valid targets, and basic usage — not internal implementation or emitter-level type graph details.
 
-> When a doc comment in a `.tsp` file is inconsistent with the actual behavior shown in the unit tests and implementation, fix the `.tsp` doc comment to match, then run `pnpm regen-docs` from `packages/typespec-client-generator-core/` to regenerate the reference docs. Do NOT edit the generated reference docs directly.
+> When a doc comment is inconsistent with actual behavior, fix the `.tsp` doc comment to match, then run `pnpm regen-docs` from `packages/typespec-client-generator-core/`. Do NOT edit the generated reference docs directly.
 
-### 5. Test Samples (Spector)
+### 5. Test Samples — Spector (audience: TypeSpec spec authors and SDK emitter authors)
 
 Location: `packages/azure-http-specs/specs/`
-Purpose: Functional samples demonstrating TCGC features with runnable test scenarios.
+Content: Runnable TypeSpec test scenarios demonstrating TCGC features, used by emitter teams for conformance testing.
 
 ## Instructions
 
@@ -99,7 +105,7 @@ For every `<ClientTabs>` block you create or update, invoke @doc-example-generat
 
 ### Step 3: Audit and Fix Spector Test Coverage
 
-Spector specs must cover all TCGC features — both decorator customizations and baseline type graph mappings. Not every unit test scenario needs its own Spector spec, but every scenario must be covered by at least one spec.
+Spector specs must cover all TCGC features — both decorator customizations and baseline type graph mappings. Every distinct usage pattern (e.g., applying a decorator to different target types, using different parameter combinations) needs Spector coverage. You do not need to cover every edge case or corner case — focus on the main usage patterns that users would encounter.
 
 **First, build the gap list.** Inventory existing Spector specs under `packages/azure-http-specs/specs/`, then compare against the scenarios from Step 1. List every uncovered scenario explicitly.
 
