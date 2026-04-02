@@ -85,9 +85,9 @@ By reading the tests, you learn:
 
 ### Step 2: Audit and Fix Documentation
 
-Using what you learned in Step 1, audit ALL documentation areas and fix every issue found.
+Using what you learned in Step 1, audit ALL documentation areas and fix every issue found. Documentation must cover all main usage patterns that users would encounter — you do not need to document every edge case or corner case, but every distinct usage pattern must be documented.
 
-**First, build the complete issue list.** Before fixing anything, scan all documentation areas and compile a numbered list of every issue — inaccurate descriptions, missing scenarios, wrong signatures, outdated doc comments, etc. Write this list out explicitly.
+**First, build the complete issue list.** Before fixing anything, scan all documentation areas and compile a numbered list of every issue — inaccurate descriptions, missing usage patterns, wrong signatures, outdated doc comments, etc. Write this list out explicitly.
 
 **Then, fix every issue on the list, one by one.** Work through the entire list. After fixing each issue, check it off and state which issue number you just fixed and how many remain. Do not stop until the list is empty.
 
