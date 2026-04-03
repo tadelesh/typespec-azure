@@ -98,6 +98,16 @@ Clients, models, enums, and unions include namespace information. Emitters can u
 - A flattened structure (`SdkPackage.clients`, `SdkPackage.enums`, `SdkPackage.models`, `SdkPackage.unions`)
 - A hierarchical structure (`SdkPackage.namespaces`) requiring iteration through nested namespaces.
 
+### Cross-Language Version Hash
+
+`SdkPackage.crossLanguageVersion` is a 12-character hex hash derived from the TypeSpec source files. It is deterministic — the same spec always produces the same hash — and changes whenever the spec content changes.
+
+Emitters can use `crossLanguageVersion` to detect whether the API surface has changed between runs, for example to version generated SDKs or to compare outputs across languages.
+
+```typescript
+const hash = sdkPackage.crossLanguageVersion; // e.g. "a3f9c1b72d0e"
+```
+
 ### License Information
 
 Emitters can get package license info from `SdkPackage.licenseInfo`. The [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) contains license details for client code comments or license file generation.
