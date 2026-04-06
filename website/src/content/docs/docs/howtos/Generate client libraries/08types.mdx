@@ -497,6 +497,90 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 
 - The referenced type should be compatible with the intended usage in the generated client library.
 
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a string-type model property should be treated as `null` when the service returns an empty string (`""`). This is useful for services that use empty strings to represent missing or unset values.
+
+The decorator can only be applied to model properties whose type is `string` or a scalar derived from `string`.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@service
+namespace DeserializeExample;
+
+model UserProfile {
+  id: string;
+  name: string;
+
+  @deserializeEmptyStringAsNull
+  nickname?: string;
+
+  @deserializeEmptyStringAsNull
+  bio?: string;
+}
+
+@route("/users/{id}")
+@get
+op getUser(@path id: string): UserProfile;
+```
+
+```python
+class UserProfile(_Model):
+    id: str = rest_field()
+    name: str = rest_field()
+    # Empty string "" will be deserialized as None
+    nickname: Optional[str] = rest_field()
+    bio: Optional[str] = rest_field()
+```
+
+```csharp
+public partial class UserProfile
+{
+    public string Id { get; }
+    public string Name { get; }
+    // Empty string "" will be deserialized as null
+    public string Nickname { get; }
+    public string Bio { get; }
+}
+```
+
+```typescript
+export interface UserProfile {
+  id: string;
+  name: string;
+  // Empty string "" will be deserialized as undefined
+  nickname?: string;
+  bio?: string;
+}
+```
+
+```java
+public final class UserProfile {
+    public String getId();
+    public String getName();
+    // Empty string "" will be deserialized as null
+    public String getNickname();
+    public String getBio();
+}
+```
+
+```go
+type UserProfile struct {
+    ID       *string
+    Name     *string
+    // Empty string "" will be deserialized as nil
+    Nickname *string
+    Bio      *string
+}
+```
+
+</ClientTabs>
+
 ## Client Default Values (Legacy)
 
 :::caution

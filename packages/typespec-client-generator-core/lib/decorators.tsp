@@ -177,8 +177,6 @@ extern dec protocolAPI(
  * @client({service: MyService, name: "MySpecialClient"})
  * interface MyInterface {}
  * ```
- *
- * @example
  */
 extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?: valueof string);
 
@@ -552,7 +550,7 @@ extern dec access(
  *
  * @@override(MyService.myOperation, myOperationCustomization)
  *
- * // method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
+ * // method signature is now `op myOperation(foo: string, bar: string)`
  * ```
  */
 extern dec override(target: Operation, override: Operation, scope?: valueof string);

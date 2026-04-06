@@ -2231,3 +2231,161 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## Scoping operations to specific languages with `@scope`
+
+The `@scope` decorator controls which language emitters include a given operation or model property in their generated output. By default, all operations are generated for every language. Use `@scope` to limit an operation to specific languages or exclude it from certain languages.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@service
+namespace ScopeExample;
+
+model Widget {
+  id: string;
+  name: string;
+}
+
+@route("/widgets")
+@get
+op listWidgets(): Widget[];
+
+// Only generate createWidget for Python and Java
+@route("/widgets")
+@post
+@scope("python, java")
+op createWidget(@body widget: Widget): Widget;
+```
+
+```python
+class ScopeExampleClient:
+    def list_widgets(self, **kwargs: Any) -> list[Widget]: ...
+    # createWidget IS generated for Python (included in scope)
+    def create_widget(self, widget: Widget, **kwargs: Any) -> Widget: ...
+```
+
+```csharp
+public partial class ScopeExampleClient
+{
+    // Only listWidgets is generated — createWidget is excluded by @scope
+    public virtual Response<IReadOnlyList<Widget>> GetWidgets(CancellationToken cancellationToken = default);
+    public virtual async Task<Response<IReadOnlyList<Widget>>> GetWidgetsAsync(CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class ScopeExampleClient {
+  // Only listWidgets is generated — createWidget is excluded by @scope
+  listWidgets(options?: ListWidgetsOptionalParams): Promise<Widget[]>;
+}
+```
+
+```java
+public final class ScopeExampleClient {
+    public List<Widget> listWidgets();
+    // createWidget IS generated for Java (included in scope)
+    public Widget createWidget(Widget widget);
+}
+```
+
+```go
+type ScopeExampleClient struct {}
+
+// Only ListWidgets is generated — CreateWidget is excluded by @scope
+func (client *ScopeExampleClient) ListWidgets(ctx context.Context, options *ScopeExampleClientListWidgetsOptions) (ScopeExampleClientListWidgetsResponse, error)
+```
+
+</ClientTabs>
+
+You can also use negation to exclude specific languages:
+
+```typespec
+// Generate for all languages EXCEPT C#
+@scope("!csharp")
+op myOperation(): void;
+
+// Exclude multiple languages
+@scope("!(csharp, go)")
+op anotherOperation(): void;
+```
+
+The `@scope` decorator can also be applied to model properties to include or exclude them from specific language outputs:
+
+```typespec
+model TestModel {
+  @scope("csharp")
+  csharpOnlyProp: string;
+}
+```
+
+## Modeling HEAD operations as boolean with `@responseAsBool`
+
+The `@responseAsBool` decorator changes a HEAD operation so that it returns a boolean value instead of void. When applied:
+
+- **2xx responses** return `true`
+- **404 responses** return `false` (no error is raised)
+- All other error status codes still raise exceptions
+
+This is useful for "exists" checks where you only need to know if a resource exists.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@service
+namespace ResponseAsBoolExample;
+
+model Widget {
+  @key
+  id: string;
+
+  name: string;
+}
+
+@route("/widgets/{id}")
+@head
+@responseAsBool
+op checkWidgetExists(@path id: string): void;
+```
+
+```python
+class ResponseAsBoolExampleClient:
+    # Returns bool instead of None — True if widget exists, False if 404
+    def check_widget_exists(self, id: str, **kwargs: Any) -> bool: ...
+```
+
+```csharp
+public partial class ResponseAsBoolExampleClient
+{
+    // Returns Response<bool> — true for 2xx, false for 404
+    public virtual Response<bool> CheckWidgetExists(string id, CancellationToken cancellationToken = default);
+    public virtual async Task<Response<bool>> CheckWidgetExistsAsync(string id, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class ResponseAsBoolExampleClient {
+  // Response body is boolean
+  checkWidgetExists(id: string, options?: CheckWidgetExistsOptionalParams): Promise<boolean>;
+}
+```
+
+```java
+public final class ResponseAsBoolExampleClient {
+    public Response<BinaryData> checkWidgetExistsWithResponse(String id, RequestOptions requestOptions);
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

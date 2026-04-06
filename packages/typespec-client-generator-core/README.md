@@ -1057,7 +1057,7 @@ op myOperationCustomization(foo: string, bar: string): void;
 
 @@override(MyService.myOperation, myOperationCustomization)
 
-// method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
+// method signature is now `op myOperation(foo: string, bar: string)`
 ```
 
 #### `@paramAlias`

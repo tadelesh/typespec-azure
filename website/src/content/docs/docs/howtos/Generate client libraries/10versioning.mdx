@@ -944,3 +944,98 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Adding Client-Specific API Versions with `@clientApiVersions`
+
+The `@clientApiVersions` decorator allows you to define additional API versions that the client can support beyond those defined in the service's versioning configuration. This is useful when you need to generate a complete API version enum without requiring the entire specification to be annotated with versioning decorators.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@typespec/versioning";
+import "@typespec/http";
+
+using TypeSpec.Versioning;
+using Http;
+
+@versioned(Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+  v2024_07_01: "2024-07-01",
+}
+
+model Widget {
+  id: string;
+  name: string;
+}
+
+@route("/widgets")
+@get
+op listWidgets(): Widget[];
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace MyCustomizations;
+
+// Add older API versions alongside the service's versions
+enum ClientApiVersions {
+  v2023_06_01: "2023-06-01",
+  v2023_10_01: "2023-10-01",
+  ...My.Service.Versions,
+}
+
+@@clientApiVersions(My.Service, ClientApiVersions);
+```
+
+```python
+from my.service import ServiceClient
+
+# Client uses the latest version by default
+client = ServiceClient(endpoint=..., credential=...)
+
+# Override to an older version added via @clientApiVersions
+client = ServiceClient(endpoint=..., credential=..., api_version="2023-06-01")
+```
+
+```csharp
+// The generated ServiceVersion enum includes all four versions
+public enum ServiceVersion
+{
+    V2023_06_01 = 1,
+    V2023_10_01 = 2,
+    V2024_01_01 = 3,
+    V2024_07_01 = 4
+}
+```
+
+```typescript
+export enum KnownClientApiVersions {
+  V20230601 = "2023-06-01",
+  V20231001 = "2023-10-01",
+  V20240101 = "2024-01-01",
+  V20240701 = "2024-07-01",
+}
+```
+
+```java
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2024_01_01("2024-01-01"),
+    V2024_07_01("2024-07-01");
+
+    public static ServiceServiceVersion getLatest() {} // V2024_07_01
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

@@ -427,3 +427,54 @@ model Page {
   ]>;
 }
 ```
+
+### Force paging behavior (Legacy)
+
+:::caution
+The `@markAsPageable` and `@disablePageable` decorators are legacy functionality in the `Azure.ClientGenerator.Core.Legacy` namespace. They should only be used when standard TypeSpec paging patterns are not feasible.
+:::
+
+The `@markAsPageable` decorator forces an operation to be treated as a pageable operation even when the operation does not follow standard paging patterns. When applied, SDK generators will produce paging mechanisms (iterators/async iterators) and pageable-specific return types.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model ItemListResult {
+  @pageItems value: Item[];
+  nextLink?: string;
+}
+
+// Force this operation to be treated as pageable
+@markAsPageable
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+Conversely, the `@disablePageable` decorator prevents an operation from being treated as pageable, even if it follows standard paging patterns (e.g., decorated with `@list`). When applied, the operation is treated as a basic method that returns the paged model directly.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+// Prevent this list operation from being treated as pageable
+@disablePageable
+@list
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+Both decorators support language-specific scoping:
+
+```typespec
+// Only disable paging for C#
+@disablePageable("csharp")
+@list
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
