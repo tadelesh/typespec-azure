@@ -60,6 +60,8 @@ When set to `true`, the emitter will generate convenience methods for each servi
 
 Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
 
+> **Note:** For multi-service specifications (specs that combine multiple `@service` namespaces), a specific version string (e.g. `"2024-01-01"`) is not meaningful and will be ignored. Only `"all"` and `"latest"` have well-defined semantics for multi-service clients.
+
 ### `license`
 
 **Type:** `object`
