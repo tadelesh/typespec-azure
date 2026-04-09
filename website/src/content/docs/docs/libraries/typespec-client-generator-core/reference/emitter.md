@@ -60,6 +60,8 @@ When set to `true`, the emitter will generate convenience methods for each servi
 
 Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
 
+> **Note for multi-service TypeSpec:** When multiple services are present in the same TypeSpec spec, a specific version string (e.g. `"2024-01-01"`) has no meaningful semantics because each service has its own independent version enum. In this case, specific version values are ignored and the emitter falls back to the default `latest` behavior per service. Only `"all"` and `"latest"` have well-defined semantics for multi-service clients.
+
 ### `license`
 
 **Type:** `object`
