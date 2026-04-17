@@ -112,7 +112,7 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 #### `@armLibraryNamespace`
 
-`@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+`@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
 
 ```typespec
 @Azure.ResourceManager.armLibraryNamespace
@@ -166,7 +166,7 @@ namespace Microsoft.ContosoService;
 
 #### `@armProviderNameValue`
 
-`@armResourceType` sets the value fo the decorated string
+`@armProviderNameValue` sets the value of the decorated string
 property to the type of the Azure Resource Manager resource.
 
 ```typespec
@@ -296,7 +296,7 @@ of the operations will be grouped based on the interface name in generated
 clients.
 
 The optional `resourceOperationOptions` parameter provides additional options.
-`allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+`allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
 choose static (`@route`) or automatic (`@autoRoute`) routing.
 
 `resourceType: Model` specifies the resource type for the operations in the interface
