@@ -32,6 +32,7 @@ For example, these lines pull in symbols from the `@typespec/rest` and `@azure-t
 ```
 using Http;
 using Rest;
+using Azure.Core;
 using Azure.ResourceManager;
 ```
 
