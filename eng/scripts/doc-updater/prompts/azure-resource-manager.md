@@ -34,11 +34,18 @@ When a doc comment is wrong, fix the `.tsp` file and regenerate.
 
 ## Critical Rules
 
-1. **Preserve `@dev` comments on template interfaces.** The `@dev` tag in `.tsp` doc comments is intentional — it prevents the description from becoming the default description of template instantiations. Never convert `@dev` comments to regular `/** ... */` doc comments, and never remove them.
-2. **Use spread patterns from samples, not manual alternatives.** When writing code examples for resource definitions, always use the idiomatic spread patterns shown in `packages/samples/specs/resource-manager/` (e.g., `...ResourceNameParameter<Resource, "widgetName">` for name parameters). Do NOT use manual `@key`/`@segment`/`@path` patterns when a spread pattern exists.
-3. **Be conservative with existing content.** Do not restructure, remove rows from, or rewrite tables and sections that are already accurate. Only fix clear errors (typos, wrong names, missing items). If you are unsure whether existing content is wrong, leave it as-is.
-4. **Only document what currently exists in the source code.** Never describe features, behaviors, or return types that are not implemented in `lib/` and `src/`. If a template does not yet return a certain type, do not claim it does.
-5. **Verify every change against source before committing it.** Read the actual `.tsp` declaration or `.ts` implementation to confirm a fix is correct. Do not infer or fabricate behavior.
+### What you MUST do
+
+1. **Fix wrong doc comments in `.tsp` files.** If a doc comment has typos, references a wrong decorator/parameter name, describes behavior that doesn't match the implementation, or has ghost `@param` tags for parameters that don't exist — fix it. This includes comments in `decorators.tsp`, `interfaces.tsp`, `operations.tsp`, `models.tsp`, and `responses.tsp`.
+2. **Add missing documentation.** If a resource type, operation template, decorator, response type, or linting rule exists in the source but is not documented, add documentation for it. Gaps are bugs.
+3. **Use spread patterns from samples, not manual alternatives.** When writing code examples for resource definitions, always use the idiomatic spread patterns shown in `packages/samples/specs/resource-manager/` (e.g., `...ResourceNameParameter<Resource, "widgetName">` for name parameters). Do NOT use manual `@key`/`@segment`/`@path` patterns when a spread pattern exists.
+4. **Verify every change against source before committing it.** Read the actual `.tsp` declaration or `.ts` implementation to confirm a fix is correct. Do not infer behavior from doc text alone.
+
+### What you must NOT do
+
+5. **Never remove or convert `@dev` comments.** The `@dev` tag in `.tsp` doc comments is intentional — it prevents the description from becoming the default description of template instantiations. You may fix typos or wrong descriptions _within_ a `@dev` comment, but never change it to a regular `/** ... */` doc comment and never remove it.
+6. **Never fabricate features.** Only document what currently exists in `lib/` and `src/`. If a template does not return a certain type, do not claim it does. If a feature is not implemented, do not document it.
+7. **Never restructure correct content.** Do not reorder, remove rows from, or rewrite tables and sections that are already accurate. You may _add_ missing rows or sections, but do not change the structure of content that is correct.
 
 ## Instructions
 
@@ -63,7 +70,7 @@ Build a complete **feature list** covering:
 
 ### Step 2: Audit and Fix Documentation
 
-**First, build the complete issue list.** Before fixing anything, scan all doc areas and compile a numbered list of every issue — inaccurate descriptions, missing features, wrong signatures, broken examples, outdated content, missing how-to guides.
+**First, build the complete issue list.** Before fixing anything, scan all doc areas and compile a numbered list of every issue — inaccurate descriptions, missing features, wrong signatures, broken examples, outdated content, missing how-to guides, wrong doc comments in `.tsp` files.
 
 Specifically check:
 
@@ -73,7 +80,10 @@ Specifically check:
 - All code examples are valid TypeSpec that match actual library signatures and sample patterns
 - Getting-started steps accurately reflect current library API
 - `arm-rules.md` lists all current linting rules with correct names and descriptions
-- If a doc comment in a `.tsp` file is wrong, add a fix item for the doc comment
+- Doc comments in `.tsp` files: fix typos, wrong parameter names, ghost `@param` tags, inaccurate descriptions, wrong grammar. Check `decorators.tsp`, `interfaces.tsp`, `operations.tsp`, `models.tsp`, and `responses.tsp`.
+- Rule reference files under `libraries/azure-resource-manager/rules/`: verify each file's title and namespace match the actual rule name and package
+- How-to guides document all response types, LRO header models, and scope types that exist in the source
+- Envelope property sections in `resource-type.md` cover all properties available in the library
 
 **Then, fix every issue, one by one.** Check it off and state which issue you just fixed and how many remain. Do not stop until the list is empty.
 
@@ -95,4 +105,4 @@ Run `pnpm change add` from the repository root for changelog entries on any modi
 3. **Copy code examples from samples.** When a sample in `packages/samples/specs/resource-manager/` demonstrates the pattern, adapt that code into the doc example. This ensures examples use the latest idiomatic patterns (spread operators, template aliases, etc.).
 4. **Link to related docs.** Cross-reference between getting-started and how-to guides.
 5. **Keep it practical.** Service teams want to know what to write, not implementation details. Show realistic TypeSpec patterns, not toy examples.
-6. **When in doubt, don't change it.** If you cannot confirm from source code that existing doc content is wrong, leave it alone. False fixes are worse than unfixed typos.
+6. **Be thorough.** Fix every issue you find — typos, wrong descriptions, missing content, incorrect signatures. Do not skip fixes out of caution. If the source code proves a doc is wrong, fix it.
