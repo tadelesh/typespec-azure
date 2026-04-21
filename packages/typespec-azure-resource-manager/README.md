@@ -166,7 +166,7 @@ namespace Microsoft.ContosoService;
 
 #### `@armProviderNameValue`
 
-`@armResourceType` sets the value fo the decorated string
+`@armResourceType` sets the value of the decorated string
 property to the type of the Azure Resource Manager resource.
 
 ```typespec

@@ -66,16 +66,13 @@ model UserProperties {
   emailAddress: string;
 
   /** The status of the last operation */
+  @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
 /** A User Resource */
 model User is TrackedResource<UserProperties> {
-  /** Address name */
-  @key("userName")
-  @segment("users")
-  @path
-  name: string;
+  ...ResourceNameParameter<User, KeyName = "userName", SegmentName = "users">;
 }
 
 /** The details of a user notification */
@@ -124,6 +121,7 @@ model AddressResourceProperties {
   zip: int32;
 
   /** The status of the last operation */
+  @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 

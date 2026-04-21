@@ -524,7 +524,7 @@ In addition to the resource-specific property bag, a resource may configure on o
 
 Standard configuration for ARM support of both SystemAssigned and UserAssigned Managed Service Identity (MSI)
 
-- If a resource allows both generated (SystemAssigned) and user-assigned (UserAssigned) Managed Identity, use the spread (...) operator to include the standard ManagedServiceIdentity envelope property. This will allow users to manage any ManagedServiceIdentity associated with this resource.
+- If a resource allows both generated (SystemAssigned) and user-assigned (UserAssigned) Managed Identity, use the spread (...) operator to include the `ManagedServiceIdentityProperty` standard envelope property. This will allow users to manage any ManagedServiceIdentity associated with this resource.
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -535,11 +535,11 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
     @path
     name: string;
 
-    ...ManagedServiceIdentity;
+    ...ManagedServiceIdentityProperty;
   }
   ```
 
-- If a resource allows only generated (SystemAssigned) Managed Identity, use the spread operator (...) to include the `ManagedSystemAssignedIdentity` standard envelope property in the resource definition. This will allow users to manage the SystemAssigned identity associated with this resource.
+- If a resource allows only generated (SystemAssigned) Managed Identity, use the spread operator (...) to include the `ManagedSystemAssignedIdentityProperty` standard envelope property in the resource definition. This will allow users to manage the SystemAssigned identity associated with this resource.
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -550,7 +550,7 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
     @path
     name: string;
 
-    ...ManagedSystemAssignedIdentity;
+    ...ManagedSystemAssignedIdentityProperty;
   }
   ```
 
@@ -558,7 +558,7 @@ For more information, see [Managed Service Identity Support](https://eng.ms/docs
 
 ### SKU
 
-Standard support for setting a SKU-based service level for a resource. To enable SKU support, add the `ResourceSku` enevelope property to the resource definition:
+Standard support for setting a SKU-based service level for a resource. To enable SKU support, add the `ResourceSkuProperty` envelope property to the resource definition:
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -569,7 +569,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...ResourceSku;
+  ...ResourceSkuProperty;
 }
 ```
 
@@ -577,7 +577,7 @@ For more information, see [SKU Support](https://eng.ms/docs/products/arm/rpaas/s
 
 ### ETags
 
-Indicator that entity-tag operation concurrency support is enabled for this resource. To enable ETags, add the `EntityTag` envelope property to the resource definition.
+Indicator that entity-tag operation concurrency support is enabled for this resource. To enable ETags, add the `EntityTagProperty` envelope property to the resource definition.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -588,7 +588,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...EntityTag;
+  ...EntityTagProperty;
 }
 ```
 
@@ -596,7 +596,7 @@ For more information, and limitations on RPaaS concurrency support, see [RPaaS E
 
 ### Plan
 
-Support for marketplace billing configuration for the resource. To enable `Plan` support, add the `ResourcePlan` standard envelope property to the resource definition.
+Support for marketplace billing configuration for the resource. To enable `Plan` support, add the `ResourcePlanProperty` standard envelope property to the resource definition.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -607,15 +607,15 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...ResourcePlan;
+  ...ResourcePlanProperty;
 }
 ```
 
-See [MarketPlace Third Party Billing SUpport](https://eng.ms/docs/products/arm/rpaas/custom_billing)
+See [MarketPlace Third Party Billing Support](https://eng.ms/docs/products/arm/rpaas/custom_billing)
 
 ### ResourceKind
 
-Support for certain kinds of portal user experiences based on the kind of resource. To include 'Kind' in the resource defintion, add the `ResourceKind` standard envelope property.
+Support for certain kinds of portal user experiences based on the kind of resource. To include 'Kind' in the resource definition, add the `ResourceKindProperty` standard envelope property.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -626,7 +626,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...ResourceKind;
+  ...ResourceKindProperty;
 }
 ```
 
@@ -634,7 +634,7 @@ For more information on user experiences in the Azure Portal, see [Portal Suppor
 
 ### ManagedBy
 
-Support for management of this resource by other resources. To add 'ManagedBy' support to the resource, add the `ManagedBy` envelope property to the resource definition:
+Support for management of this resource by other resources. To add 'ManagedBy' support to the resource, add the `ManagedByProperty` envelope property to the resource definition:
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -645,11 +645,46 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...ManagedBy;
+  ...ManagedByProperty;
 }
 ```
 
 For more information on supporting 'ManagedBy', see [ManagedBy API Contract](https://eng.ms/docs/products/arm/api_contracts/managedby)
+
+### ExtendedLocation
+
+Support for extended location (Azure Stack HCI / edge). To add extended location to a resource, add the `ExtendedLocationProperty` standard envelope property to the resource definition:
+
+```typespec
+model EmployeeResource is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<EmployeeResource>;
+  ...ExtendedLocationProperty;
+}
+```
+
+### Encryption
+
+Support for customer-managed key encryption. To add encryption configuration to a resource's properties, use the `EncryptionProperty` spread model:
+
+```typespec
+model EmployeeProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
+
+  ...EncryptionProperty;
+}
+```
+
+### AvailabilityZones
+
+Support for availability zones. To add availability zone support to a resource, use the `AvailabilityZonesProperty` standard envelope property:
+
+```typespec
+model EmployeeResource is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<EmployeeResource>;
+  ...AvailabilityZonesProperty;
+}
+```
 
 ## Reference
 
