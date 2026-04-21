@@ -9,6 +9,7 @@ To define an Azure Resource Manager service, the first thing you will need to do
 ```typespec tryit="{"emit": ["@azure-tools/typespec-autorest"]}"
 @armProviderNamespace
 @service(#{ title: "<service name>" })
+@versioned(Versions)
 namespace <mynamespace>;
 ```
 
@@ -17,11 +18,25 @@ For example:
 ```typespec
 @armProviderNamespace
 @service(#{ title: "Contoso User Service" })
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@versioned(Versions)
 namespace Contoso.Users;
 ```
 
-If you need to use a different version of the ARM `common-types` definitions in your emitted Swagger files, change the `@armCommonTypesVersion` decorator to the version that you require.
+## Versioning
+
+ARM services must declare their API versions using a `Versions` enum. Each version member should be decorated with `@armCommonTypesVersion` to specify the version of ARM `common-types` definitions to use in your emitted Swagger files.
+
+```typespec
+/** API versions */
+enum Versions {
+  /** 2021-01-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @previewVersion
+  `2021-01-01-preview`,
+}
+```
+
+If you need to use a different version of the ARM `common-types` definitions, change the `@armCommonTypesVersion` decorator on the version enum member to the version that you require.
 
 ## The `using` keyword
 
@@ -32,6 +47,8 @@ For example, these lines pull in symbols from the `@typespec/rest` and `@azure-t
 ```
 using Http;
 using Rest;
+using Versioning;
+using Azure.Core;
 using Azure.ResourceManager;
 ```
 

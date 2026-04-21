@@ -19,7 +19,16 @@ model NotificationDetails {
 }
 
 @armResourceOperations
-interface Users extends TrackedResourceOperations<User, UserProperties> {
+interface Users {
+  get is ArmResourceRead<User>;
+  create is ArmResourceCreateOrReplaceAsync<User>;
+  update is ArmCustomPatchSync<
+    User,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<User, UserProperties>
+  >;
+  delete is ArmResourceDeleteSync<User>;
+  listByResourceGroup is ArmResourceListByParent<User>;
+  listBySubscription is ArmListBySubscription<User>;
   /** Send a notification to the user */
   @segment("notify")
   NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
@@ -75,7 +84,7 @@ There are a number of model types which specify common parameters which are used
 | ---------------------------- | ------------ | ------------------------------------------------------------------ |
 | `ApiVersionParameter`        | query        | `api-version` parameter                                            |
 | `SubscriptionIdParameter`    | path         | Subscription ID path parameter                                     |
-| `ResourceGroupNameParameter` | path         | Resource Group Name path parameter                                 |
+| `ResourceGroupParameter`     | path         | Resource Group Name path parameter                                 |
 | `CommonResourceParameters`   | path & query | Group of Api version, Subscription ID and Resource group parameter |
 | `ResourceUriParameter`       | path         | Resource uri path parameter                                        |
 | `OperationIdParameter`       | path         | Operation Id path parameter                                        |

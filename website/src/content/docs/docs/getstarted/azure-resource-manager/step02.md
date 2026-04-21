@@ -12,7 +12,7 @@ There are three essential components of a resource defined with TypeSpec:
 - A model type defining the properties of the resource type
 - An interface that defines the operations that can be performed on the resource type, usually a combination of [recommended and required Operations](../../howtos/ARM/resource-operations.md#recommended-and-required-operations) and [resource actions](../../howtos/ARM/resource-operations.md#resource-actions-post)
 
-> Read the [TypeSpec tutorial](https://github.com/Microsoft/typespec/blob/main/docs/tutorial.md) to learn the basics about TypeSpec model types and interfaces.
+> Read the [TypeSpec tutorial](https://typespec.io/docs) to learn the basics about TypeSpec model types and interfaces.
 
 ## 1. **Define a model representing the `properties` of the ARM resource**
 
@@ -26,6 +26,34 @@ model UserProperties {
 
   /** The user's email address */
   emailAddress: string;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+```
+
+You should also define the `ProvisioningState` union, which tracks the lifecycle state of the resource:
+
+```typespec
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  string,
 }
 ```
 

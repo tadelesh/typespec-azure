@@ -28,5 +28,6 @@ These lines import the libraries you will need to build your first service.
 using Http;
 using Rest;
 using Versioning;
+using Azure.Core;
 using Azure.ResourceManager;
 ```

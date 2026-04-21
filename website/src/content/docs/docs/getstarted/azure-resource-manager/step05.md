@@ -32,9 +32,17 @@ using Azure.ResourceManager;
 
 /** Contoso Resource Provider management API */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient", version: "2021-01-01-preview" })
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
+
+/** API versions */
+enum Versions {
+  /** 2021-01-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @previewVersion
+  `2021-01-01-preview`,
+}
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -66,16 +74,13 @@ model UserProperties {
   emailAddress: string;
 
   /** The status of the last operation */
+  @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
 /** A User Resource */
 model User is TrackedResource<UserProperties> {
-  /** Address name */
-  @key("userName")
-  @segment("users")
-  @path
-  name: string;
+  ...ResourceNameParameter<User>;
 }
 
 /** The details of a user notification */
@@ -124,6 +129,7 @@ model AddressResourceProperties {
   zip: int32;
 
   /** The status of the last operation */
+  @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 

@@ -9,7 +9,7 @@ namespace Azure.ResourceManager;
 
 /**
  * A resource list operation, at the subscription scope
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
@@ -31,7 +31,7 @@ op ArmListBySubscription<
 
 /**
  * A resource list operation, at the scope of the resource's parent
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template ParentName Optional. The name of the parent resource
  * @template ParentFriendlyName Optional. The friendly name of the parent resource
@@ -65,7 +65,7 @@ op ArmResourceListByParent<
 
 /**
  * A resource list operation, with scope determined by BaseParameters
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
@@ -883,7 +883,7 @@ op checkLocalNameAvailability<
 >;
 
 /**
- * @dev A provider action performed over a tenant
+ * @dev A synchronous provider action.
  * @template Request The request model for the action
  * @template Response The response type for the action
  * @template Scope The scope of the action (SubscriptionActionScope, TenantActionScope, or ExtensionResourceActionScope)

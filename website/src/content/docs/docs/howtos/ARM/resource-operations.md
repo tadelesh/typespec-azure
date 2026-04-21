@@ -209,13 +209,19 @@ modelled as a _resource action_. Examples of resource actions include:
 Operations that manage credentials are a good example fo this category. TypeSpec defines synchronous
 and asynchronous templates for actions that consume and produce information.
 
-| Operation                    | TypeSpec                                                                       |
-| ---------------------------- | ------------------------------------------------------------------------------ |
-| Synchronous Resource Action  | `updateCredentials is ArmResourceActionSync<ResourceType, Request, Response>`  |
-| Asynchronous Resource Action | `updateCredentials is ArmResourceActionAsync<ResourceType, Request, Response>` |
+| Operation                              | TypeSpec                                                                       |
+| -------------------------------------- | ------------------------------------------------------------------------------ |
+| Synchronous Resource Action            | `updateCredentials is ArmResourceActionSync<ResourceType, Request, Response>`  |
+| Asynchronous Resource Action           | `updateCredentials is ArmResourceActionAsync<ResourceType, Request, Response>` |
+| Asynchronous Resource Action (LRO only) | `updateCredentials is ActionAsync<ResourceType, Request, Response>`            |
 
 Parameters to the template are the ResourceType, the model for the operation Request body, and the
 model for the operation Response body.
+
+> **Note:** `ArmResourceActionAsync` returns both the `Response` body and `ArmAcceptedLroResponse`
+> (202 Accepted), meaning the response type may appear directly or after polling. `ActionAsync` is
+> the standard long-running action pattern that returns **only** `ArmAcceptedLroResponse` — the
+> `Response` is obtained exclusively through polling the long-running operation.
 
 #### Actions that take input but produce no output (state changing actions)
 
@@ -412,6 +418,8 @@ select the desired path:
 | `SubscriptionActionScope`         | `GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}`                 |
 | `TenantLocationActionScope`       | `GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}`                     |
 | `SubscriptionLocationActionScope` | `GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}` |
+| `ExtensionResourceActionScope`    | `GET /{resourceUri}/providers/{ns}/operationStatuses/{operationId}`                       |
+| `ExtensionActionScope`            | `GET /{scope}/providers/{ns}/operationStatuses/{operationId}`                             |
 
 ### Example
 
@@ -435,6 +443,15 @@ interface OperationStatuses {
     ArmOperationStatus,
     SubscriptionLocationActionScope
   >;
+
+  // Extension resource scope
+  getExtensionResourceStatus is GetResourceOperationStatus<
+    ArmOperationStatus,
+    ExtensionResourceActionScope
+  >;
+
+  // Extension action scope
+  getExtensionStatus is GetResourceOperationStatus<ArmOperationStatus, ExtensionActionScope>;
 }
 ```
 
