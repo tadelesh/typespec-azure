@@ -223,10 +223,11 @@ Operations that make state changes will often take some user configuration, and 
 seccess code or an error code depending on success or failure. TypeSpec defines synchronous and
 asynchronous operation templates for state changing actions.
 
-| Operation                     | TypeSpec                                                                              |
-| ----------------------------- | ------------------------------------------------------------------------------------- |
-| Synchronous NoContent Action  | `updateCredentials is ArmResourceActionNoContentSync<ResourceType, Request>`          |
-| Asynchronous NoContent Action | `updateCredentials is ArmResourceActionNoResponseContentAsync<ResourceType, Request>` |
+| Operation                                    | TypeSpec                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Synchronous NoContent Action                 | `updateCredentials is ArmResourceActionNoContentSync<ResourceType, Request>`          |
+| Asynchronous NoContent Action (202 \| 204)   | `updateCredentials is ArmResourceActionNoContentAsync<ResourceType, Request>`         |
+| Asynchronous NoContent Action (202 only)     | `updateCredentials is ArmResourceActionNoResponseContentAsync<ResourceType, Request>` |
 
 Parameters to the template are the ResourceType and the model for the operation Request body.
 
@@ -303,6 +304,11 @@ standard ARM response types to help with reusability and compliance.
 | `ArmNoContentResponse`              | 204  | Base Arm No Content response.                 |
 | `ArmDeletedResponse`                | 200  | Resource deleted response.                    |
 | `ArmDeleteAcceptedResponse`         | 202  | Resource deletion in progress response.       |
+| `ArmDeleteAcceptedLroResponse`      | 202  | Asynchronous delete accepted with LRO headers |
+| `ArmDeletedNoContentResponse`       | 204  | Resource does not exist (delete operations)   |
+| `ArmAcceptedLroResponse`            | 202  | Asynchronous operation accepted (LRO headers) |
+| `ArmResourceExistsResponse`         | 204  | Resource exists (HEAD response)               |
+| `ArmResourceNotFoundResponse`       | 404  | Resource not found (HEAD response)            |
 | `ResourceListResult<T>`             | 200  | Return a list of resource with ARM pagination |
 | `ErrorResponse`                     | x    | Error response                                |
 
