@@ -26,10 +26,8 @@ export type ArmResourceCollectionActionDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * `@armResourceType` sets the value fo the decorated string
+ * `@armProviderNameValue` sets the value of the decorated string
  * property to the type of the Azure Resource Manager resource.
- *
- * @param resource The resource to get the type of
  */
 export type ArmProviderNameValueDecorator = (
   context: DecoratorContext,
@@ -70,7 +68,6 @@ export type IdentifiersDecorator = (
  *  namespace Microsoft.ContosoService;
  * ```
  * @param providerNamespace Provider namespace
- * @param libraryNamespaces a library namespace containing types for this namespace
  */
 export type ArmProviderNamespaceDecorator = (
   context: DecoratorContext,
@@ -91,7 +88,7 @@ export type UseLibraryNamespaceDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * `@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+ * `@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
  *
  * @example
  * ```typespec
@@ -124,7 +121,7 @@ export type SingletonDecorator = (
  * `@tenantResource` marks an Azure Resource Manager resource model as a Tenant resource/Root resource/Top-Level resource.
  *
  * Tenant resources have REST API paths like:
- * `/provider/Microsoft.Contoso/FooResources`
+ * `/providers/Microsoft.Contoso/FooResources`
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */
@@ -137,7 +134,7 @@ export type TenantResourceDecorator = (
  * `@subscriptionResource` marks an Azure Resource Manager resource model as a subscription resource.
  *
  * Subscription resources have REST API paths like:
- * `/subscription/{id}/providers/Microsoft.Contoso/employees`
+ * `/subscriptions/{id}/providers/Microsoft.Contoso/employees`
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */
@@ -165,7 +162,7 @@ export type LocationResourceDecorator = (
  * This is the default option for Azure Resource Manager resources. It is provided for symmetry and clarity, and
  * you typically do not need to specify it.
  *
- * `/subscription/{id}/resourcegroups/{rg}/providers/Microsoft.Contoso/employees`
+ * `/subscriptions/{id}/resourcegroups/{rg}/providers/Microsoft.Contoso/employees`
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */
@@ -296,7 +293,7 @@ export type ArmResourceCheckExistenceDecorator = (
  * clients.
  *
  * The optional `resourceOperationOptions` parameter provides additional options.
- * `allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+ * `allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
  * choose static (`@route`) or automatic (`@autoRoute`) routing.
  *
  * `resourceType: Model` specifies the resource type for the operations in the interface
@@ -328,7 +325,6 @@ export type ArmCommonTypesVersionDecorator = (
  * This decorator is used on Azure Resource Manager resources that are not based on
  * Azure.ResourceManager common types.
  *
- * @param propertiesType : The type of the resource properties.
  * @param provider Optional. The resource provider namespace for the virtual resource.
  */
 export type ArmVirtualResourceDecorator = (

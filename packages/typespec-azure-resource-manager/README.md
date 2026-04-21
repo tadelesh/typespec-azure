@@ -112,7 +112,7 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 #### `@armLibraryNamespace`
 
-`@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+`@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
 
 ```typespec
 @Azure.ResourceManager.armLibraryNamespace
@@ -166,7 +166,7 @@ namespace Microsoft.ContosoService;
 
 #### `@armProviderNameValue`
 
-`@armResourceType` sets the value fo the decorated string
+`@armProviderNameValue` sets the value of the decorated string
 property to the type of the Azure Resource Manager resource.
 
 ```typespec
@@ -296,7 +296,7 @@ of the operations will be grouped based on the interface name in generated
 clients.
 
 The optional `resourceOperationOptions` parameter provides additional options.
-`allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+`allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
 choose static (`@route`) or automatic (`@autoRoute`) routing.
 
 `resourceType: Model` specifies the resource type for the operations in the interface
@@ -467,7 +467,7 @@ This decorator sets the base type of the given resource.
 This is the default option for Azure Resource Manager resources. It is provided for symmetry and clarity, and
 you typically do not need to specify it.
 
-`/subscription/{id}/resourcegroups/{rg}/providers/Microsoft.Contoso/employees`
+`/subscriptions/{id}/resourcegroups/{rg}/providers/Microsoft.Contoso/employees`
 
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
@@ -511,7 +511,7 @@ See more details on [different Azure Resource Manager resource type here.](https
 `@subscriptionResource` marks an Azure Resource Manager resource model as a subscription resource.
 
 Subscription resources have REST API paths like:
-`/subscription/{id}/providers/Microsoft.Contoso/employees`
+`/subscriptions/{id}/providers/Microsoft.Contoso/employees`
 
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
@@ -532,7 +532,7 @@ None
 `@tenantResource` marks an Azure Resource Manager resource model as a Tenant resource/Root resource/Top-Level resource.
 
 Tenant resources have REST API paths like:
-`/provider/Microsoft.Contoso/FooResources`
+`/providers/Microsoft.Contoso/FooResources`
 
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 

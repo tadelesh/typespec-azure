@@ -112,7 +112,7 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 | StatusMonitor   | The type of the polling StatusMonitor when following the Azure-AsyncOperation url |
 | FinalResult     | The type of the logical result when following the location header                 |
 | PollingUrlValue | The value type of the link to the status monitor                                  |
-| FinalUrlValue   | The value type fo the link to the final result                                    |
+| FinalUrlValue   | The value type of the link to the final result                                    |
 
 #### Examples
 
@@ -395,7 +395,7 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 
 | Name       | Description                                                |
 | ---------- | ---------------------------------------------------------- |
-| Resource   | The resource being updated                                 |
+| Resource   | The resource being created                                 |
 | LroHeaders | Optional. The lro headers returned with a Created response |
 
 #### Examples
@@ -428,7 +428,7 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 | Name     | Description                |
 | -------- | -------------------------- |
-| Resource | The resource being updated |
+| Resource | The resource being created |
 
 #### Examples
 
@@ -469,6 +469,15 @@ op head(...ResourceInstanceParameters<Employee>): ArmResourceExistsResponse;
 
 ```typespec
 model Azure.ResourceManager.ArmResourceNotFoundResponse
+```
+
+#### Examples
+
+```typespec
+@head
+op head(
+  ...ResourceInstanceParameters<Employee>,
+): ArmResponse<Employee> | ArmResourceNotFoundResponse;
 ```
 
 #### Properties
@@ -1158,13 +1167,13 @@ model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName
 
 #### Template Parameters
 
-| Name        | Description                                                                                              |
-| ----------- | -------------------------------------------------------------------------------------------------------- |
-| Resource    | The ARM resource this name parameter is applying to.                                                     |
-| KeyName     | Override default key name of the resource.                                                               |
-| SegmentName | Override default segment name of the resource.                                                           |
-| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.                                        |
-| Type        | The type of the name property. Default type is string. However you can pass an union with string values. |
+| Name        | Description                                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------------------- |
+| Resource    | The ARM resource this name parameter is applying to.                                                    |
+| KeyName     | Override default key name of the resource.                                                              |
+| SegmentName | Override default segment name of the resource.                                                          |
+| NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.                                       |
+| Type        | The type of the name property. Default type is string. However you can pass a union with string values. |
 
 #### Examples
 

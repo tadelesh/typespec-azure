@@ -242,7 +242,7 @@ model ArmLroLocationHeader<
  * @template StatusMonitor The type of the polling StatusMonitor when following the Azure-AsyncOperation url
  * @template FinalResult The type of the logical result when following the location header
  * @template PollingUrlValue The value type of the link to the status monitor
- * @template FinalUrlValue The value type fo the link to the final result
+ * @template FinalUrlValue The value type of the link to the final result
  *
  * @example
  * ```typespec
@@ -315,7 +315,7 @@ model ArmResourceUpdatedResponse<Resource extends Azure.ResourceManager.Foundati
 
 /**
  * @dev Resource create operation succeeded
- * @template Resource The resource being updated
+ * @template Resource The resource being created
  * @template LroHeaders Optional. The lro headers returned with a Created response
  *
  * @example
@@ -345,7 +345,7 @@ model ArmResourceCreatedResponse<
 
 /**
  * @dev Resource synchronous create operation succeeded
- * @template Resource The resource being updated
+ * @template Resource The resource being created
  *
  * @example
  * ```typespec
@@ -380,6 +380,8 @@ model ArmResourceExistsResponse {
 
 /**
  * @dev Resource is not found response
+ *
+ * @example
  * ```typespec
  * @head
  * op head(...ResourceInstanceParameters<Employee>): ArmResponse<Employee>  | ArmResourceNotFoundResponse;

@@ -429,8 +429,8 @@ interface Employees {
 
 ### `ProxyResourceOperations` {#Azure.ResourceManager.ProxyResourceOperations}
 
-A composite interface for Proxy resources that include `ResourceInstanceOperations<Resource, Properties>`
-and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
+A composite interface for Proxy resources that include `ResourceRead`, `ResourceCreate`,
+`ResourceDelete`, and `ResourceListByParent`. It includes: `GET`, `PUT`, `DELETE`, ListByParent operations.
 
 The actual route depends on the resource model but would have started with
 `/subscriptions/{id}/resourcegroups/{rg}/providers/Microsoft.XXX/...`
@@ -670,7 +670,7 @@ op Azure.ResourceManager.ResourceListByParent<Resource, BaseParameters, ParentNa
 
 ### `ResourceListBySubscription` {#Azure.ResourceManager.ResourceListBySubscription}
 
-An interface for resources with can be listed by subscription.
+An interface for resources which can be listed by subscription.
 
 ```typespec
 interface Azure.ResourceManager.ResourceListBySubscription<Resource>
@@ -810,7 +810,7 @@ op Azure.ResourceManager.ResourceUpdateSync<Resource, Properties, BaseParameters
 A composite interface for Tenant resources that include `ResourceInstanceOperations<Resource, Properties>`
 and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
 
-The routes are always start at root level:
+The routes always start at root level:
 `/providers/Microsoft.XXX/...`
 
 This is the most common API pattern for Tenant Resources to use.
@@ -984,7 +984,7 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 
 | Name       | Description                                               |
 | ---------- | --------------------------------------------------------- |
-| Resource   | the resource being patched                                |
+| Resource   | the resource being listed                                 |
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |
@@ -1331,7 +1331,7 @@ op Azure.ResourceManager.ArmResourceListAtScope(): Response | Error
 
 | Name           | Description                                               |
 | -------------- | --------------------------------------------------------- |
-| Resource       | the resource being patched                                |
+| Resource       | the resource being listed                                 |
 | BaseParameters | Optional. Allows overriding the operation parameters      |
 | Parameters     | Optional. Additional parameters after the path parameters |
 | Response       | Optional. The success response for the list operation     |
@@ -1350,7 +1350,7 @@ op Azure.ResourceManager.ArmResourceListByParent(): Response | Error
 
 | Name               | Description                                               |
 | ------------------ | --------------------------------------------------------- |
-| Resource           | the resource being patched                                |
+| Resource           | the resource being listed                                 |
 | BaseParameters     | Optional. Allows overriding the operation parameters      |
 | ParentName         | Optional. The name of the parent resource                 |
 | ParentFriendlyName | Optional. The friendly name of the parent resource        |
