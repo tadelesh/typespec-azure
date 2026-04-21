@@ -38,14 +38,15 @@ When a doc comment is wrong, fix the `.tsp` file and regenerate.
 
 1. **Fix wrong doc comments in `.tsp` files.** If a doc comment has typos, references a wrong decorator/parameter name, describes behavior that doesn't match the implementation, or has ghost `@param` tags for parameters that don't exist — fix it. This includes comments in `decorators.tsp`, `interfaces.tsp`, `operations.tsp`, `models.tsp`, and `responses.tsp`.
 2. **Add missing documentation.** If a resource type, operation template, decorator, response type, or linting rule exists in the source but is not documented, add documentation for it. Gaps are bugs.
-3. **Use spread patterns from samples, not manual alternatives.** When writing code examples for resource definitions, always use the idiomatic spread patterns shown in `packages/samples/specs/resource-manager/` (e.g., `...ResourceNameParameter<Resource, "widgetName">` for name parameters). Do NOT use manual `@key`/`@segment`/`@path` patterns when a spread pattern exists.
-4. **Verify every change against source before committing it.** Read the actual `.tsp` declaration or `.ts` implementation to confirm a fix is correct. Do not infer behavior from doc text alone.
+3. **Use spread patterns from samples, not manual alternatives.** When writing code examples for resource definitions, always use the idiomatic spread patterns shown in `packages/samples/specs/resource-manager/` (e.g., `...ResourceNameParameter<Resource, KeyName = "widgetName", SegmentName = "widgets">` for name parameters). Do NOT use manual `@key`/`@segment`/`@path` patterns when a spread pattern exists.
+4. **Preserve semantics in every replacement.** When updating a code example or doc text, the replacement must express the same meaning as the original. Do not drop parameters, arguments, or constraints. If the original code passed specific values (key names, segment names, types, etc.), the replacement must include them. Simplifying syntax is fine; changing behavior is not.
+5. **Verify every change against source before committing it.** Read the actual `.tsp` declaration or `.ts` implementation to confirm a fix is correct. Do not infer behavior from doc text alone.
 
 ### What you must NOT do
 
-5. **Never remove or convert `@dev` comments.** The `@dev` tag in `.tsp` doc comments is intentional — it prevents the description from becoming the default description of template instantiations. You may fix typos or wrong descriptions _within_ a `@dev` comment, but never change it to a regular `/** ... */` doc comment and never remove it.
-6. **Never fabricate features.** Only document what currently exists in `lib/` and `src/`. If a template does not return a certain type, do not claim it does. If a feature is not implemented, do not document it.
-7. **Never restructure correct content.** Do not reorder, remove rows from, or rewrite tables and sections that are already accurate. You may _add_ missing rows or sections, but do not change the structure of content that is correct.
+6. **Never remove or convert `@dev` comments.** The `@dev` tag in `.tsp` doc comments is intentional — it prevents the description from becoming the default description of template instantiations. You may fix typos or wrong descriptions _within_ a `@dev` comment, but never change it to a regular `/** ... */` doc comment and never remove it.
+7. **Never fabricate features.** Only document what currently exists in `lib/` and `src/`. If a template does not return a certain type, do not claim it does. If a feature is not implemented, do not document it.
+8. **Never restructure correct content.** Do not reorder, remove rows from, or rewrite tables and sections that are already accurate. You may _add_ missing rows or sections, but do not change the structure of content that is correct.
 
 ## Instructions
 
