@@ -4,7 +4,7 @@ description: Choosing and modeling ARM resources
 llmstxt: true
 ---
 
-## Introductions
+## Introduction
 
 Introduction
 Resources are the basic building blocks of Azure. When a customer interacts with Azure through the Control Plane (ARM), they generally will be reading (GET), writing (PUT/PATCH), deleting (DELETE) or performing actions upon (POST) one or more resources. Each resource is managed by a particular Resource Provider, so we uniquely identify a resource by its 'fully-qualified type'. Some well-known examples of types are Microsoft.Compute/virtualMachines, or Microsoft.Network/networkSecurityGroups/securityRules. See Resource Ids for a more in-depth breakdown of the id and associated fields.
@@ -235,7 +235,7 @@ You can find samples of Child Resources [in the DynaTrace sample](https://github
 
 ### Subscription-based Resource
 
-Tenant resources use the `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
+Subscription-based resources use the `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
 
 ```typespec
 @subscriptionResource
@@ -435,7 +435,7 @@ Also note that optional properties may specify defaults, as with `biography?: st
 
 In the sample, new constrained scalar types and new complex model types are defined and used inside the _rp-specific property bag_. TypeSpec allows you to define custom types for use in your specification.
 
-You will often want to define scalar types or properties that have constraints. For example, numeric values may be constrained to have a certain minimum or maximum, strign values may be constrained to follow a particular regex pattern, and so on. Whenever these constrained types are used in your spec, the constraints will be transmitted to the usage.
+You will often want to define scalar types or properties that have constraints. For example, numeric values may be constrained to have a certain minimum or maximum, string values may be constrained to follow a particular regex pattern, and so on. Whenever these constrained types are used in your spec, the constraints will be transmitted to the usage.
 
 The example creates a numeric type with minimum and maximum constraints:
 
@@ -558,7 +558,7 @@ For more information, see [Managed Service Identity Support](https://eng.ms/docs
 
 ### SKU
 
-Standard support for setting a SKU-based service level for a resource. To enable SKU support, add the `ResourceSku` enevelope property to the resource definition:
+Standard support for setting a SKU-based service level for a resource. To enable SKU support, add the `ResourceSku` envelope property to the resource definition:
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -611,11 +611,11 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
 }
 ```
 
-See [MarketPlace Third Party Billing SUpport](https://eng.ms/docs/products/arm/rpaas/custom_billing)
+See [MarketPlace Third Party Billing Support](https://eng.ms/docs/products/arm/rpaas/custom_billing)
 
 ### ResourceKind
 
-Support for certain kinds of portal user experiences based on the kind of resource. To include 'Kind' in the resource defintion, add the `ResourceKind` standard envelope property.
+Support for certain kinds of portal user experiences based on the kind of resource. To include 'Kind' in the resource definition, add the `ResourceKind` standard envelope property.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {

@@ -25,7 +25,7 @@ If you need to use a different version of the ARM `common-types` definitions in 
 
 ## The `using` keyword
 
-Just after the `namespace` declaration, you will also need to include a few `using` statements to pull in symbols from the namespaces of libraries you will for your specification.
+Just after the `namespace` declaration, you will also need to include a few `using` statements to pull in symbols from the namespaces of libraries you will use for your specification.
 
 For example, these lines pull in symbols from the `@typespec/rest` and `@azure-tools/typespec-azure-resource-manager`:
 

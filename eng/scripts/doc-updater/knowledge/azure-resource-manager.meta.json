@@ -1,0 +1,9 @@
+{
+  "lastCommit": "7bf8cebf6a58579be13faa77bb2cab8d774d6b72",
+  "lastUpdated": "2026-04-21T06:06:03.946Z",
+  "analyzedPaths": [
+    "packages/typespec-azure-resource-manager/src",
+    "packages/typespec-azure-resource-manager/lib",
+    "packages/samples/specs/resource-manager/"
+  ]
+}

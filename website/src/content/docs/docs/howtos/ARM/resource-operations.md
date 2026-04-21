@@ -206,7 +206,7 @@ modelled as a _resource action_. Examples of resource actions include:
 
 #### Actions that take input and output
 
-Operations that manage credentials are a good example fo this category. TypeSpec defines synchronous
+Operations that manage credentials are a good example of this category. TypeSpec defines synchronous
 and asynchronous templates for actions that consume and produce information.
 
 | Operation                    | TypeSpec                                                                       |
@@ -220,7 +220,7 @@ model for the operation Response body.
 #### Actions that take input but produce no output (state changing actions)
 
 Operations that make state changes will often take some user configuration, and will return a
-seccess code or an error code depending on success or failure. TypeSpec defines synchronous and
+success code or an error code depending on success or failure. TypeSpec defines synchronous and
 asynchronous operation templates for state changing actions.
 
 | Operation                     | TypeSpec                                                                              |
