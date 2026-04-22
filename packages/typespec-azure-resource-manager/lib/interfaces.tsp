@@ -93,7 +93,7 @@ interface ProxyResourceOperations<
  * A composite interface for Tenant resources that include `ResourceInstanceOperations<Resource, Properties>`
  * and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
  *
- * The routes are always start at root level:
+ * The routes always start at root level:
  *   `/providers/Microsoft.XXX/...`
  *
  * This is the most common API pattern for Tenant Resources to use.

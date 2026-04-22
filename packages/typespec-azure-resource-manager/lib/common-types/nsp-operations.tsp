@@ -127,7 +127,7 @@ interface NspConfigurationOperations<
   >;
 
   /**
-   * @dev List the network security parameter configuration for a resource without pagination - this should only be used for legacy operations
+   * @dev List the network security perimeter configuration for a resource without pagination - this should only be used for legacy operations
    * @template ParentResource the parent resource of the NspConfiguration
    * @template Resource Optional. The NspConfiguration resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -196,7 +196,7 @@ interface NspConfigurationOperations<
   >;
 
   /**
-   * @dev GET a network security perimeter configuration for a particular resource
+   * @dev Perform an action on a network security perimeter configuration for a particular resource
    * @template ParentResource the parent resource of the NspConfiguration
    * @template Request The request body type
    * @template Response The success response for the read operation
@@ -238,11 +238,11 @@ interface NspConfigurationOperations<
   ): Response | Error;
 
   /**
-   * @dev GET a network security perimeter configuration for a particular resource
+   * @dev Perform a long-running action on a network security perimeter configuration for a particular resource
    * @template ParentResource the parent resource of the NspConfiguration
    * @template Request The request body type
-   * @template Response The success response for the read operation
-   * @template Resource the NspConfiguration resource being read
+   * @template Response The success response for the action operation
+   * @template Resource the NspConfiguration resource being acted upon
    * @template BaseParameters Optional. Allows overriding the operation parameters
    * @template KeyName Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`
    * @template Parameters Optional. Additional parameters after the path parameters
