@@ -810,7 +810,7 @@ op Azure.ResourceManager.ResourceUpdateSync<Resource, Properties, BaseParameters
 A composite interface for Tenant resources that include `ResourceInstanceOperations<Resource, Properties>`
 and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
 
-The routes are always start at root level:
+The routes always start at root level:
 `/providers/Microsoft.XXX/...`
 
 This is the most common API pattern for Tenant Resources to use.
@@ -984,7 +984,7 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 
 | Name       | Description                                               |
 | ---------- | --------------------------------------------------------- |
-| Resource   | the resource being patched                                |
+| Resource   | the resource being listed                                 |
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |
@@ -1331,7 +1331,7 @@ op Azure.ResourceManager.ArmResourceListAtScope(): Response | Error
 
 | Name           | Description                                               |
 | -------------- | --------------------------------------------------------- |
-| Resource       | the resource being patched                                |
+| Resource       | the resource being listed                                 |
 | BaseParameters | Optional. Allows overriding the operation parameters      |
 | Parameters     | Optional. Additional parameters after the path parameters |
 | Response       | Optional. The success response for the list operation     |
@@ -1350,7 +1350,7 @@ op Azure.ResourceManager.ArmResourceListByParent(): Response | Error
 
 | Name               | Description                                               |
 | ------------------ | --------------------------------------------------------- |
-| Resource           | the resource being patched                                |
+| Resource           | the resource being listed                                 |
 | BaseParameters     | Optional. Allows overriding the operation parameters      |
 | ParentName         | Optional. The name of the parent resource                 |
 | ParentFriendlyName | Optional. The friendly name of the parent resource        |
@@ -1601,8 +1601,8 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | ParentResource       | the parent resource of the NspConfiguration                                                                              |
 | Request              | The request body type                                                                                                    |
-| Response             | The success response for the read operation                                                                              |
-| Resource             | the NspConfiguration resource being read                                                                                 |
+| Response             | The success response for the action operation                                                                            |
+| Resource             | the NspConfiguration resource being acted upon                                                                           |
 | BaseParameters       | Optional. Allows overriding the operation parameters                                                                     |
 | KeyName              | Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName` |
 | Parameters           | Optional. Additional parameters after the path parameters                                                                |
@@ -1932,7 +1932,7 @@ op Azure.ResourceManager.Extension.ListByTarget(apiVersion: string, subscription
 
 | Name                 | Description                                                                                                |
 | -------------------- | ---------------------------------------------------------------------------------------------------------- |
-| TargetResource       | The target to list at, e.g. Extension.Subscription or Extension>ManagementGroup or Extension.ResourceGroup |
+| TargetResource       | The target to list at, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
 | ExtensionResource    | the resource being listed                                                                                  |
 | Parameters           | Optional. Additional parameters after the path parameters                                                  |
 | Response             | Optional. The success response for the list operation                                                      |
@@ -1952,7 +1952,7 @@ op Azure.ResourceManager.Extension.Read(apiVersion: string, subscriptionId: Azur
 | Name                 | Description                                                                                              |
 | -------------------- | -------------------------------------------------------------------------------------------------------- |
 | TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource    | the resource being rea                                                                                   |
+| ExtensionResource    | the resource being read                                                                                  |
 | Parameters           | Optional. Additional parameters after the path parameters                                                |
 | Response             | Optional. The success response for the read operation                                                    |
 | Error                | Optional. The error response, if non-standard.                                                           |
