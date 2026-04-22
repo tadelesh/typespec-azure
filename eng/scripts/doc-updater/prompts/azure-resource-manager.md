@@ -36,10 +36,10 @@ When a doc comment is wrong, fix the `.tsp` file and regenerate.
 
 ### What you MUST do
 
-1. **Fix wrong doc comments in `.tsp` files.** If a doc comment has typos, references a wrong decorator/parameter name, describes behavior that doesn't match the implementation, or has ghost `@param` tags for parameters that don't exist — fix it. This includes comments in `decorators.tsp`, `interfaces.tsp`, `operations.tsp`, `models.tsp`, and `responses.tsp`.
+1. **Fix wrong doc comments in `.tsp` files.** If a doc comment has typos, references a wrong decorator/parameter name, describes behavior that doesn't match the implementation, or has ghost `@param` tags for parameters that don't exist — fix it. Check all `.tsp` files under `lib/`, including subdirectories (`common-types/`, `foundations/`, `legacy-types/`, `extension/`).
 2. **Add missing documentation.** If a resource type, operation template, decorator, response type, or linting rule exists in the source but is not documented, add documentation for it. Gaps are bugs.
 3. **Use spread patterns from samples, not manual alternatives.** When writing code examples for resource definitions, always use the idiomatic spread patterns shown in `packages/samples/specs/resource-manager/` (e.g., `...ResourceNameParameter<Resource, KeyName = "widgetName", SegmentName = "widgets">` for name parameters).
-4. **Preserve semantics in every replacement.** When replacing code with a template or spread pattern, carry over all values from the original — key names, segment names, type arguments, constraints. Look up the template's parameter names in the source and pass the correct values. Simplifying syntax is fine; losing information is not.
+4. **Preserve semantics in every replacement.** When replacing code with a template or spread pattern, carry over all values from the original. Do not rely on auto-derivation — always pass explicit template parameter values that match the original code. For example, if the original has `@key("employeeName")` and `@segment("employees")`, the replacement must be `...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`, not `...ResourceNameParameter<EmployeeResource>`. Simplifying syntax is fine; losing information is not.
 5. **Verify every change against source before committing it.** Read the actual `.tsp` declaration or `.ts` implementation to confirm a fix is correct. Do not infer behavior from doc text alone.
 
 ### What you must NOT do
@@ -81,7 +81,7 @@ Specifically check:
 - All code examples are valid TypeSpec that match actual library signatures and sample patterns
 - Getting-started steps accurately reflect current library API
 - `arm-rules.md` lists all current linting rules with correct names and descriptions
-- Doc comments in `.tsp` files: fix typos, wrong parameter names, ghost `@param` tags, inaccurate descriptions, wrong grammar. Check `decorators.tsp`, `interfaces.tsp`, `operations.tsp`, `models.tsp`, and `responses.tsp`.
+- Doc comments in all `.tsp` files under `lib/`: fix typos, wrong parameter names, ghost `@param` tags, inaccurate descriptions, wrong grammar. Include subdirectories (`common-types/`, `foundations/`, `legacy-types/`, `extension/`).
 - Rule reference files under `libraries/azure-resource-manager/rules/`: verify each file's title and namespace match the actual rule name and package
 - How-to guides document all response types, LRO header models, and scope types that exist in the source
 - Envelope property sections in `resource-type.md` cover all properties available in the library
