@@ -118,6 +118,11 @@ completes).
 | Synchronous PUT  | `createOrUpdate is ArmResourceCreateOrReplaceSync<ResourceType>`  |
 | Asynchronous PUT | `createOrUpdate is ArmResourceCreateOrReplaceAsync<ResourceType>` |
 
+`ArmResourceCreateOrUpdateAsync` is also available and is functionally equivalent to
+`ArmResourceCreateOrReplaceAsync` (which delegates to it).
+
+> **Deprecated:** `ArmResourceCreateOrUpdateSync` is deprecated. Use `ArmResourceCreateOrReplaceSync` instead.
+
 In the TypeSpec in the table `createOrUpdate` is the name of the operation, which will be passed on
 to clients, and `ResourceType` is the type of the resource being created (or updated)
 
@@ -168,6 +173,8 @@ asynchronous.
 | Synchronous Delete  | `delete is ArmResourceDeleteSync<ResourceType>`           |
 | Asynchronous Delete | `delete is ArmResourceDeleteWithoutOkAsync<ResourceType>` |
 
+> **Deprecated:** `ArmResourceDeleteAsync` is deprecated. Use `ArmResourceDeleteWithoutOkAsync` instead.
+
 In the TypeSpec in the table `delete` is the name of the operation, which will be passed on to
 clients, and `ResourceType` is the type of the resource being deleted.
 
@@ -209,10 +216,14 @@ modelled as a _resource action_. Examples of resource actions include:
 Operations that manage credentials are a good example fo this category. TypeSpec defines synchronous
 and asynchronous templates for actions that consume and produce information.
 
-| Operation                    | TypeSpec                                                                       |
-| ---------------------------- | ------------------------------------------------------------------------------ |
-| Synchronous Resource Action  | `updateCredentials is ArmResourceActionSync<ResourceType, Request, Response>`  |
-| Asynchronous Resource Action | `updateCredentials is ArmResourceActionAsync<ResourceType, Request, Response>` |
+| Operation                          | TypeSpec                                                                       |
+| ---------------------------------- | ------------------------------------------------------------------------------ |
+| Synchronous Resource Action        | `updateCredentials is ArmResourceActionSync<ResourceType, Request, Response>`  |
+| Asynchronous Resource Action       | `updateCredentials is ArmResourceActionAsync<ResourceType, Request, Response>` |
+| Asynchronous Action (202 only) | `startMigration is ActionAsync<ResourceType, Request, Response>`               |
+
+`ArmResourceActionAsync` returns the `Response` type and a `202 Accepted` response. `ActionAsync`
+returns only the `202 Accepted` response (the final result is obtained by polling the LRO).
 
 Parameters to the template are the ResourceType, the model for the operation Request body, and the
 model for the operation Response body.
@@ -227,6 +238,8 @@ asynchronous operation templates for state changing actions.
 | ----------------------------- | ------------------------------------------------------------------------------------- |
 | Synchronous NoContent Action  | `updateCredentials is ArmResourceActionNoContentSync<ResourceType, Request>`          |
 | Asynchronous NoContent Action | `updateCredentials is ArmResourceActionNoResponseContentAsync<ResourceType, Request>` |
+
+> **Deprecated:** `ArmResourceActionNoContentAsync` is deprecated. Use `ArmResourceActionNoResponseContentAsync` instead.
 
 Parameters to the template are the ResourceType and the model for the operation Request body.
 
@@ -293,33 +306,55 @@ The building blocks are described in the sections below:
 Custom operations in ARM still need to respect the correct response schema. This library provides
 standard ARM response types to help with reusability and compliance.
 
-| Model                               | Code | Description                                   |
-| ----------------------------------- | ---- | --------------------------------------------- |
-| `ArmResponse<T>`                    | 200  | Base Arm 200 response.                        |
-| `ArmResourceUpdatedResponse<T>`     | 200  | Resource updated (PUT) response.              |
-| `ArmResourceCreatedResponse<T>`     | 201  | Resource created response for an lro.         |
-| `ArmResourceCreatedSyncResponse<T>` | 201  | Resource created synchronously.               |
-| `ArmAcceptedResponse`               | 202  | Base Arm Accepted response.                   |
-| `ArmNoContentResponse`              | 204  | Base Arm No Content response.                 |
-| `ArmDeletedResponse`                | 200  | Resource deleted response.                    |
-| `ArmDeleteAcceptedResponse`         | 202  | Resource deletion in progress response.       |
-| `ResourceListResult<T>`             | 200  | Return a list of resource with ARM pagination |
-| `ErrorResponse`                     | x    | Error response                                |
+| Model                               | Code | Description                                          |
+| ----------------------------------- | ---- | ---------------------------------------------------- |
+| `ArmResponse<T>`                    | 200  | Base Arm 200 response.                               |
+| `ArmResourceUpdatedResponse<T>`     | 200  | Resource updated (PUT) response.                     |
+| `ArmCreatedResponse<T>`             | 201  | General 201 Created response with extra headers.     |
+| `ArmResourceCreatedResponse<T>`     | 201  | Resource created response for an lro.                |
+| `ArmResourceCreatedSyncResponse<T>` | 201  | Resource created synchronously.                      |
+| `ArmAcceptedResponse`               | 202  | Base Arm Accepted response.                          |
+| `ArmAcceptedLroResponse`            | 202  | Accepted response with LRO headers.                  |
+| `ArmDeleteAcceptedLroResponse`      | 202  | Delete accepted response with LRO headers.           |
+| `ArmDeleteAcceptedResponse`         | 202  | Resource deletion in progress response.              |
+| `ArmDeletedResponse`                | 200  | Resource deleted response.                           |
+| `ArmNoContentResponse`              | 204  | Base Arm No Content response.                        |
+| `ArmDeletedNoContentResponse`       | 204  | Resource does not exist (after delete).              |
+| `ArmResourceExistsResponse`         | 204  | Resource exists (HEAD response).                     |
+| `ArmResourceNotFoundResponse`       | 404  | Resource not found (HEAD response).                  |
+| `ResourceListResult<T>`             | 200  | Return a list of resource with ARM pagination.       |
+| `ErrorResponse`                     | x    | Error response.                                      |
+
+For LRO header models (`ArmAsyncOperationHeader`, `ArmLroLocationHeader`, `ArmCombinedLroHeaders`)
+and `ArmOperationStatus`, see [Customizing Long-Running Operations](./long-running-operations.md)
+and [Operation Status Endpoints](#operation-status-endpoints).
 
 ### Common Operation Parameters
 
 There are a number of model types which specify common parameters which are used in resource type
 operations:
 
-| Model                           | In           | Description                                                 |
-| ------------------------------- | ------------ | ----------------------------------------------------------- |
-| `ApiVersionParameter`           | query        | api-version parameter                                       |
-| `SubscriptionIdParameter`       | path         | Subscription ID path parameter                              |
-| `ResourceGroupNameParameter`    | path         | Resource Group Name path parameter                          |
-| `ResourceInstanceParameters<T>` | path & query | Identity parameters for a resource, with api-version        |
-| `ResourceParentParameters<T>`   | path & query | Identity Parameters for listing by parent, with api-version |
-| `ResourceUriParameter`          | path         | Resource uri path parameter for Extension resources         |
-| `OperationIdParameter`          | path         | Operation Id path parameter                                 |
+| Model                                    | In           | Description                                                  |
+| ---------------------------------------- | ------------ | ------------------------------------------------------------ |
+| `ApiVersionParameter`                    | query        | api-version parameter                                        |
+| `SubscriptionIdParameter`                | path         | Subscription ID path parameter                               |
+| `ResourceGroupNameParameter`             | path         | Resource Group Name path parameter                           |
+| `LocationResourceParameter`              | path         | Location name path parameter                                 |
+| `ResourceInstanceParameters<T>`          | path & query | Identity parameters for a resource, with api-version         |
+| `ResourceParentParameters<T>`            | path & query | Identity parameters for listing by parent, with api-version  |
+| `ExtensionResourceInstanceParameters<T>` | path & query | Identity parameters for an extension resource                |
+| `TenantInstanceParameters<T>`            | path & query | Identity parameters for a tenant resource                    |
+| `ResourceUriParameter`                   | path         | Resource uri path parameter for Extension resources          |
+| `OperationIdParameter`                   | path         | Operation Id path parameter                                  |
+| `SubscriptionActionScope`                | path         | Scope for subscription-level provider actions                |
+| `TenantActionScope`                      | path         | Scope for tenant-level provider actions                      |
+| `TenantLocationActionScope`              | path         | Scope for tenant + location operation statuses               |
+| `SubscriptionLocationActionScope`        | path         | Scope for subscription + location operation statuses         |
+| `ExtensionResourceActionScope`           | path         | Scope for extension resource provider actions                |
+| `ArmTopParameter`                        | query        | `$top` parameter for limiting list results                   |
+| `ArmFilterParameter`                     | query        | `$filter` OData parameter for list filtering                 |
+| `ArmSkipParameter`                       | query        | `$skip` parameter for list pagination offset                 |
+| `SkipTokenParameter`                     | query        | `$skiptoken` parameter for opaque pagination tokens          |
 
 ### Synchronous List Action
 

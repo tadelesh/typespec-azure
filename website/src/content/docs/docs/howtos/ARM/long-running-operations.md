@@ -68,7 +68,7 @@ op createOrUpdate is ArmResourceCreateOrReplaceAsync<
 
 ## Update (PATCH)
 
-The `ArmResourcePatchAsync` and `ArmCustomPatchAsync` templates use `ArmLroLocationHeader` by
+The `ArmResourcePatchAsync`, `ArmCustomPatchAsync`, and `ArmTagsPatchAsync` templates use `ArmLroLocationHeader` by
 default with the resource as the final result.
 
 ### Default
