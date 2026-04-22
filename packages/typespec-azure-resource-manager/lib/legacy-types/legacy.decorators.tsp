@@ -35,14 +35,14 @@ extern dec externalTypeRef(entity: Model | ModelProperty, jsonRef: valueof strin
 /**
  * Signifies that an operation is an Azure Resource Manager operation
  * and optionally associates the operation with a route template.
- * @param target The operation to associate the model with
+ * @param target The operation to associate with a route template
  * @param route Optional route to associate with the operation
  */
 extern dec armOperationRoute(target: Operation, route?: valueof ArmOperationOptions);
 
 /**
  * Signifies that a Resource is represented using a library type in generated SDKs.
- * @param target The model to that is an external resource
+ * @param target The model that is an external resource
  */
 extern dec armExternalType(target: Model);
 

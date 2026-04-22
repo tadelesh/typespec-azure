@@ -185,7 +185,7 @@ model ProxyResourceUpdateModel<
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 
-/** A base definition of a resource using simple types.  This
+/** A base definition of a resource using simple types. This
  * model should only be used as a constraint for other models.
  */
 model SimpleResource {
@@ -272,7 +272,6 @@ op ArmCreateOperation<
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
- * @template RequestBody Optional. ENables changing the name, documentation, or optionality of the request body parameter
  */
 op ArmUpdateOperation<
   HttpParameters extends {},

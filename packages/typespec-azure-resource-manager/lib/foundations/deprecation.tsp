@@ -25,6 +25,6 @@ alias ManagedIdentityProperties = ManagedServiceIdentity;
 #deprecated "Please change ManagedSystemIdentityProperties to SystemAssignedServiceIdentity."
 alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
 
-/** Alias of ManagedServiceIdentityType for back compatability. Please change to ManagedServiceIdentityType. */
+/** Alias of ManagedServiceIdentityType for back compatibility. Please change to ManagedServiceIdentityType. */
 #deprecated "Please change to ManagedServiceIdentityType."
 alias ManagedIdentityType = ManagedServiceIdentityType;

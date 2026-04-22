@@ -9,7 +9,7 @@ using Azure.ResourceManager.Private;
 
 /**
  * List an extension resource at the given target scope
- * @template TargetResource The target to list at, e.g. Extension.Subscription or Extension>ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource The target to list at, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being listed
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
@@ -41,7 +41,7 @@ op ListByTarget<
 /**
  * A resource GET operation
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
- * @template ExtensionResource the resource being rea
+ * @template ExtensionResource the resource being read
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the read operation
  * @template Error Optional. The error response, if non-standard.
