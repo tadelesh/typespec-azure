@@ -91,8 +91,8 @@ model ExtendedLocationOptional {
 model ResourceWithPathParameter {}
 
 /**
- * Model representing the  `kind` envelope property only for use with a polymorphic resource..
- * Spread this model into a resource model if the resource support ARM `kind`.
+ * Model representing the `kind` envelope property only for use with a polymorphic resource.
+ * Spread this model into a resource model if the resource supports ARM `kind`.
  * @template Type The type of the kind property. Default is string. However you can pass a union with string values.
  *
  * @example

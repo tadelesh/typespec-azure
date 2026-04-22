@@ -42,7 +42,7 @@ extern dec armOperationRoute(target: Operation, route?: valueof ArmOperationOpti
 
 /**
  * Signifies that a Resource is represented using a library type in generated SDKs.
- * @param target The model to that is an external resource
+ * @param target The model that is an external resource
  */
 extern dec armExternalType(target: Model);
 

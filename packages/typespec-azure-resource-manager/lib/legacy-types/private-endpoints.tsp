@@ -12,8 +12,6 @@ using Rest;
  * @template ParentResource the parent resource of the PrivateEndpointConnection
  * @template Resource Optional. The PrivateEndpointConnection resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
- * @template ParentName Optional. The name of the parent resource
- * @template ParentFriendlyName Optional. The friendly name of the parent resource
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
@@ -172,7 +170,7 @@ op CustomPatchAsync<
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
  */
 @autoRoute
-@doc("Update a {name PrivateEndpointConnection}", ParentResource)
+@doc("Update a {name} PrivateEndpointConnection", ParentResource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(ParentResource, Foundations.Resource)
 @patch(#{ implicitOptionality: false })
