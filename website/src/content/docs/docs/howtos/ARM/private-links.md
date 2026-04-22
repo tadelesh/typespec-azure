@@ -42,10 +42,11 @@ interface Employees {
 
 The `PrivateLinks` interface provides the following operations:
 
-| Operation    | Description                              | TypeSpec Representation                          |
-| ------------ | ---------------------------------------- | ------------------------------------------------ |
-| Read         | Get a single private link resource       | `getPrivateLink is Ops.Read<ParentResource>;`    |
-| ListByParent | List private link resources for a parent | `listLinks is Ops.ListByParent<ParentResource>;` |
+| Operation             | Description                                          | TypeSpec Representation                                    |
+| --------------------- | ---------------------------------------------------- | ---------------------------------------------------------- |
+| Read                  | Get a single private link resource                   | `getPrivateLink is Ops.Read<ParentResource>;`              |
+| ListByParent          | List private link resources for a parent             | `listLinks is Ops.ListByParent<ParentResource>;`           |
+| ListSinglePageByParent | List private link resources (legacy, no pagination) | `listLinks is Ops.ListSinglePageByParent<ParentResource>;` |
 
 ## Complete Example
 

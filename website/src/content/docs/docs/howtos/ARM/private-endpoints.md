@@ -47,17 +47,18 @@ interface Employees {
 
 The `PrivateEndpoints` interface provides the following operations:
 
-| Operation            | Description                                           | TypeSpec Representation                               |
-| -------------------- | ----------------------------------------------------- | ----------------------------------------------------- |
-| Read                 | Get a private endpoint connection                     | `get is Ops.Read<ParentResource>;`                    |
-| CreateOrUpdateAsync  | Create or update a connection (async)                 | `create is Ops.CreateOrUpdateAsync<ParentResource>;`  |
-| CreateOrReplaceSync  | Create or replace a connection (sync)                 | `create is Ops.CreateOrReplaceSync<ParentResource>;`  |
-| CreateOrReplaceAsync | Create or replace a connection (async)                | `create is Ops.CreateOrReplaceAsync<ParentResource>;` |
-| CustomPatchAsync     | Update a connection with custom PATCH payload (async) | `update is Ops.CustomPatchAsync<ParentResource>;`     |
-| CustomPatchSync      | Update a connection with custom PATCH payload (sync)  | `update is Ops.CustomPatchSync<ParentResource>;`      |
-| DeleteAsync          | Delete a connection (async)                           | `delete is Ops.DeleteAsync<ParentResource>;`          |
-| DeleteSync           | Delete a connection (sync)                            | `delete is Ops.DeleteSync<ParentResource>;`           |
-| ListByParent         | List connections for a parent resource                | `list is Ops.ListByParent<ParentResource>;`           |
+| Operation            | Description                                              | TypeSpec Representation                                             |
+| -------------------- | -------------------------------------------------------- | ------------------------------------------------------------------- |
+| Read                 | Get a private endpoint connection                        | `get is Ops.Read<ParentResource>;`                                  |
+| CreateOrUpdateAsync  | Create or update a connection (async)                    | `create is Ops.CreateOrUpdateAsync<ParentResource>;`                |
+| CreateOrReplaceSync  | Create or replace a connection (sync)                    | `create is Ops.CreateOrReplaceSync<ParentResource>;`                |
+| CreateOrReplaceAsync | Create or replace a connection (async)                   | `create is Ops.CreateOrReplaceAsync<ParentResource>;`               |
+| CustomPatchAsync     | Update a connection with custom PATCH payload (async)    | `update is Ops.CustomPatchAsync<ParentResource>;`                   |
+| CustomPatchSync      | Update a connection with custom PATCH payload (sync)     | `update is Ops.CustomPatchSync<ParentResource>;`                    |
+| DeleteAsync          | Delete a connection (async)                              | `delete is Ops.DeleteAsync<ParentResource>;`                        |
+| DeleteSync           | Delete a connection (sync)                               | `delete is Ops.DeleteSync<ParentResource>;`                         |
+| DeleteAsyncBase      | Delete a connection (async, custom response type)        | `delete is Ops.DeleteAsyncBase<ParentResource, CustomResponse>;`    |
+| ListByParent         | List connections for a parent resource                   | `list is Ops.ListByParent<ParentResource>;`                         |
 
 ## Complete Example
 

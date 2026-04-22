@@ -49,12 +49,13 @@ interface Employees {
 
 The `NspConfigurations` interface provides the following operations:
 
-| Operation    | Description                                     | TypeSpec Representation                         |
-| ------------ | ----------------------------------------------- | ----------------------------------------------- |
-| Read         | Get a single NSP configuration                  | `get is Ops.Read<ParentResource>;`              |
-| ListByParent | List NSP configurations for a parent resource   | `list is Ops.ListByParent<ParentResource>;`     |
-| Action       | Perform a synchronous action on an NSP config   | `action is Ops.Action<Parent, Req, Resp>;`      |
-| ActionAsync  | Perform an asynchronous action on an NSP config | `action is Ops.ActionAsync<Parent, Req, Resp>;` |
+| Operation              | Description                                           | TypeSpec Representation                                     |
+| ---------------------- | ----------------------------------------------------- | ----------------------------------------------------------- |
+| Read                   | Get a single NSP configuration                        | `get is Ops.Read<ParentResource>;`                          |
+| ListByParent           | List NSP configurations for a parent resource         | `list is Ops.ListByParent<ParentResource>;`                 |
+| ListSinglePageByParent | List NSP configurations (legacy, no pagination)       | `list is Ops.ListSinglePageByParent<ParentResource>;`       |
+| Action                 | Perform a synchronous action on an NSP config         | `action is Ops.Action<Parent, Req, Resp>;`                  |
+| ActionAsync            | Perform an asynchronous action on an NSP config       | `action is Ops.ActionAsync<Parent, Req, Resp>;`             |
 
 ## Complete Example
 
