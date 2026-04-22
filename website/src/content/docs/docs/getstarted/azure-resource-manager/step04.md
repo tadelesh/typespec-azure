@@ -64,8 +64,8 @@ Custom operations in ARM still need to respect the correct response schema. This
 | `ArmDeletedResponse`             | 200  | Resource deleted response.                                                                                                  |
 | `ArmDeleteAcceptedResponse`      | 202  | Resource deletion in progress response.                                                                                     |
 | `ArmDeletedNoContentResponse`    | 204  | Resource deleted response.                                                                                                  |
-| `Page<T>`                        | 200  | Return a list of resource with ARM pagination.                                                                              |
-| `ErrorResponse<T>`               | x    | Error response.                                                                                                             |
+| `ResourceListResult<T>`          | 200  | Return a list of resources with ARM pagination.                                                                             |
+| `ErrorResponse`                  | x    | Error response.                                                                                                             |
 
 ### Common Operation Parameters
 
@@ -75,8 +75,7 @@ There are a number of model types which specify common parameters which are used
 | ---------------------------- | ------------ | ------------------------------------------------------------------ |
 | `ApiVersionParameter`        | query        | `api-version` parameter                                            |
 | `SubscriptionIdParameter`    | path         | Subscription ID path parameter                                     |
-| `ResourceGroupNameParameter` | path         | Resource Group Name path parameter                                 |
-| `CommonResourceParameters`   | path & query | Group of Api version, Subscription ID and Resource group parameter |
+| `ResourceGroupParameter`     | path         | Resource Group Name path parameter                                 |
 | `ResourceUriParameter`       | path         | Resource uri path parameter                                        |
 | `OperationIdParameter`       | path         | Operation Id path parameter                                        |
 
@@ -104,4 +103,4 @@ For reference, the standard templates use the following `TScopeParameters`:
 | Operation                      | Scope Parameters                                                       |
 | ------------------------------ | ---------------------------------------------------------------------- |
 | Global Name Availability Check | `SubscriptionIdParameter, DefaultProviderNamespace`                    |
-| Local Name Availability Check  | `SubscriptionIdParameter, DefaultProviderNamespace, LocationParameter` |
+| Local Name Availability Check  | `SubscriptionIdParameter, DefaultProviderNamespace, LocationResourceParameter` |
