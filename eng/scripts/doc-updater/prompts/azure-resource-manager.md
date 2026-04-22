@@ -97,7 +97,7 @@ When fixing a `.tsp` doc comment:
 
 ### Step 3: Finalize
 
-Run `pnpm change add` from the repository root for changelog entries on any modified packages.
+Run `pnpm change add` from the repository root for changelog entries on any modified packages. Do NOT create a pull request — the outer workflow handles PR creation.
 
 ## Quality Guidelines
 
