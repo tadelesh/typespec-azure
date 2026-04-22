@@ -90,7 +90,7 @@ interface PrivateEndpoints<
   >;
 
   /**
-   * @dev GET the a private endpoint connection for a particular resource
+   * @dev GET a private endpoint connection for a particular resource
    * @template ParentResource the parent resource of the PrivateEndpointConnection
    * @template Resource the PrivateEndpointConnection resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters

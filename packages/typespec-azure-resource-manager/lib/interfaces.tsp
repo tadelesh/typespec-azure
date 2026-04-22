@@ -93,7 +93,7 @@ interface ProxyResourceOperations<
  * A composite interface for Tenant resources that include `ResourceInstanceOperations<Resource, Properties>`
  * and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
  *
- * The routes are always start at root level:
+ * The routes always start at root level:
  *   `/providers/Microsoft.XXX/...`
  *
  * This is the most common API pattern for Tenant Resources to use.
@@ -141,7 +141,7 @@ interface ResourceCollectionOperations<
 > extends ResourceListByParent<Resource, BaseParameters>, ResourceListBySubscription<Resource> {}
 
 /**
- * An interface for resources with can be listed by subscription.
+ * An interface for resources which can be listed by subscription.
  * @template Resource The ArmResource that provides these operations
  */
 interface ResourceListBySubscription<Resource extends Foundations.SimpleResource> {
@@ -248,7 +248,7 @@ interface ResourceDeleteAsync<
 }
 
 /**
- * @dev A composite interface for resources that include a synchronous delete operation.
+ * @dev A composite interface for resources that include an asynchronous delete operation.
  * @template Resource The ArmResource that provides these operations
  * @template BaseParameters The http parameters that are part of the request
  */
