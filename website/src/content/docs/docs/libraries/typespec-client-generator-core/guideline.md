@@ -111,6 +111,8 @@ Clients, models, enums, and unions include namespace information. Emitters can u
 - A flattened structure (`SdkPackage.clients`, `SdkPackage.enums`, `SdkPackage.models`, `SdkPackage.unions`)
 - A hierarchical structure (`SdkPackage.namespaces`) requiring iteration through nested namespaces.
 
+`SdkPackage.crossLanguageVersion` is a SHA-256 hash of the source TypeSpec files. Use it to determine whether two different language SDKs were generated from the same specification, enabling cross-language SDK comparison and consistency checks.
+
 ### License Information
 
 Emitters can get package license info from `SdkPackage.licenseInfo`. The [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) contains license details for client code comments or license file generation.

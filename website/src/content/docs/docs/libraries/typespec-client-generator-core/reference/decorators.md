@@ -846,6 +846,8 @@ model MyModel {
 
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
+**Deprecated**: Use [`@client`](#@Azure.ClientGenerator.Core.client) instead. The `@operationGroup` decorator now delegates to `@client` internally and will be removed in a future release. Use `@client` to define sub clients instead.
+
 ```typespec
 @Azure.ClientGenerator.Core.operationGroup(scope?: valueof string)
 ```
