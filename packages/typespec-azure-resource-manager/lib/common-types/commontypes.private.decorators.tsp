@@ -14,6 +14,7 @@ alias ArmCommonTypeVersionSpec = {
 };
 
 /**
+ * Marks a model, enum, or union as a common ARM definition that maps to a common-types reference.
  * @param definitionName Definition name
  * @param version Azure Resource Manager Version
  * @param referenceFile Reference file
@@ -26,6 +27,7 @@ extern dec armCommonDefinition(
 );
 
 /**
+ * Marks a model property as a common ARM parameter that maps to a common-types reference.
  * @param definitionName Definition name
  * @param version Azure Resource Manager Version
  * @param referenceFile Reference file

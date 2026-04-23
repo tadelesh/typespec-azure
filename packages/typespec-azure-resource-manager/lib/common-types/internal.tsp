@@ -29,5 +29,5 @@ enum ResourceHome {
   BuiltInResourceGroup,
 }
 
-/** Alias of keyEncryptionKeyIdentity for back compatibility. Please change to keyEncryptionKeyIdentity. */
+/** Alias of KeyEncryptionKeyIdentity for backward compatibility. Please change to KeyEncryptionKeyIdentity. */
 alias KeyEncryptionIdentity = KeyEncryptionKeyIdentity;
