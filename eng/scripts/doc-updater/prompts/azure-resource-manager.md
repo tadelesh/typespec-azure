@@ -34,6 +34,8 @@ When a doc comment is wrong, fix the `.tsp` file and regenerate.
 
 ## Critical Rules
 
+**Do NOT call `create_pull_request`.** Only read files, edit files, and run build commands. The outer workflow creates the PR.
+
 ### What you MUST do
 
 1. **Fix wrong doc comments in `.tsp` files.** If a doc comment has typos, references a wrong decorator/parameter name, describes behavior that doesn't match the implementation, or has ghost `@param` tags for parameters that don't exist — fix it.
