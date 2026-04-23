@@ -39,20 +39,11 @@ Tracked resources use the `TrackedResource<TProperties/>` as their base resource
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 }
 ```
 
-`@doc`: provides documentation for the 'name' property of the resource.
-`@segment(employees)`: provides the resource type name for this resource.
-`@key(employeeName)`: provides the parameter name for the name of the resource in operations that use this resource.
-`@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
-`@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
+`...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`: spreads in the standard resource name parameter, which defines the resource type name (`employees`), the name of the resource name parameter (`employeeName`), and provides a default pattern constraint for resource names.
 
 You can find samples of Tracked Resources [in the DynaTrace sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/dynatrace/main.tsp).
 
@@ -63,21 +54,12 @@ Tenant resources use the `ProxyResource<TProperties/>` as their base resource ty
 ```typespec
 @tenantResource
 model EmployeeResource is ProxyResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 }
 ```
 
 `@tenantResource`: designates this resource as being a cross-tenant resource, with scope across all customer subscriptions in the tenant.
-`@doc`: provides documentation for the 'name' property of the resource.
-`@segment(employees)`: provides the resource type name for this resource.
-`@key(employeeName)`: provides the parameter name for the name of the resource in operations that use this resource.
-`@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
-`@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
+`...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`: spreads in the standard resource name parameter, which defines the resource type name (`employees`), the name of the resource name parameter (`employeeName`), and provides a default pattern constraint for resource names.
 
 You can find samples of Tenant Resources [in the TenantResource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/tenantResource/main.tsp).
 
@@ -215,21 +197,12 @@ Child resources usually use the `ProxyResource<TProperties/>` as their base reso
 ```typespec
 @parentResource(EmployeeResource)
 model JobResource is ProxyResource<JobProperties> {
-  /** The job name */
-  @segment("jobs")
-  @key("jobName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<JobResource, KeyName = "jobName", SegmentName = "jobs">;
 }
 ```
 
 `@parentResource`: designates the model type for the parent of this child resource. The resource identifier for this resource will be prepended with the resource identity of the parent.
-`@doc`: provides documentation for the 'name' property of the resource.
-`@segment(employees)`: provides the resource type name for this resource.
-`@key(employeeName)`: provides the parameter name for the name of the resource in operations that use this resource.
-`@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
-`@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
+`...ResourceNameParameter<JobResource, KeyName = "jobName", SegmentName = "jobs">`: spreads in the standard resource name parameter, which defines the resource type name (`jobs`), the name of the resource name parameter (`jobName`), and provides a default pattern constraint for resource names.
 
 You can find samples of Child Resources [in the DynaTrace sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/dynatrace/main.tsp).
 
@@ -240,21 +213,12 @@ Tenant resources use the `ProxyResource<TProperties/>` as their base resource ty
 ```typespec
 @subscriptionResource
 model EmployeeResource is ProxyResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 }
 ```
 
 `@subscriptionResource`: designates this resource as being a cross-subscription resource, with scope across all resource groups in the subscription.
-`@doc`: provides documentation for the 'name' property of the resource.
-`@segment(employees)`: provides the resource type name for this resource.
-`@key(employeeName)`: provides the parameter name for the name of the resource in operations that use this resource.
-`@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
-`@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
+`...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`: spreads in the standard resource name parameter, which defines the resource type name (`employees`), the name of the resource name parameter (`employeeName`), and provides a default pattern constraint for resource names.
 
 You can find samples of Subscription Resources [in the OperationTemplates sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/operationsTest/opTemplates.tsp).
 
@@ -288,22 +252,13 @@ Singleton resources can use any resource base type, but most often use `ProxyRes
 @singleton
 @tenantResource
 model EmployeeAgreementResource is ProxyResource<EmployeeAgreementProperties> {
-  /** The default employee agreement, applying to all employees. */
-  @segment("employeeAgreements")
-  @key
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeAgreementResource, SegmentName = "employeeAgreements">;
 }
 ```
 
 `@singleton`: indicates that there can only be one of the resources in the resource container (in this case, only one instance in the customer tenant).
 `@tenantResource`: designates this resource as being a cross-tenant resource, with scope across all customer subscriptions in the tenant.
-`@doc`: provides documentation for the 'name' property of the resource. For a singleton, the name value will always be the same.
-`@segment(employeeAGreements)`: provides the resource type name for this resource.
-`@key`: provides the parameter name for the name of the resource in operations that use this resource - this will not be a settable value for singleton resources.
-`@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
-`@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
+`...ResourceNameParameter<EmployeeAgreementResource, SegmentName = "employeeAgreements">`: spreads in the standard resource name parameter, which defines the resource type name (`employeeAgreements`) and provides a default pattern constraint for resource names.
 
 You can find samples of Singleton Resources [in the Singleton sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/arm-scenarios/singleton/main.tsp#L29).
 
@@ -322,12 +277,7 @@ Here is an example of a property bag for the `EmployeeResource` resource.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 }
 
 union EmployeeProvisioningState {
@@ -528,12 +478,7 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
-    /** The employee name, using 'Firstname Lastname' notation */
-    @segment("employees")
-    @key("employeeName")
-    @visibility(Lifecycle.Read)
-    @path
-    name: string;
+    ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 
     ...ManagedServiceIdentity;
   }
@@ -543,12 +488,7 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
-    /** The employee name, using 'Firstname Lastname' notation */
-    @segment("employees")
-    @key("employeeName")
-    @visibility(Lifecycle.Read)
-    @path
-    name: string;
+    ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 
     ...ManagedSystemAssignedIdentity;
   }
@@ -562,12 +502,7 @@ Standard support for setting a SKU-based service level for a resource. To enable
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 
   ...ResourceSku;
 }
@@ -581,12 +516,7 @@ Indicator that entity-tag operation concurrency support is enabled for this reso
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 
   ...EntityTag;
 }
@@ -600,12 +530,7 @@ Support for marketplace billing configuration for the resource. To enable `Plan`
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 
   ...ResourcePlan;
 }
@@ -619,12 +544,7 @@ Support for certain kinds of portal user experiences based on the kind of resour
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 
   ...ResourceKind;
 }
@@ -638,12 +558,7 @@ Support for management of this resource by other resources. To add 'ManagedBy' s
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 
   ...ManagedBy;
 }

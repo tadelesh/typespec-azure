@@ -71,11 +71,7 @@ model UserProperties {
 
 /** A User Resource */
 model User is TrackedResource<UserProperties> {
-  /** Address name */
-  @key("userName")
-  @segment("users")
-  @path
-  name: string;
+  ...ResourceNameParameter<User, KeyName = "userName", SegmentName = "users">;
 }
 
 /** The details of a user notification */
@@ -99,7 +95,6 @@ interface Users {
   listByResourceGroup is ArmResourceListByParent<User>;
   listBySubscription is ArmListBySubscription<User>;
   /** Send a notification to the user */
-  @segment("notify")
   NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
 }
 

@@ -21,19 +21,18 @@ model NotificationDetails {
 @armResourceOperations
 interface Users extends TrackedResourceOperations<User, UserProperties> {
   /** Send a notification to the user */
-  @segment("notify")
   NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
 }
 ```
 
 The following operation templates for different kinds of actions are provided in the `Azure.ResourceManager` namespace:
 
-| Template                                                 | Description                                                                                        |
-| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `ArmResourceActionNoContentSync<TResource, TRequest>`    | Synchronous action with no data in the response, providing the resource type and request payload.  |
-| `ArmResourceActionNoContentAsync<TResource, TRequest>`   | Asynchronous action with no data in the response, providing the resource type and request payload. |
-| `ArmResourceActionSync<TResource, TRequest, TResponse>`  | Synchronous action, providing the resource type and request and response payload.                  |
-| `ArmResourceActionAsync<TResource, TRequest, TResponse>` | Asynchronous action, providing the resource type and request and response payload.                 |
+| Template                                                          | Description                                                                                        |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `ArmResourceActionNoContentSync<TResource, TRequest>`             | Synchronous action with no data in the response, providing the resource type and request payload.  |
+| `ArmResourceActionNoResponseContentAsync<TResource, TRequest>`    | Asynchronous action with no data in the response, providing the resource type and request payload. |
+| `ArmResourceActionSync<TResource, TRequest, TResponse>`           | Synchronous action, providing the resource type and request and response payload.                  |
+| `ArmResourceActionAsync<TResource, TRequest, TResponse>`          | Asynchronous action, providing the resource type and request and response payload.                 |
 
 ## Custom Operations
 
@@ -65,7 +64,7 @@ Custom operations in ARM still need to respect the correct response schema. This
 | `ArmDeleteAcceptedResponse`      | 202  | Resource deletion in progress response.                                                                                     |
 | `ArmDeletedNoContentResponse`    | 204  | Resource deleted response.                                                                                                  |
 | `Page<T>`                        | 200  | Return a list of resource with ARM pagination.                                                                              |
-| `ErrorResponse<T>`               | x    | Error response.                                                                                                             |
+| `ErrorResponse`                  | x    | Error response.                                                                                                             |
 
 ### Common Operation Parameters
 
