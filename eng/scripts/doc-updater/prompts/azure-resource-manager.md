@@ -34,19 +34,20 @@ When a doc comment is wrong, fix the `.tsp` file and regenerate.
 
 ## Critical Rules
 
+**Do NOT call `create_pull_request`.** Only read files, edit files, and run build commands. The outer workflow creates the PR.
+
 ### What you MUST do
 
 1. **Fix wrong doc comments in `.tsp` files.** If a doc comment has typos, references a wrong decorator/parameter name, describes behavior that doesn't match the implementation, or has ghost `@param` tags for parameters that don't exist — fix it.
 2. **Add missing documentation.** If a resource type, operation template, decorator, response type, or linting rule exists in the source but is not documented, add documentation for it. Gaps are bugs.
-3. **Always pass explicit template parameters to `ResourceNameParameter`.** Never write bare `...ResourceNameParameter<Resource>`. Every usage must include `KeyName` and `SegmentName` — e.g., `...ResourceNameParameter<Resource, KeyName = "widgetName", SegmentName = "widgets">`. When replacing manual `@key`/`@segment`/`@path`, copy the values from the original. When writing new examples, derive the values from other examples of the same resource in the doc or from samples. Do NOT use manual `@key`/`@segment`/`@path` patterns when the spread pattern exists.
-4. **Preserve semantics in every replacement.** When replacing code with a template or spread pattern, carry over all values from the original. Do not rely on auto-derivation — always pass explicit template parameter values that match the original code. For example, if the original has `@key("employeeName")` and `@segment("employees")`, the replacement must be `...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`, not `...ResourceNameParameter<EmployeeResource>`. Simplifying syntax is fine; losing information is not.
-5. **Verify every change against source before committing it.** Read the actual `.tsp` declaration or `.ts` implementation to confirm a fix is correct. Do not infer behavior from doc text alone.
+3. **Preserve semantics in every replacement.** When replacing code with a template or spread pattern, carry over all values from the original. Simplifying syntax is fine; losing information is not.
+4. **Verify every change against source before committing it.** Read the actual `.tsp` declaration or `.ts` implementation to confirm a fix is correct. Do not infer behavior from doc text alone.
 
 ### What you must NOT do
 
-6. **Never remove or convert `@dev` comments.** The `@dev` tag in `.tsp` doc comments is intentional — it prevents the description from becoming the default description of template instantiations. You may fix typos or wrong descriptions _within_ a `@dev` comment, but never change it to a regular `/** ... */` doc comment and never remove it.
-7. **Never fabricate features.** Only document what currently exists in `lib/` and `src/`. If a template does not return a certain type, do not claim it does. If a feature is not implemented, do not document it.
-8. **Never restructure correct content.** Do not reorder, remove rows from, or rewrite tables and sections that are already accurate. You may _add_ missing rows or sections, but do not change the structure of content that is correct.
+5. **Never remove or convert `@dev` comments.** The `@dev` tag in `.tsp` doc comments is intentional — it prevents the description from becoming the default description of template instantiations. You may fix typos or wrong descriptions _within_ a `@dev` comment, but never change it to a regular `/** ... */` doc comment and never remove it.
+6. **Never fabricate features.** Only document what currently exists in `lib/` and `src/`. If a template does not return a certain type, do not claim it does. If a feature is not implemented, do not document it.
+7. **Never restructure correct content.** Do not reorder, remove rows from, or rewrite tables and sections that are already accurate. You may _add_ missing rows or sections, but do not change the structure of content that is correct.
 
 ## Instructions
 
@@ -83,7 +84,7 @@ Specifically check:
 - `arm-rules.md` lists all current linting rules with correct names and descriptions
 - Doc comments in all `.tsp` files under `lib/`: fix typos, wrong parameter names, ghost `@param` tags, inaccurate descriptions, wrong grammar. Include subdirectories (`common-types/`, `foundations/`, `legacy-types/`, `extension/`).
 - Rule reference files under `libraries/azure-resource-manager/rules/`: verify each file's title and namespace match the actual rule name and package
-- How-to guides document all response types, LRO header models, and scope types that exist in the source
+- How-to guides remove deprecated types and correct inaccuracies, but do not try to make every list comprehensive — that is what reference documentation is for
 - Envelope property sections in `resource-type.md` cover all properties available in the library
 
 **Then, fix every issue, one by one.** Check it off and state which issue you just fixed and how many remain. Do not stop until the list is empty.
@@ -102,7 +103,7 @@ Run `pnpm change add` from the repository root for changelog entries on any modi
 ## Quality Guidelines
 
 1. **Match the audience.** Getting-started pages are for newcomers; how-to guides assume TypeSpec familiarity. Use ARM terminology (resource type, provider namespace, LRO, common types) since the audience already knows ARM.
-2. **Study existing files** before editing — match their formatting, heading hierarchy, and example style.
+2. **Study existing files** before editing — match their formatting, heading hierarchy, and example style. Validate the format of every changed `.tsp` file by running `tsp format` before finishing.
 3. **Copy code examples from samples.** When a sample in `packages/samples/specs/resource-manager/` demonstrates the pattern, adapt that code into the doc example. This ensures examples use the latest idiomatic patterns (spread operators, template aliases, etc.).
 4. **Link to related docs.** Cross-reference between getting-started and how-to guides.
 5. **Keep it practical.** Service teams want to know what to write, not implementation details. Show realistic TypeSpec patterns, not toy examples.
