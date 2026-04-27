@@ -83,8 +83,8 @@ namespace Microsoft.ContosoService;
 
 ### `@armProviderNameValue` {#@Azure.ResourceManager.armProviderNameValue}
 
-`@armResourceType` sets the value fo the decorated string
-property to the type of the Azure Resource Manager resource.
+`@armProviderNameValue` sets the value of the provider namespace string
+property in the operation path to the ARM provider namespace.
 
 ```typespec
 @Azure.ResourceManager.armProviderNameValue
