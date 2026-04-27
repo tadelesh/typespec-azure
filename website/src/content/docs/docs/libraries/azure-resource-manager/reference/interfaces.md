@@ -984,7 +984,7 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 
 | Name       | Description                                               |
 | ---------- | --------------------------------------------------------- |
-| Resource   | the resource being patched                                |
+| Resource   | the resource being listed                                 |
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |
@@ -1331,7 +1331,7 @@ op Azure.ResourceManager.ArmResourceListAtScope(): Response | Error
 
 | Name           | Description                                               |
 | -------------- | --------------------------------------------------------- |
-| Resource       | the resource being patched                                |
+| Resource       | the resource being listed                                 |
 | BaseParameters | Optional. Allows overriding the operation parameters      |
 | Parameters     | Optional. Additional parameters after the path parameters |
 | Response       | Optional. The success response for the list operation     |
@@ -1350,7 +1350,7 @@ op Azure.ResourceManager.ArmResourceListByParent(): Response | Error
 
 | Name               | Description                                               |
 | ------------------ | --------------------------------------------------------- |
-| Resource           | the resource being patched                                |
+| Resource           | the resource being listed                                 |
 | BaseParameters     | Optional. Allows overriding the operation parameters      |
 | ParentName         | Optional. The name of the parent resource                 |
 | ParentFriendlyName | Optional. The friendly name of the parent resource        |
@@ -1952,7 +1952,7 @@ op Azure.ResourceManager.Extension.Read(apiVersion: string, subscriptionId: Azur
 | Name                 | Description                                                                                              |
 | -------------------- | -------------------------------------------------------------------------------------------------------- |
 | TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource    | the resource being rea                                                                                   |
+| ExtensionResource    | the resource being read                                                                                  |
 | Parameters           | Optional. Additional parameters after the path parameters                                                |
 | Response             | Optional. The success response for the read operation                                                    |
 | Error                | Optional. The error response, if non-standard.                                                           |
@@ -2300,7 +2300,7 @@ interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, Resour
 | --------------------- | -------------------------------------------------------------------------------- |
 | ParentParameters      | The path parameters for the resource parent                                      |
 | ResourceTypeParameter | The path parameter for the resource name                                         |
-| ErrorType             | Optional. The type of error models used in operations created form this template |
+| ErrorType             | Optional. The type of error models used in operations created from this template |
 | ResourceName          | Optional. The name of the resource type described in this template               |
 
 #### `LegacyOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CreateOrUpdateAsync}
@@ -2437,7 +2437,7 @@ interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, Resour
 | --------------------- | -------------------------------------------------------------------------------- |
 | ParentParameters      | The path parameters for the resource parent                                      |
 | ResourceTypeParameter | The path parameter for the resource name                                         |
-| ErrorType             | Optional. The type of error models used in operations created form this template |
+| ErrorType             | Optional. The type of error models used in operations created from this template |
 | ResourceRoute         | Optional. The resource route to use for operations in the interface.             |
 | RoutedResourceName    | Optional. The name of the resource type described in this template               |
 
@@ -2496,7 +2496,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 
 | Name                 | Description                                                             |
 | -------------------- | ----------------------------------------------------------------------- |
-| Resource             | the resource being created or updated                                   |
+| Resource             | the resource being updated                                              |
 | PatchModel           | the PATCH request model                                                 |
 | LroHeaders           | Optional. Allows overriding the lro headers returned on resource create |
 | Parameters           | Optional. Additional parameters after the path parameters               |
@@ -2518,7 +2518,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 
 | Name                 | Description                                               |
 | -------------------- | --------------------------------------------------------- |
-| Resource             | the resource being created or updated                     |
+| Resource             | the resource being updated                                |
 | PatchModel           | the PATCH request model                                   |
 | Parameters           | Optional. Additional parameters after the path parameters |
 | Response             | Optional. The success response(s) for the PATCH operation |

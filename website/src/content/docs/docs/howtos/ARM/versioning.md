@@ -363,6 +363,26 @@ model EmployeeProperties {
 }
 ```
 
+### @typeChangedFrom
+
+Use `@typeChangedFrom` to change the type of a property in a specific version.
+
+- The `version` argument is the version where the type changed.
+- The `oldType` argument is the previous type.
+
+**Example: Changing a property type across versions**
+
+For example, suppose a property was originally a `string` in v1 and you want to change it to a more specific union type in v2:
+
+```tsp
+model EmployeeProperties {
+  @typeChangedFrom(Versions.v2, string)
+  status: EmployeeStatus;
+}
+```
+
+In versions before v2, the `status` property will be emitted as `string`. In v2 and later, it will use the `EmployeeStatus` type.
+
 ## FAQ
 
 ### How do I version a pattern?

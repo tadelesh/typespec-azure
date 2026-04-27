@@ -177,8 +177,8 @@ extern dec extensionResourceOperation(
 /**
  * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
  * @param target The operation to associate the resourceType with
- * @param targetResourceType The resource model for the target resource
- * @param extensionResourceType The resource model for the extension resource
+ * @param parentResourceType The resource model for the parent resource
+ * @param builtInResourceType The resource model for the built-in resource
  * @param operationType The type of operation being performed
  * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
  */

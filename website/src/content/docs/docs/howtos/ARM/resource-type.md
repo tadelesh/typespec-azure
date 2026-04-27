@@ -235,7 +235,7 @@ You can find samples of Child Resources [in the DynaTrace sample](https://github
 
 ### Subscription-based Resource
 
-Tenant resources use the `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
+Subscription-based resources use the `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
 
 ```typespec
 @subscriptionResource

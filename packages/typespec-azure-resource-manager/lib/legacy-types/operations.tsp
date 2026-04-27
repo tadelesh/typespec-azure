@@ -13,7 +13,7 @@ using Rest;
  * is accessible at multiple, fixed resource paths.
  * @template ParentParameters The path parameters for the resource parent
  * @template ResourceTypeParameter The path parameter for the resource name
- * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ErrorType Optional. The type of error models used in operations created from this template
  * @template ResourceName Optional. The name of the resource type described in this template
  */
 interface LegacyOperations<
@@ -34,7 +34,7 @@ interface LegacyOperations<
  * is accessible at multiple, fixed resource paths. Can be used with static routes.
  * @template ParentParameters The path parameters for the resource parent
  * @template ResourceTypeParameter The path parameter for the resource name
- * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ErrorType Optional. The type of error models used in operations created from this template
  * @template ResourceRoute Optional. The resource route to use for operations in the interface.
  * @template RoutedResourceName Optional. The name of the resource type described in this template
  */
@@ -120,7 +120,7 @@ interface RoutedOperations<
 
   /**
    * A long-running resource Update (PATCH)
-   * @template Resource the resource being created or updated
+   * @template Resource the resource being updated
    * @template PatchModel the PATCH request model
    * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
    * @template Parameters Optional. Additional parameters after the path parameters
@@ -162,7 +162,7 @@ interface RoutedOperations<
 
   /**
    * A synchronous resource Update (PATCH)
-   * @template Resource the resource being created or updated
+   * @template Resource the resource being updated
    * @template PatchModel the PATCH request model
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PATCH operation

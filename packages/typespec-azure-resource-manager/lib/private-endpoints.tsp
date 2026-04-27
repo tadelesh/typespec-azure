@@ -90,7 +90,7 @@ interface PrivateEndpoints<
   >;
 
   /**
-   * @dev GET the a private endpoint connection for a particular resource
+   * @dev Get a private endpoint connection for a particular resource
    * @template ParentResource the parent resource of the PrivateEndpointConnection
    * @template Resource the PrivateEndpointConnection resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -284,7 +284,7 @@ interface PrivateEndpoints<
    * @template OverrideResourceName Optional. The name of the private endpoint connection resource being operated on.
    */
   @autoRoute
-  @doc("Update a {name PrivateEndpointConnection}", ParentResource)
+  @doc("Update a {name} PrivateEndpointConnection", ParentResource)
   @builtInResourceOperation(ParentResource, Resource, "update", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   @patch(#{ implicitOptionality: false })
