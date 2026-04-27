@@ -432,7 +432,7 @@ interface Employees {
 A composite interface for Proxy resources that include `ResourceInstanceOperations<Resource, Properties>`
 and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
 
-The actual route depends on the resource model but would have started with
+The actual route depends on the resource model but starts with
 `/subscriptions/{id}/resourcegroups/{rg}/providers/Microsoft.XXX/...`
 
 This is the most common API pattern for Proxy Resources to use.
@@ -810,7 +810,7 @@ op Azure.ResourceManager.ResourceUpdateSync<Resource, Properties, BaseParameters
 A composite interface for Tenant resources that include `ResourceInstanceOperations<Resource, Properties>`
 and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent operations.
 
-The routes are always start at root level:
+The routes always start at root level:
 `/providers/Microsoft.XXX/...`
 
 This is the most common API pattern for Tenant Resources to use.
@@ -1952,7 +1952,7 @@ op Azure.ResourceManager.Extension.Read(apiVersion: string, subscriptionId: Azur
 | Name                 | Description                                                                                              |
 | -------------------- | -------------------------------------------------------------------------------------------------------- |
 | TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource    | the resource being rea                                                                                   |
+| ExtensionResource    | the resource being read                                                                                  |
 | Parameters           | Optional. Additional parameters after the path parameters                                                |
 | Response             | Optional. The success response for the read operation                                                    |
 | Error                | Optional. The error response, if non-standard.                                                           |
@@ -2300,7 +2300,7 @@ interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, Resour
 | --------------------- | -------------------------------------------------------------------------------- |
 | ParentParameters      | The path parameters for the resource parent                                      |
 | ResourceTypeParameter | The path parameter for the resource name                                         |
-| ErrorType             | Optional. The type of error models used in operations created form this template |
+| ErrorType             | Optional. The type of error models used in operations created from this template |
 | ResourceName          | Optional. The name of the resource type described in this template               |
 
 #### `LegacyOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CreateOrUpdateAsync}
@@ -2437,7 +2437,7 @@ interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, Resour
 | --------------------- | -------------------------------------------------------------------------------- |
 | ParentParameters      | The path parameters for the resource parent                                      |
 | ResourceTypeParameter | The path parameter for the resource name                                         |
-| ErrorType             | Optional. The type of error models used in operations created form this template |
+| ErrorType             | Optional. The type of error models used in operations created from this template |
 | ResourceRoute         | Optional. The resource route to use for operations in the interface.             |
 | RoutedResourceName    | Optional. The name of the resource type described in this template               |
 

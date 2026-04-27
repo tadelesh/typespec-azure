@@ -13,7 +13,7 @@ using Rest;
  * is accessible at multiple, fixed resource paths.
  * @template ParentParameters The path parameters for the resource parent
  * @template ResourceTypeParameter The path parameter for the resource name
- * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ErrorType Optional. The type of error models used in operations created from this template
  * @template ResourceName Optional. The name of the resource type described in this template
  */
 interface LegacyOperations<
@@ -34,7 +34,7 @@ interface LegacyOperations<
  * is accessible at multiple, fixed resource paths. Can be used with static routes.
  * @template ParentParameters The path parameters for the resource parent
  * @template ResourceTypeParameter The path parameter for the resource name
- * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ErrorType Optional. The type of error models used in operations created from this template
  * @template ResourceRoute Optional. The resource route to use for operations in the interface.
  * @template RoutedResourceName Optional. The name of the resource type described in this template
  */

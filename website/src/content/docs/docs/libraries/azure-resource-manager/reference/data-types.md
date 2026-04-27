@@ -897,9 +897,9 @@ model Azure.ResourceManager.PrivateEndpointConnectionResource<Description>
 
 #### Template Parameters
 
-| Name        | Description                                                                                       |
-| ----------- | ------------------------------------------------------------------------------------------------- |
-| Description | Optional. The documentary description of the private endpoint connection resource name parameter. |
+| Name        | Description                                                                           |
+| ----------- | ------------------------------------------------------------------------------------- |
+| Description | Optional. The description of the private endpoint connection resource name parameter. |
 
 #### Examples
 
@@ -946,9 +946,9 @@ model Azure.ResourceManager.PrivateLink<Description>
 
 #### Template Parameters
 
-| Name        | Description                                                                        |
-| ----------- | ---------------------------------------------------------------------------------- |
-| Description | Optional. The documentary description of the private link resource name parameter. |
+| Name        | Description                                                            |
+| ----------- | ---------------------------------------------------------------------- |
+| Description | Optional. The description of the private link resource name parameter. |
 
 #### Examples
 
@@ -2065,7 +2065,7 @@ model Azure.ResourceManager.CommonTypes.NspConfigurationResource<KeyName, Descri
 | Name        | Description                                                                                                                           |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | KeyName     | Optional. The name of the NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`. |
-| Description | Optional. The documentary description of the NSP configuration resource name parameter.                                               |
+| Description | Optional. The description of the NSP configuration resource name parameter.                                                           |
 
 #### Examples
 

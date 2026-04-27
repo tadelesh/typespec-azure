@@ -9,7 +9,7 @@ namespace Azure.ResourceManager;
  * A private endpoint connection resource.
  * Resource providers must declare a private endpoint connection resource type in their provider namespace if
  * they support private endpoint connections
- * @template Description Optional. The documentary description of the private endpoint connection resource name parameter.
+ * @template Description Optional. The description of the private endpoint connection resource name parameter.
  *
  * @example
  * ```ts
@@ -60,8 +60,6 @@ interface PrivateEndpoints<
    * @template ParentResource the parent resource of the PrivateEndpointConnection
    * @template Resource Optional. The PrivateEndpointConnection resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
-   * @template ParentName Optional. The name of the parent resource
-   * @template ParentFriendlyName Optional. The friendly name of the parent resource
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for the list operation
    * @template Error Optional. The error response, if non-standard.
@@ -90,7 +88,7 @@ interface PrivateEndpoints<
   >;
 
   /**
-   * @dev GET the a private endpoint connection for a particular resource
+   * @dev GET a private endpoint connection for a particular resource
    * @template ParentResource the parent resource of the PrivateEndpointConnection
    * @template Resource the PrivateEndpointConnection resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -284,7 +282,7 @@ interface PrivateEndpoints<
    * @template OverrideResourceName Optional. The name of the private endpoint connection resource being operated on.
    */
   @autoRoute
-  @doc("Update a {name PrivateEndpointConnection}", ParentResource)
+  @doc("Update a {name} PrivateEndpointConnection", ParentResource)
   @builtInResourceOperation(ParentResource, Resource, "update", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   @patch(#{ implicitOptionality: false })

@@ -9,7 +9,7 @@ namespace Azure.ResourceManager.CommonTypes;
  * provider namespace to enable NSP capabilities for their resources.
  *
  * @template KeyName Optional. The name of the NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`.
- * @template Description Optional. The documentary description of the NSP configuration resource name parameter.
+ * @template Description Optional. The description of the NSP configuration resource name parameter.
  *
  * @example
  * ```ts
