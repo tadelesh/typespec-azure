@@ -125,7 +125,7 @@ interface PrivateLinks<
   >;
 
   /**
-   * @dev GET the a private link to a particular resource
+   * @dev GET a private link to a particular resource
    * @template ParentResource the parent resource of the PrivateLink
    * @template Resource the PrivateLink resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters
