@@ -172,7 +172,7 @@ interface NspConfigurationOperations<
    * @template Error Optional. The error response, if non-standard.
    * @template OverrideResourceName Optional. The name of the network security perimeter configuration resource being operated on.
    */
-  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Metching legacy API"
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Matching legacy API"
   @Versioning.added(Versions.v5)
   @autoRoute
   @doc("Get a {name} NetworkSecurityPerimeterConfiguration", ParentResource)
@@ -208,7 +208,7 @@ interface NspConfigurationOperations<
    * @template OverrideResourceName Optional. The name of the network security perimeter configuration resource being operated on.
    * @template OptionalRequestBody Optional. Indicates if the request body is optional.
    */
-  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Metching legacy API"
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Matching legacy API"
   @Versioning.added(Versions.v5)
   @autoRoute
   @Azure.ResourceManager.Private.enforceConstraint(ParentResource, Foundations.Resource)
@@ -251,7 +251,7 @@ interface NspConfigurationOperations<
    * @template OverrideResourceName Optional. The name of the network security perimeter configuration resource being operated on.
    * @template OptionalRequestBody Optional. Indicates if the request body is optional.
    */
-  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Metching legacy API"
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Matching legacy API"
   @Versioning.added(Versions.v5)
   @autoRoute
   @Azure.ResourceManager.Private.enforceConstraint(ParentResource, Foundations.Resource)
