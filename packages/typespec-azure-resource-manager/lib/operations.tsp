@@ -9,7 +9,7 @@ namespace Azure.ResourceManager;
 
 /**
  * A resource list operation, at the subscription scope
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
@@ -31,7 +31,7 @@ op ArmListBySubscription<
 
 /**
  * A resource list operation, at the scope of the resource's parent
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template ParentName Optional. The name of the parent resource
  * @template ParentFriendlyName Optional. The friendly name of the parent resource
@@ -65,7 +65,7 @@ op ArmResourceListByParent<
 
 /**
  * A resource list operation, with scope determined by BaseParameters
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
@@ -845,9 +845,9 @@ op ArmResourceActionNoContentSync<
 /**
  * @dev Adds check global name availability operation, normally used if
  * a resource name must be globally unique (for example, if the resource
- * exposes and endpoint that uses the resource name in the url)
+ * exposes an endpoint that uses the resource name in the url)
  * @template Request the availability request, defaults to the standard request, containing name and resource type
- * @template Response the availability response, default to the standard response
+ * @template Response the availability response, defaults to the standard response
  * @template AdditionalParams A model specifying additional non-path parameters to the availability request
  */
 @doc("Implements global CheckNameAvailability operations")
@@ -865,9 +865,9 @@ op checkGlobalNameAvailability<
 /**
  * @dev Adds check location-specific name availability operation, normally used if
  * a resource name must be globally unique (for example, if the resource
- * exposes and endpoint that uses the resource name in the url)
+ * exposes an endpoint that uses the resource name in the url)
  * @template Request the availability request, defaults to the standard request, containing name and resource type
- * @template Response the availability response, default to the standard response
+ * @template Response the availability response, defaults to the standard response
  * @template AdditionalParams A model specifying additional non-path parameters to the availability request
  */
 @doc("Implements local CheckNameAvailability operations")

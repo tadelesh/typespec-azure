@@ -110,7 +110,7 @@ extern dec resourceGroupResource(target: Model);
 extern dec extensionResource(target: Model);
 
 /**
- * `@armResourceType` sets the value fo the decorated string
+ * `@armResourceType` sets the value for the decorated string
  * property to the type of the Azure Resource Manager resource.
  * @param resource The resource to get the type of
  */
