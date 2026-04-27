@@ -103,7 +103,7 @@ Run `pnpm change add` from the repository root for changelog entries on any modi
 ## Quality Guidelines
 
 1. **Match the audience.** Getting-started pages are for newcomers; how-to guides assume TypeSpec familiarity. Use ARM terminology (resource type, provider namespace, LRO, common types) since the audience already knows ARM.
-2. **Study existing files** before editing — match their formatting, heading hierarchy, and example style. Validate the format of every changed `.tsp` file by running `tsp format` before finishing.
+2. **Study existing files** before editing — match their formatting, heading hierarchy, and example style. Validate the format of every changed file by running `pnpm format:dir` on its directory before finishing.
 3. **Copy code examples from samples.** When a sample in `packages/samples/specs/resource-manager/` demonstrates the pattern, adapt that code into the doc example. This ensures examples use the latest idiomatic patterns (spread operators, template aliases, etc.).
 4. **Link to related docs.** Cross-reference between getting-started and how-to guides.
 5. **Keep it practical.** Service teams want to know what to write, not implementation details. Show realistic TypeSpec patterns, not toy examples.
