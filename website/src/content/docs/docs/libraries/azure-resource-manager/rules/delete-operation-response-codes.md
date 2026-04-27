@@ -2,7 +2,7 @@
 title: delete-operation-response-codes
 ---
 
-```text title=- Full name-
+```text title="Full name"
 @azure-tools/typespec-azure-resource-manager/delete-operation-response-codes
 ```
 

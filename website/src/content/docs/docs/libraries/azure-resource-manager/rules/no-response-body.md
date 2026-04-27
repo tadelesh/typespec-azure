@@ -1,10 +1,9 @@
 ---
-title: no-empty-model
+title: no-response-body
 ---
 
-```text title=- Full name-
+```text title="Full name"
 @azure-tools/typespec-azure-resource-manager/no-response-body
-
 ```
 
 ARM operation responses with status code 202 or 204 should not contain a response body. Operation responses with other success (2xx) status codes should contain a response body.

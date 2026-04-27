@@ -26,7 +26,7 @@ export type ArmResourceCollectionActionDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * `@armResourceType` sets the value fo the decorated string
+ * `@armProviderNameValue` sets the value of the decorated string
  * property to the type of the Azure Resource Manager resource.
  *
  * @param resource The resource to get the type of
@@ -70,7 +70,6 @@ export type IdentifiersDecorator = (
  *  namespace Microsoft.ContosoService;
  * ```
  * @param providerNamespace Provider namespace
- * @param libraryNamespaces a library namespace containing types for this namespace
  */
 export type ArmProviderNamespaceDecorator = (
   context: DecoratorContext,
@@ -91,7 +90,7 @@ export type UseLibraryNamespaceDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * `@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+ * `@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
  *
  * @example
  * ```typespec
