@@ -315,7 +315,7 @@ model ArmResourceUpdatedResponse<Resource extends Azure.ResourceManager.Foundati
 
 /**
  * @dev Resource create operation succeeded
- * @template Resource The resource being updated
+ * @template Resource The resource being created
  * @template LroHeaders Optional. The lro headers returned with a Created response
  *
  * @example
@@ -345,7 +345,7 @@ model ArmResourceCreatedResponse<
 
 /**
  * @dev Resource synchronous create operation succeeded
- * @template Resource The resource being updated
+ * @template Resource The resource being created
  *
  * @example
  * ```typespec

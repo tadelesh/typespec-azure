@@ -29,7 +29,7 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 ### `@armLibraryNamespace` {#@Azure.ResourceManager.armLibraryNamespace}
 
-`@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+`@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
 
 ```typespec
 @Azure.ResourceManager.armLibraryNamespace

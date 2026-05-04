@@ -70,7 +70,6 @@ export type IdentifiersDecorator = (
  *  namespace Microsoft.ContosoService;
  * ```
  * @param providerNamespace Provider namespace
- * @param libraryNamespaces a library namespace containing types for this namespace
  */
 export type ArmProviderNamespaceDecorator = (
   context: DecoratorContext,
@@ -91,7 +90,7 @@ export type UseLibraryNamespaceDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * `@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+ * `@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
  *
  * @example
  * ```typespec

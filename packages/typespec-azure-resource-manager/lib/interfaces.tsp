@@ -248,7 +248,7 @@ interface ResourceDeleteAsync<
 }
 
 /**
- * @dev A composite interface for resources that include a synchronous delete operation.
+ * @dev A composite interface for resources that include an asynchronous delete operation.
  * @template Resource The ArmResource that provides these operations
  * @template BaseParameters The http parameters that are part of the request
  */
