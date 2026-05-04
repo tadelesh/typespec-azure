@@ -1,9 +1,9 @@
 ---
-title: post-operation-response-codes
+title: arm-post-operation-response-codes
 ---
 
 ```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/post-operation-response-codes
+@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes
 ```
 
 ## Synchronous
@@ -15,9 +15,10 @@ Synchronous post operations should have one of the following combinations of res
 ```tsp
 @armResourceOperations
 interface Employees {
-  @armResourceDelete(Employee)
-  delete(...ApiVersionParameter): {
-    @statusCode _: 200;
+  @armResourceAction(Employee)
+  @post
+  deactivate(...ApiVersionParameter): {
+    @statusCode _: 201;
     result: boolean;
   };
 }
@@ -28,7 +29,7 @@ interface Employees {
 ```tsp
 @armResourceOperations
 interface Employees {
-  delete is ArmResourceDeleteSync<Employee>;
+  deactivate is ArmResourceActionSync<Employee, void, void>;
 }
 ```
 
@@ -41,7 +42,14 @@ Long-running (LRO) post operations should have 202 and default responses. The mu
 ```tsp
 @armResourceOperations
 interface Employees {
-  delete is ArmResourceDeleteAsync<Employee>;
+  @armResourceAction(Employee)
+  @post
+  deactivate(...ApiVersionParameter): {
+    @statusCode _: 200;
+    result: boolean;
+  } | {
+    @statusCode _: 201;
+  };
 }
 ```
 
@@ -50,6 +58,6 @@ interface Employees {
 ```tsp
 @armResourceOperations
 interface Employees {
-  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+  deactivate is ArmResourceActionAsync<Employee, void, void>;
 }
 ```

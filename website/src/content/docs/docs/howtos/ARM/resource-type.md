@@ -4,9 +4,8 @@ description: Choosing and modeling ARM resources
 llmstxt: true
 ---
 
-## Introductions
+## Introduction
 
-Introduction
 Resources are the basic building blocks of Azure. When a customer interacts with Azure through the Control Plane (ARM), they generally will be reading (GET), writing (PUT/PATCH), deleting (DELETE) or performing actions upon (POST) one or more resources. Each resource is managed by a particular Resource Provider, so we uniquely identify a resource by its 'fully-qualified type'. Some well-known examples of types are Microsoft.Compute/virtualMachines, or Microsoft.Network/networkSecurityGroups/securityRules. See Resource Ids for a more in-depth breakdown of the id and associated fields.
 
 In order to give customers a consistent API when working with many different Resource Providers, and to allow ARM to understand and manage resources programmatically, ARM requires each RP to follow a set of contracts for resource management, defined in the ARM RPC.
@@ -515,16 +514,18 @@ Finally, when your _rp-specific property bag_ contains an array of complex prope
 In addition to the resource-specific property bag, a resource may configure on or more standard ARM features through the use of standard properties in the _ARM Envelope_. Standard features configured in the envelope include:
 
 - **Managed Identity**: Associating a managed identity with the resource to authorize actions taken by this resource on other resources.
+- **Extended Location**: Enabling the resource to be created in an extended location (e.g. Azure Edge Zones).
 - **SKU**: A standard mechanism for configuring levels of service for a resource.
 - **Plan**: A standard mechanism for configuring MarketPlace billing plans for a resource.
 - **ETags**: A standard mechanism for managing concurrent operations over the resource.
 - **ResourceKind**: A standard mechanism for specifying a type of user experience in the portal.
+- **ManagedBy**: Indicating that the resource is managed by another resource.
 
 ### Managed Identity
 
 Standard configuration for ARM support of both SystemAssigned and UserAssigned Managed Service Identity (MSI)
 
-- If a resource allows both generated (SystemAssigned) and user-assigned (UserAssigned) Managed Identity, use the spread (...) operator to include the standard ManagedServiceIdentity envelope property. This will allow users to manage any ManagedServiceIdentity associated with this resource.
+- If a resource allows both generated (SystemAssigned) and user-assigned (UserAssigned) Managed Identity, use the spread (...) operator to include the standard `ManagedServiceIdentityProperty` envelope property. This will allow users to manage any ManagedServiceIdentity associated with this resource.
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -535,11 +536,11 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
     @path
     name: string;
 
-    ...ManagedServiceIdentity;
+    ...ManagedServiceIdentityProperty;
   }
   ```
 
-- If a resource allows only generated (SystemAssigned) Managed Identity, use the spread operator (...) to include the `ManagedSystemAssignedIdentity` standard envelope property in the resource definition. This will allow users to manage the SystemAssigned identity associated with this resource.
+- If a resource allows only generated (SystemAssigned) Managed Identity, use the spread operator (...) to include the `ManagedSystemAssignedIdentityProperty` standard envelope property in the resource definition. This will allow users to manage the SystemAssigned identity associated with this resource.
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -550,15 +551,15 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
     @path
     name: string;
 
-    ...ManagedSystemAssignedIdentity;
+    ...ManagedSystemAssignedIdentityProperty;
   }
   ```
 
 For more information, see [Managed Service Identity Support](https://eng.ms/docs/products/arm/rpaas/msisupport)
 
-### SKU
+### Extended Location
 
-Standard support for setting a SKU-based service level for a resource. To enable SKU support, add the `ResourceSku` enevelope property to the resource definition:
+Support for creating the resource in an extended location, such as Azure Edge Zones. To enable extended location support, add the `ExtendedLocationProperty` envelope property to the resource definition:
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -569,7 +570,24 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...ResourceSku;
+  ...ExtendedLocationProperty;
+}
+```
+
+### SKU
+
+Standard support for setting a SKU-based service level for a resource. To enable SKU support, add the `ResourceSkuProperty` envelope property to the resource definition:
+
+```typespec
+model EmployeeResource is TrackedResource<EmployeeProperties> {
+  /** The employee name, using 'Firstname Lastname' notation */
+  @segment("employees")
+  @key("employeeName")
+  @visibility(Lifecycle.Read)
+  @path
+  name: string;
+
+  ...ResourceSkuProperty;
 }
 ```
 
@@ -577,7 +595,7 @@ For more information, see [SKU Support](https://eng.ms/docs/products/arm/rpaas/s
 
 ### ETags
 
-Indicator that entity-tag operation concurrency support is enabled for this resource. To enable ETags, add the `EntityTag` envelope property to the resource definition.
+Indicator that entity-tag operation concurrency support is enabled for this resource. To enable ETags, add the `EntityTagProperty` envelope property to the resource definition.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -588,7 +606,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...EntityTag;
+  ...EntityTagProperty;
 }
 ```
 
@@ -596,7 +614,7 @@ For more information, and limitations on RPaaS concurrency support, see [RPaaS E
 
 ### Plan
 
-Support for marketplace billing configuration for the resource. To enable `Plan` support, add the `ResourcePlan` standard envelope property to the resource definition.
+Support for marketplace billing configuration for the resource. To enable `Plan` support, add the `ResourcePlanProperty` standard envelope property to the resource definition.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -607,15 +625,15 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...ResourcePlan;
+  ...ResourcePlanProperty;
 }
 ```
 
-See [MarketPlace Third Party Billing SUpport](https://eng.ms/docs/products/arm/rpaas/custom_billing)
+See [MarketPlace Third Party Billing Support](https://eng.ms/docs/products/arm/rpaas/custom_billing)
 
-### ResourceKind
+### ResourceKindProperty
 
-Support for certain kinds of portal user experiences based on the kind of resource. To include 'Kind' in the resource defintion, add the `ResourceKind` standard envelope property.
+Support for certain kinds of portal user experiences based on the kind of resource. To include 'Kind' in the resource definition, add the `ResourceKindProperty` standard envelope property.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -626,15 +644,15 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...ResourceKind;
+  ...ResourceKindProperty;
 }
 ```
 
 For more information on user experiences in the Azure Portal, see [Portal Support](https://eng.ms/docs/products/arm/rpaas/portal/gettingstarted)
 
-### ManagedBy
+### ManagedByProperty
 
-Support for management of this resource by other resources. To add 'ManagedBy' support to the resource, add the `ManagedBy` envelope property to the resource definition:
+Support for management of this resource by other resources. To add 'ManagedBy' support to the resource, add the `ManagedByProperty` envelope property to the resource definition:
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
@@ -645,7 +663,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   @path
   name: string;
 
-  ...ManagedBy;
+  ...ManagedByProperty;
 }
 ```
 
