@@ -2017,6 +2017,8 @@ You could define a single client that combines operations from multiple services
 :::caution
 All services being merged must share the same endpoint and authentication method. If not, you will get diagnostics error.
 TCGC automatically merges sub clients with the same name, but you still need to ensure that there are no naming conflicts between models, enums, and other types in the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.
+
+If the services being merged declare different versions of a shared library dependency (e.g. `Azure.ResourceManager.CommonTypes`) via `@useDependency`, TCGC will emit a `warning` diagnostic `inconsistent-multiple-service-dependency` listing the conflicting versions. Diverging dependency versions can cause duplicate or incomplete models in the emitted SDK; align the `@useDependency` declarations across services to resolve this warning.
 :::
 
 <ClientTabs>
