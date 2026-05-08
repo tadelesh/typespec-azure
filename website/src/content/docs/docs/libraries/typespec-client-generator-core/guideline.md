@@ -306,6 +306,12 @@ TCGC infers the body parameter type from TypeSpec HTTP lib type [`HttpOperationB
 
 TCGC creates the `Content-Type` header parameter for any operation with body parameter if it doesn't exist, and creates the `Accept` header parameter for any operation with response that contains body. TCGC also creates corresponding method parameters for the operation's upper layer method for each case.
 
+The SDK type generated for these synthetic parameters depends on the number of content types involved:
+
+- **Single content type**: always produces a `constant` (e.g. `"application/json"`), for both `Content-Type` and `Accept`.
+- **Multiple content types — `Content-Type`**: produces an `enum` so the caller can pick one value to send in the request.
+- **Multiple content types — `Accept`**: produces a `constant` whose value is a comma-joined string of all response content types (e.g. `"application/json, image/png"`). Structured content types (JSON, XML, text/plain) are listed before others. This avoids modeling the synthetic `Accept` parameter as a content-negotiation parameter. If real content negotiation is required, split the operation per content type using `@sharedRoute`.
+
 TCGC uses several ways to find an HTTP operation's parameter's corresponding method parameter or model property:
 
 - Check if the parameter is a client-level method parameter.
