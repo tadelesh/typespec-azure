@@ -143,7 +143,7 @@ export type DefaultResourceKeySegmentNameDecorator = (
  *
  * Due to TypeSpec language and all optional properties of `Foundations.Resource`,
  * the `Resource extends Foundations.SimpleResource` on many of the standard ARM templates is
- * essentially equal to `Resource extends {}` and does not enforce the containt.
+ * essentially equal to `Resource extends {}` and does not enforce the constraint.
  *
  * Note, this is intended for internal use only for now.
  */
@@ -158,7 +158,7 @@ export type EnforceConstraintDecorator = (
  * Marks the operation as being a collection action
  *
  * @param resourceType Resource
- * @param parentTypeName : Parent type name.
+ * @param parentTypeName Parent type name.
  * @param parentFriendlyTypeName Friendly name for parent.
  * @param applyOperationRename If true, apply both doc and operation name update
  */

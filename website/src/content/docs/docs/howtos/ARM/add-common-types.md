@@ -30,7 +30,7 @@ Creating a new version of an existing common type mostly involves editing what i
 3. If it is a completely new version, add the version to [versions.tsp](https://github.com/AlitzelMendez/typespec-azure/blob/main/packages/typespec-azure-resource-manager/lib/common-types/versions.tsp))
 4. Generate the Swagger updates by running:
    ```bash
-   cd typespec-azure\packages\samples\common-types
+   cd typespec-azure/packages/samples/common-types
    pnpm regen-common-types
    ```
 5. Generate the documentation
@@ -73,7 +73,7 @@ Creating a new version of an existing common type mostly involves editing what i
    ```
 1. Generate the Swagger updates by running:
    ```bash
-   cd typespec-azure\packages\samples\common-types
+   cd typespec-azure/packages/samples/common-types
    pnpm regen-common-types
    ```
 1. Finally, generate the documentation:

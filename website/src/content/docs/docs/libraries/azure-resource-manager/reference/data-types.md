@@ -618,7 +618,7 @@ model Azure.ResourceManager.EncryptionProperty
 
 ```typespec
 model Foo is TrackedResource<FooProperties> {
-  ...Encryption;
+  ...EncryptionProperty;
 }
 ```
 
