@@ -512,45 +512,37 @@ Finally, when your _rp-specific property bag_ contains an array of complex prope
 
 ## Adding Optional Standard Envelope Properties
 
-In addition to the resource-specific property bag, a resource may configure on or more standard ARM features through the use of standard properties in the _ARM Envelope_. Standard features configured in the envelope include:
+In addition to the resource-specific property bag, a resource may configure one or more standard ARM features through the use of standard properties in the _ARM Envelope_. Standard features configured in the envelope include:
 
 - **Managed Identity**: Associating a managed identity with the resource to authorize actions taken by this resource on other resources.
 - **SKU**: A standard mechanism for configuring levels of service for a resource.
 - **Plan**: A standard mechanism for configuring MarketPlace billing plans for a resource.
 - **ETags**: A standard mechanism for managing concurrent operations over the resource.
 - **ResourceKind**: A standard mechanism for specifying a type of user experience in the portal.
+- **ManagedBy**: Indicating that the resource is managed by another Azure resource.
+- **Extended Location**: Supporting extended locations (e.g. Edge Zones) for the resource.
+- **Encryption**: Configuring customer-managed key (CMK) encryption for the resource.
+- **Availability Zones**: Specifying availability zone support for the resource.
 
 ### Managed Identity
 
 Standard configuration for ARM support of both SystemAssigned and UserAssigned Managed Service Identity (MSI)
 
-- If a resource allows both generated (SystemAssigned) and user-assigned (UserAssigned) Managed Identity, use the spread (...) operator to include the standard ManagedServiceIdentity envelope property. This will allow users to manage any ManagedServiceIdentity associated with this resource.
+- If a resource allows both generated (SystemAssigned) and user-assigned (UserAssigned) Managed Identity, use the spread (...) operator to include the standard `ManagedServiceIdentityProperty` envelope property. This will allow users to manage any ManagedServiceIdentity associated with this resource.
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
-    /** The employee name, using 'Firstname Lastname' notation */
-    @segment("employees")
-    @key("employeeName")
-    @visibility(Lifecycle.Read)
-    @path
-    name: string;
-
-    ...ManagedServiceIdentity;
+    ...ResourceNameParameter<EmployeeResource>;
+    ...ManagedServiceIdentityProperty;
   }
   ```
 
-- If a resource allows only generated (SystemAssigned) Managed Identity, use the spread operator (...) to include the `ManagedSystemAssignedIdentity` standard envelope property in the resource definition. This will allow users to manage the SystemAssigned identity associated with this resource.
+- If a resource allows only generated (SystemAssigned) Managed Identity, use the spread operator (...) to include the `ManagedSystemAssignedIdentityProperty` standard envelope property in the resource definition. This will allow users to manage the SystemAssigned identity associated with this resource.
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
-    /** The employee name, using 'Firstname Lastname' notation */
-    @segment("employees")
-    @key("employeeName")
-    @visibility(Lifecycle.Read)
-    @path
-    name: string;
-
-    ...ManagedSystemAssignedIdentity;
+    ...ResourceNameParameter<EmployeeResource>;
+    ...ManagedSystemAssignedIdentityProperty;
   }
   ```
 
@@ -558,18 +550,12 @@ For more information, see [Managed Service Identity Support](https://eng.ms/docs
 
 ### SKU
 
-Standard support for setting a SKU-based service level for a resource. To enable SKU support, add the `ResourceSku` enevelope property to the resource definition:
+Standard support for setting a SKU-based service level for a resource. To enable SKU support, add the `ResourceSkuProperty` envelope property to the resource definition:
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
-
-  ...ResourceSku;
+  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceSkuProperty;
 }
 ```
 
@@ -577,18 +563,12 @@ For more information, see [SKU Support](https://eng.ms/docs/products/arm/rpaas/s
 
 ### ETags
 
-Indicator that entity-tag operation concurrency support is enabled for this resource. To enable ETags, add the `EntityTag` envelope property to the resource definition.
+Indicator that entity-tag operation concurrency support is enabled for this resource. To enable ETags, add the `EntityTagProperty` envelope property to the resource definition.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
-
-  ...EntityTag;
+  ...ResourceNameParameter<EmployeeResource>;
+  ...EntityTagProperty;
 }
 ```
 
@@ -596,37 +576,25 @@ For more information, and limitations on RPaaS concurrency support, see [RPaaS E
 
 ### Plan
 
-Support for marketplace billing configuration for the resource. To enable `Plan` support, add the `ResourcePlan` standard envelope property to the resource definition.
+Support for marketplace billing configuration for the resource. To enable `Plan` support, add the `ResourcePlanProperty` standard envelope property to the resource definition.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
-
-  ...ResourcePlan;
+  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourcePlanProperty;
 }
 ```
 
-See [MarketPlace Third Party Billing SUpport](https://eng.ms/docs/products/arm/rpaas/custom_billing)
+See [MarketPlace Third Party Billing Support](https://eng.ms/docs/products/arm/rpaas/custom_billing)
 
 ### ResourceKind
 
-Support for certain kinds of portal user experiences based on the kind of resource. To include 'Kind' in the resource defintion, add the `ResourceKind` standard envelope property.
+Support for certain kinds of portal user experiences based on the kind of resource. To include 'Kind' in the resource definition, add the `ResourceKindProperty` standard envelope property.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
-
-  ...ResourceKind;
+  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceKindProperty;
 }
 ```
 
@@ -634,22 +602,55 @@ For more information on user experiences in the Azure Portal, see [Portal Suppor
 
 ### ManagedBy
 
-Support for management of this resource by other resources. To add 'ManagedBy' support to the resource, add the `ManagedBy` envelope property to the resource definition:
+Support for management of this resource by other resources. To add 'ManagedBy' support to the resource, add the `ManagedByProperty` envelope property to the resource definition:
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
-
-  ...ManagedBy;
+  ...ResourceNameParameter<EmployeeResource>;
+  ...ManagedByProperty;
 }
 ```
 
 For more information on supporting 'ManagedBy', see [ManagedBy API Contract](https://eng.ms/docs/products/arm/api_contracts/managedby)
+
+### Extended Location
+
+Support for extended locations (e.g., Edge Zones) for the resource. To include extended location support, add the `ExtendedLocationProperty` envelope property to the resource definition:
+
+```typespec
+model EmployeeResource is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<EmployeeResource>;
+  ...ExtendedLocationProperty;
+}
+```
+
+### Encryption
+
+Support for customer-managed key (CMK) encryption for the resource. To include encryption support, add the `EncryptionProperty` envelope property to the resource properties:
+
+```typespec
+model EmployeeProperties {
+  /** The employee's full name */
+  fullName: string;
+
+  /** The status of the last operation */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+
+  ...EncryptionProperty;
+}
+```
+
+### Availability Zones
+
+Support for availability zones for the resource. To include availability zone support, add the `AvailabilityZonesProperty` envelope property to the resource definition:
+
+```typespec
+model EmployeeResource is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<EmployeeResource>;
+  ...AvailabilityZonesProperty;
+}
+```
 
 ## Reference
 
