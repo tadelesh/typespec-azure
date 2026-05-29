@@ -206,21 +206,26 @@ modelled as a _resource action_. Examples of resource actions include:
 
 #### Actions that take input and output
 
-Operations that manage credentials are a good example fo this category. TypeSpec defines synchronous
+Operations that manage credentials are a good example of this category. TypeSpec defines synchronous
 and asynchronous templates for actions that consume and produce information.
 
 | Operation                    | TypeSpec                                                                       |
 | ---------------------------- | ------------------------------------------------------------------------------ |
-| Synchronous Resource Action  | `updateCredentials is ArmResourceActionSync<ResourceType, Request, Response>`  |
-| Asynchronous Resource Action | `updateCredentials is ArmResourceActionAsync<ResourceType, Request, Response>` |
+| Synchronous Resource Action        | `updateCredentials is ArmResourceActionSync<ResourceType, Request, Response>`  |
+| Asynchronous Resource Action       | `updateCredentials is ArmResourceActionAsync<ResourceType, Request, Response>` |
+| Accepted-Only Async Resource Action | `updateCredentials is ActionAsync<ResourceType, Request, Response>`           |
 
 Parameters to the template are the ResourceType, the model for the operation Request body, and the
 model for the operation Response body.
 
+> **Note:** `ArmResourceActionAsync` returns both an `ArmAcceptedLroResponse` and the `Response` type.
+> `ActionAsync` is the standard long-running action template that only returns `ArmAcceptedLroResponse`
+> (202 Accepted), which is the recommended pattern for most async actions.
+
 #### Actions that take input but produce no output (state changing actions)
 
 Operations that make state changes will often take some user configuration, and will return a
-seccess code or an error code depending on success or failure. TypeSpec defines synchronous and
+success code or an error code depending on success or failure. TypeSpec defines synchronous and
 asynchronous operation templates for state changing actions.
 
 | Operation                     | TypeSpec                                                                              |
@@ -230,11 +235,18 @@ asynchronous operation templates for state changing actions.
 
 Parameters to the template are the ResourceType and the model for the operation Request body.
 
-### Actions that take no input but produce output (data retrieval actions)
+#### Actions that take no input but produce output (data retrieval actions)
 
-Some operations return data or paged lists of data. TypeSpec does not yet provide templates for
-these kinds of actions, but here are two templates that you could reuse in your own specification,
-described in the next section of the document:
+You can use the standard action templates with `void` for the Request body to define actions that
+take no input but produce output:
+
+| Operation                    | TypeSpec                                                                    |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| Synchronous Resource Action  | `getData is ArmResourceActionSync<ResourceType, void, Response>`            |
+| Asynchronous Resource Action | `getData is ArmResourceActionAsync<ResourceType, void, Response>`           |
+
+For actions that return paged lists of data, you can also define custom templates using the common
+building blocks:
 
 - [Synchronous Resource List Actions](#synchronous-list-action)
 - [Asynchronous List Action](#asynchronous-list-action)
@@ -253,7 +265,8 @@ configuration or subscription-level actions that are not tied to a particular re
 | Provider Action with no request   | `myAction is ArmProviderActionSync<void, Response>`                             |
 
 By default, provider actions use `TenantActionScope`. You can specify a different scope such as
-`SubscriptionActionScope` or `ExtensionResourceActionScope` using the `Scope` template parameter.
+`SubscriptionActionScope`, `ExtensionResourceActionScope`, `ExtensionActionScope`,
+`TenantLocationActionScope`, or `SubscriptionLocationActionScope` using the `Scope` template parameter.
 
 ### Check Name Operations
 
@@ -293,18 +306,35 @@ The building blocks are described in the sections below:
 Custom operations in ARM still need to respect the correct response schema. This library provides
 standard ARM response types to help with reusability and compliance.
 
-| Model                               | Code | Description                                   |
-| ----------------------------------- | ---- | --------------------------------------------- |
-| `ArmResponse<T>`                    | 200  | Base Arm 200 response.                        |
-| `ArmResourceUpdatedResponse<T>`     | 200  | Resource updated (PUT) response.              |
-| `ArmResourceCreatedResponse<T>`     | 201  | Resource created response for an lro.         |
-| `ArmResourceCreatedSyncResponse<T>` | 201  | Resource created synchronously.               |
-| `ArmAcceptedResponse`               | 202  | Base Arm Accepted response.                   |
-| `ArmNoContentResponse`              | 204  | Base Arm No Content response.                 |
-| `ArmDeletedResponse`                | 200  | Resource deleted response.                    |
-| `ArmDeleteAcceptedResponse`         | 202  | Resource deletion in progress response.       |
-| `ResourceListResult<T>`             | 200  | Return a list of resource with ARM pagination |
-| `ErrorResponse`                     | x    | Error response                                |
+| Model                               | Code | Description                                          |
+| ----------------------------------- | ---- | ---------------------------------------------------- |
+| `ArmResponse<T>`                    | 200  | Base Arm 200 response.                               |
+| `ArmResourceUpdatedResponse<T>`     | 200  | Resource updated (PUT) response.                     |
+| `ArmCreatedResponse<T>`             | 201  | Base Arm 201 response.                               |
+| `ArmResourceCreatedResponse<T>`     | 201  | Resource created response for an lro.                |
+| `ArmResourceCreatedSyncResponse<T>` | 201  | Resource created synchronously.                      |
+| `ArmAcceptedResponse`               | 202  | Base Arm Accepted response.                          |
+| `ArmAcceptedLroResponse`            | 202  | Accepted response with LRO headers.                  |
+| `ArmNoContentResponse`              | 204  | Base Arm No Content response.                        |
+| `ArmDeletedResponse`                | 200  | Resource deleted response.                           |
+| `ArmDeleteAcceptedResponse`         | 202  | Resource deletion in progress response.              |
+| `ArmDeleteAcceptedLroResponse`      | 202  | Resource deletion accepted with LRO headers.         |
+| `ArmDeletedNoContentResponse`       | 204  | Resource does not exist (delete no-op).              |
+| `ArmResourceExistsResponse`         | 204  | Resource exists (HEAD response).                     |
+| `ArmResourceNotFoundResponse`       | 404  | Resource not found (HEAD response).                  |
+| `ResourceListResult<T>`             | 200  | Return a list of resources with ARM pagination.      |
+| `ErrorResponse`                     | x    | Error response.                                      |
+
+### LRO Header Models
+
+Long-running operations (LROs) use response headers to convey polling URLs. The library provides
+standard header models for common LRO patterns:
+
+| Model                         | Header                 | Description                                                                          |
+| ----------------------------- | ---------------------- | ------------------------------------------------------------------------------------ |
+| `ArmAsyncOperationHeader<T>`  | `Azure-AsyncOperation` | Standard async operation polling header. Used by default in create (PUT) operations.  |
+| `ArmLroLocationHeader`        | `Location`             | Standard location polling header. Used by default in delete and patch LRO operations. |
+| `ArmCombinedLroHeaders`       | Both                   | Provides both `Azure-AsyncOperation` and `Location` headers.                         |
 
 ### Common Operation Parameters
 

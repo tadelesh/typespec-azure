@@ -19,7 +19,6 @@ namespace Azure.ResourceManager;
  * ```
  *
  * @param providerNamespace Provider namespace
- * @param libraryNamespaces a library namespace containing types for this namespace
  *
  */
 extern dec armProviderNamespace(target: Namespace, providerNamespace?: valueof string);
@@ -32,7 +31,7 @@ extern dec armProviderNamespace(target: Namespace, providerNamespace?: valueof s
 extern dec useLibraryNamespace(target: Namespace, ...namespaces: Namespace[]);
 
 /**
- * `@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+ * `@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
  *
  * @example
  *
@@ -110,9 +109,8 @@ extern dec resourceGroupResource(target: Model);
 extern dec extensionResource(target: Model);
 
 /**
- * `@armResourceType` sets the value fo the decorated string
+ * `@armProviderNameValue` sets the value of the decorated string
  * property to the type of the Azure Resource Manager resource.
- * @param resource The resource to get the type of
  */
 extern dec armProviderNameValue(target: Operation);
 
@@ -195,7 +193,7 @@ extern dec armResourceCheckExistence(
  * clients.
  *
  * The optional `resourceOperationOptions` parameter provides additional options.
- * `allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+ * `allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
  * choose static (`@route`) or automatic (`@autoRoute`) routing.
  *
  * `resourceType: Model` specifies the resource type for the operations in the interface
@@ -244,7 +242,6 @@ extern dec armCommonTypesVersion(
  * This decorator is used on Azure Resource Manager resources that are not based on
  * Azure.ResourceManager common types.
  *
- * @param propertiesType: The type of the resource properties.
  * @param provider Optional. The resource provider namespace for the virtual resource.
  */
 extern dec armVirtualResource(target: Model, provider?: valueof string);
