@@ -61,8 +61,6 @@ interface PrivateLinks<
    * @template ParentResource the parent resource of the PrivateLink
    * @template Resource Optional. The PrivateLink resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
-   * @template ParentName Optional. The name of the parent resource
-   * @template ParentFriendlyName Optional. The friendly name of the parent resource
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for the list operation
    * @template Error Optional. The error response, if non-standard.

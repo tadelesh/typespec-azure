@@ -21,7 +21,6 @@ model NotificationDetails {
 @armResourceOperations
 interface Users extends TrackedResourceOperations<User, UserProperties> {
   /** Send a notification to the user */
-  @segment("notify")
   NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
 }
 ```
@@ -64,8 +63,8 @@ Custom operations in ARM still need to respect the correct response schema. This
 | `ArmDeletedResponse`             | 200  | Resource deleted response.                                                                                                  |
 | `ArmDeleteAcceptedResponse`      | 202  | Resource deletion in progress response.                                                                                     |
 | `ArmDeletedNoContentResponse`    | 204  | Resource deleted response.                                                                                                  |
-| `Page<T>`                        | 200  | Return a list of resource with ARM pagination.                                                                              |
-| `ErrorResponse<T>`               | x    | Error response.                                                                                                             |
+| `ResourceListResult<T>`          | 200  | Return a list of resources with ARM pagination.                                                                             |
+| `ErrorResponse`                  | x    | Error response.                                                                                                             |
 
 ### Common Operation Parameters
 

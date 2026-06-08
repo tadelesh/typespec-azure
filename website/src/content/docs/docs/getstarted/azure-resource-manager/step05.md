@@ -99,7 +99,6 @@ interface Users {
   listByResourceGroup is ArmResourceListByParent<User>;
   listBySubscription is ArmListBySubscription<User>;
   /** Send a notification to the user */
-  @segment("notify")
   NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
 }
 
